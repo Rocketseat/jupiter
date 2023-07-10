@@ -4,19 +4,21 @@ import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
-import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 
 import { statuses } from '../data/data'
 import { Task } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 import { Progress } from '@/components/ui/progress'
+import { Link2Icon } from '@radix-ui/react-icons'
+import { Button } from '@/components/ui/button'
 
 dayjs.extend(relativeTime)
 
 export const columns: ColumnDef<Task>[] = [
   {
     id: 'select',
+    size: 32,
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
@@ -45,18 +47,27 @@ export const columns: ColumnDef<Task>[] = [
   {
     accessorKey: 'title',
     header: 'Title',
+    size: 600,
     cell: ({ row }) => {
       return (
-        <div className="flex space-x-2">
-          {row.original.category && (
-            <Badge variant="secondary">
-              {row.original.category.toUpperCase()}
-            </Badge>
-          )}
+        <div className="flex items-center space-x-4">
+          <div className="flex max-w-[500px] flex-col">
+            <span className="truncate font-medium">
+              {row.getValue('title')}
+            </span>
+            <span className="truncate text-xs text-muted-foreground">
+              {row.original.tags.join(', ')}
+            </span>
+          </div>
 
-          <span className="max-w-[500px] truncate font-medium">
-            {row.getValue('title')}
-          </span>
+          <Button
+            onClick={() => navigator.clipboard.writeText(row.original.url)}
+            size="xs"
+            variant="ghost"
+            className="px-1"
+          >
+            <Link2Icon className="h-4 w-4" />
+          </Button>
         </div>
       )
     },
@@ -74,33 +85,13 @@ export const columns: ColumnDef<Task>[] = [
       }
 
       if (status.value === 'progress') {
-        return <Progress className="h-2 bg-slate-200" max={100} value={40} />
+        return <Progress className="w-[120px] " max={100} value={40} />
       }
 
       return (
-        <div className="flex w-[100px] items-center font-medium">
+        <div className="flex w-[120px] items-center font-medium">
           {status.icon && <status.icon className="mr-2 h-4 w-4" />}
           <span className="text-muted-foreground">{status.label}</span>
-        </div>
-      )
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
-  },
-  {
-    accessorKey: 'tags',
-    header: 'Tags',
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center gap-1">
-          {row.original.tags.map((tag) => {
-            return (
-              <Badge key={tag} variant="outline">
-                {tag.toUpperCase()}
-              </Badge>
-            )
-          })}
         </div>
       )
     },
@@ -126,6 +117,7 @@ export const columns: ColumnDef<Task>[] = [
   },
   {
     id: 'actions',
+    size: 60,
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ]

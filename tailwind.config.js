@@ -78,11 +78,16 @@ module.exports = {
         barberpole: {
           to: { backgroundPosition: '100% 100%' },
         },
+        'fill-right': {
+          from: { width: 0 },
+          to: { width: 'var(--animation-width)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         barberpole: 'barberpole 30s linear infinite',
+        'fill-right': 'fill-right var(--animation-duration) linear',
       },
     },
   },

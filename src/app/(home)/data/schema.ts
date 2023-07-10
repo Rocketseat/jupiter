@@ -5,8 +5,8 @@ import { z } from 'zod'
 export const taskSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),
+  url: z.string().url(),
   status: z.string(),
-  category: z.string(),
   tags: z.array(z.string()),
   uploadedAt: z.coerce.date(),
 })

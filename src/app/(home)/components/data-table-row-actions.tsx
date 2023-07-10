@@ -1,6 +1,11 @@
 'use client'
 
-import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+import {
+  DotsHorizontalIcon,
+  DownloadIcon,
+  Link2Icon,
+  Pencil1Icon,
+} from '@radix-ui/react-icons'
 import { Row } from '@tanstack/react-table'
 
 import { Button } from '@/components/ui/button'
@@ -32,10 +37,18 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Edit</DropdownMenuItem>
-        <DropdownMenuItem>Make a copy</DropdownMenuItem>
-        <DropdownMenuItem>Favorite</DropdownMenuItem>
-        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Pencil1Icon className="mr-2 h-4 w-4" />
+          <span>Edit</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link2Icon className="mr-2 h-4 w-4" />
+          <span>Copy URL</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <DownloadIcon className="mr-2 h-4 w-4" />
+          <span>Download MP4</span>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           Delete

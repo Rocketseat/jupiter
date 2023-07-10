@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Video {
+  id                 String   @id @default(uuid())
+  uploadBatchId      String
+  duration           Int
+  title              String
+  storageKey         String
+  description        String?
+  externalProviderId String?  @unique
+  createdAt          DateTime @default(now())
+
+  tags        Tag[]
+  uploadBatch UploadBatch @relation(fields: [uploadBatchId], references: [id])
+}
+
+model UploadBatch {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  videos Video[]
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  videos Video[]
+}

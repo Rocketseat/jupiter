@@ -1,13 +1,15 @@
-import { Button } from '@/components/ui/button'
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
-import { Input } from '@/components/ui/input'
 import Image from 'next/image'
 
+import { Toaster } from '@/components/ui/toaster'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+
 import rocketseatIcon from '@/assets/rocketseat-icon.svg'
+import { PlusCircledIcon } from '@radix-ui/react-icons'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -34,6 +36,8 @@ export default function RootLayout({
                 src={rocketseatIcon}
                 alt="Rocketseat"
                 className="h-6 w-6"
+                width={24}
+                height={24}
               />
 
               <nav className="ml-6 flex items-center space-x-4 lg:space-x-6">
@@ -65,8 +69,8 @@ export default function RootLayout({
                 />
                 <Button asChild>
                   <Link href="/upload">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    New upload
+                    <PlusCircledIcon className="mr-2 h-4 w-4" />
+                    Upload
                   </Link>
                 </Button>
                 {/* <UserNav /> */}
@@ -75,6 +79,7 @@ export default function RootLayout({
           </div>
           <div className="flex-1 space-y-4 p-8 pt-6">{children}</div>
         </div>
+        <Toaster />
       </body>
     </html>
   )
