@@ -9,30 +9,47 @@ import {
 } from 'react'
 import axios from 'axios'
 import { produce, enableMapSet } from 'immer'
-import { useFieldArray, useForm, useFormContext } from 'react-hook-form'
+import { useFieldArray, useFormContext } from 'react-hook-form'
 import { UploadsFormSchema } from '@/app/upload/upload-list'
+import { ffmpeg } from '@/lib/ffmpeg'
+import { fetchFile } from '@ffmpeg/ffmpeg'
 
 enableMapSet()
 
 export interface Upload {
   file: File
+  audioFile?: File
   title?: string
   previewURL: string
-  isUploading: boolean
-  isRemoving: boolean
-  uploadProgress: number
   duration?: number
-  hasError: boolean
+  isRemoving: boolean
+
+  /** Audio Conversion */
+  isConvertingAudio: boolean
+  audioProgress: number
+
+  /** Video Upload */
+  isUploading: boolean
+  uploadProgress: number
   abortController?: AbortController
+  hasError: boolean
+
+  /** Audio Upload */
+  isUploadingAudio: boolean
+  audioUploadProgress: number
+  audioAbortController?: AbortController
+  audioHasError: boolean
 }
 
 interface UploadState {
   uploads: Map<string, Upload>
   isRunningAI: boolean
+  audioConversionQueue: Set<string>
 }
 
 interface UploadContextType extends UploadState {
   startUpload: (id: string) => Promise<void>
+  startAudioUpload: (id: string) => Promise<void>
   add: (files: File[]) => void
   clear: () => void
   remove: (id: string) => Promise<void>
@@ -52,10 +69,20 @@ export enum ActionTypes {
   REMOVE_UPLOAD_SUCCESS,
 
   START_UPLOAD,
+  UPDATE_UPLOAD_PROGRESS,
   UPLOAD_ERROR,
+
   UPDATE_TITLE,
   UPDATE_DURATION,
-  UPDATE_PROGRESS,
+
+  START_CONVERSION,
+  END_CONVERSION,
+  UPDATE_CONVERSION_PROGRESS,
+  CONVERSION_ERROR,
+
+  START_AUDIO_UPLOAD,
+  UPDATE_AUDIO_UPLOAD_PROGRESS,
+  UPLOAD_AUDIO_ERROR,
 
   RUN_AI_REQUEST,
   RUN_AI_SUCCESS,
@@ -69,7 +96,7 @@ interface Action {
 export const UploadsContext = createContext({} as UploadContextType)
 
 export function UploadsProvider({ children }: { children: ReactNode }) {
-  const [{ uploads, isRunningAI }, dispatch] = useReducer(
+  const [{ uploads, isRunningAI, audioConversionQueue }, dispatch] = useReducer(
     (state: UploadState, action: Action) => {
       return produce(state, (draft) => {
         switch (action.type) {
@@ -82,11 +109,18 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
               draft.uploads.set(videoId, {
                 file,
                 previewURL: URL.createObjectURL(file),
-                uploadProgress: 0,
                 isUploading: false,
+                uploadProgress: 0,
+                isConvertingAudio: false,
+                isUploadingAudio: false,
+                audioProgress: 0,
+                audioUploadProgress: 0,
                 isRemoving: false,
                 hasError: false,
+                audioHasError: false,
               })
+
+              draft.audioConversionQueue.add(videoId)
             })
 
             break
@@ -121,6 +155,8 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
               return
             }
 
+            draft.audioConversionQueue.delete(id)
+
             draft.uploads.set(id, {
               ...videoToBeUpdated,
               isRemoving: true,
@@ -135,7 +171,7 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
 
             break
           }
-          case ActionTypes.UPDATE_PROGRESS: {
+          case ActionTypes.UPDATE_UPLOAD_PROGRESS: {
             const id = action.payload.id as string
             const progress = action.payload.progress as number
 
@@ -212,11 +248,123 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
             draft.isRunningAI = false
             break
           }
+          case ActionTypes.START_CONVERSION: {
+            const id = action.payload.id as string
+
+            const videoToBeUpdated = draft.uploads.get(id)
+
+            if (!videoToBeUpdated) {
+              return
+            }
+
+            draft.uploads.set(id, {
+              ...videoToBeUpdated,
+              isConvertingAudio: true,
+              audioProgress: 0,
+              hasError: false,
+            })
+
+            break
+          }
+          case ActionTypes.END_CONVERSION: {
+            const id = action.payload.id as string
+            const audioFile = action.payload.audioFile as File
+
+            const videoToBeUpdated = draft.uploads.get(id)
+
+            if (!videoToBeUpdated) {
+              return
+            }
+
+            draft.audioConversionQueue.delete(id)
+
+            draft.uploads.set(id, {
+              ...videoToBeUpdated,
+              isConvertingAudio: false,
+              audioFile,
+            })
+
+            break
+          }
+          case ActionTypes.UPDATE_CONVERSION_PROGRESS: {
+            const id = action.payload.id as string
+            const progress = action.payload.progress as number
+
+            const videoToBeUpdated = draft.uploads.get(id)
+
+            if (!videoToBeUpdated) {
+              return
+            }
+
+            draft.uploads.set(id, {
+              ...videoToBeUpdated,
+              audioProgress: progress,
+            })
+
+            break
+          }
+          case ActionTypes.START_AUDIO_UPLOAD: {
+            const id = action.payload.id as string
+            const abortController = action.payload
+              .abortController as AbortController
+
+            const videoToBeUpdated = draft.uploads.get(id)
+
+            if (!videoToBeUpdated) {
+              return
+            }
+
+            draft.uploads.set(id, {
+              ...videoToBeUpdated,
+              isUploadingAudio: true,
+              audioUploadProgress: 0,
+              audioHasError: false,
+              audioAbortController: abortController,
+            })
+
+            break
+          }
+          case ActionTypes.UPDATE_AUDIO_UPLOAD_PROGRESS: {
+            const id = action.payload.id as string
+            const progress = action.payload.progress as number
+
+            const videoToBeUpdated = draft.uploads.get(id)
+
+            if (!videoToBeUpdated) {
+              return
+            }
+
+            draft.uploads.set(id, {
+              ...videoToBeUpdated,
+              audioUploadProgress: progress,
+              isUploadingAudio: progress < 100,
+            })
+
+            break
+          }
+          case ActionTypes.UPLOAD_AUDIO_ERROR: {
+            const id = action.payload.id as string
+
+            const videoToBeUpdated = draft.uploads.get(id)
+
+            if (!videoToBeUpdated) {
+              return
+            }
+
+            draft.uploads.set(id, {
+              ...videoToBeUpdated,
+              isUploadingAudio: false,
+              audioHasError: true,
+            })
+
+            break
+          }
         }
       })
     },
     {
       uploads: new Map(),
+      audioConversionQueue: new Set<string>(),
       isRunningAI: false,
     },
   )
@@ -241,6 +389,17 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
       const upload = uploads.get(id)
       const isStillUploading = upload?.isUploading
       const hasFinishedUploading = upload?.uploadProgress === 100
+      const hasFinishedAudioUploading = upload?.audioUploadProgress === 100
+
+      if (upload?.isConvertingAudio) {
+        ffmpeg.exit()
+      }
+
+      if (upload?.isUploadingAudio) {
+        upload.audioAbortController?.abort()
+      } else if (hasFinishedAudioUploading) {
+        await axios.delete(`/api/uploads/${id}/audio`)
+      }
 
       if (isStillUploading) {
         upload.abortController?.abort()
@@ -337,7 +496,7 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
               : 0
 
             dispatch({
-              type: ActionTypes.UPDATE_PROGRESS,
+              type: ActionTypes.UPDATE_UPLOAD_PROGRESS,
               payload: { id, progress },
             })
           },
@@ -351,6 +510,114 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
     },
     [uploads],
   )
+
+  const startAudioUpload = useCallback(
+    async (id: string) => {
+      const upload = uploads.get(id)
+
+      if (!upload) {
+        return
+      }
+
+      const abortController = new AbortController()
+
+      dispatch({
+        type: ActionTypes.START_AUDIO_UPLOAD,
+        payload: { id, abortController },
+      })
+
+      try {
+        const response = await axios.post<{ url: string }>(
+          '/api/uploads/audio',
+          {
+            videoId: id,
+          },
+        )
+
+        const uploadURL = response.data.url
+
+        await axios.put(uploadURL, upload.audioFile, {
+          signal: abortController.signal,
+          headers: {
+            'Content-Type': upload.audioFile?.type,
+          },
+          onUploadProgress(progressEvent) {
+            const progress = progressEvent.progress
+              ? Math.round(progressEvent.progress * 100)
+              : 0
+
+            dispatch({
+              type: ActionTypes.UPDATE_AUDIO_UPLOAD_PROGRESS,
+              payload: { id, progress },
+            })
+          },
+        })
+      } catch {
+        dispatch({
+          type: ActionTypes.UPLOAD_AUDIO_ERROR,
+          payload: { id },
+        })
+      }
+    },
+    [uploads],
+  )
+
+  const convertNextQueueItemToAudio = useCallback(async () => {
+    const [nextItemId] = audioConversionQueue
+
+    const upload = uploads.get(nextItemId)
+
+    if (!upload) {
+      return
+    }
+
+    dispatch({
+      type: ActionTypes.START_CONVERSION,
+      payload: { id: nextItemId },
+    })
+
+    const file = upload.file
+
+    if (!ffmpeg.isLoaded()) {
+      await ffmpeg.load()
+    }
+
+    ffmpeg.FS('writeFile', file.name, await fetchFile(file))
+
+    ffmpeg.setProgress(({ ratio }) => {
+      const progress = Math.round(ratio * 100)
+
+      dispatch({
+        type: ActionTypes.UPDATE_CONVERSION_PROGRESS,
+        payload: { id: nextItemId, progress },
+      })
+    })
+
+    await ffmpeg.run(
+      '-i',
+      file.name,
+      '-map',
+      '0:a',
+      '-b:a',
+      '20k',
+      '-acodec',
+      'libmp3lame',
+      `${nextItemId}.mp3`,
+    )
+
+    const data = ffmpeg.FS('readFile', `${nextItemId}.mp3`)
+
+    const audioFileBlob = new Blob([data.buffer], { type: 'audio/mpeg' })
+
+    const audioFile = new File([audioFileBlob], `${nextItemId}.mp3`, {
+      type: 'audio/mpeg',
+    })
+
+    dispatch({
+      type: ActionTypes.END_CONVERSION,
+      payload: { id: nextItemId, audioFile },
+    })
+  }, [uploads, audioConversionQueue])
 
   const updateDuration = useCallback(async (id: string, duration: number) => {
     dispatch({
@@ -366,19 +633,48 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
           upload.uploadProgress === 0 && !upload.isUploading && !upload.hasError
         )
       })
-      .forEach(async ([id]) => {
-        dispatch({
-          type: ActionTypes.UPLOAD_ERROR,
-          payload: { id },
-        })
-
+      .forEach(([id]) => {
         startUpload(id)
       })
   }, [uploads, startUpload])
 
+  useEffect(() => {
+    Array.from(uploads.entries())
+      .filter(([, upload]) => {
+        return (
+          upload.audioUploadProgress === 0 &&
+          !upload.isUploadingAudio &&
+          !upload.audioHasError &&
+          upload.audioFile
+        )
+      })
+      .forEach(([id]) => {
+        console.log('oi', id)
+        startAudioUpload(id)
+      })
+  }, [uploads, startAudioUpload])
+
+  useEffect(() => {
+    const isThereAnyConversionInProgress = Array.from(uploads.values()).some(
+      (upload) => {
+        return upload.isConvertingAudio
+      },
+    )
+
+    if (audioConversionQueue.size > 0 && !isThereAnyConversionInProgress) {
+      convertNextQueueItemToAudio()
+    }
+  }, [audioConversionQueue, convertNextQueueItemToAudio, uploads])
+
   const isThereAnyPendingUpload = useMemo(() => {
     return Array.from(uploads.entries()).some(([, upload]) => {
-      return upload.isUploading || upload.hasError
+      return (
+        upload.isUploading ||
+        upload.hasError ||
+        upload.isConvertingAudio ||
+        upload.isUploadingAudio ||
+        upload.audioHasError
+      )
     })
   }, [uploads])
 
@@ -392,6 +688,7 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
         uploads,
         isRunningAI,
         startUpload,
+        startAudioUpload,
         add,
         clear,
         remove,
@@ -399,6 +696,7 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
         updateDuration,
         isThereAnyPendingUpload,
         isUploadsEmpty,
+        audioConversionQueue,
       }}
     >
       {children}

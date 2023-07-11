@@ -7,7 +7,7 @@ interface DeleteUploadParams {
   }
 }
 
-export async function DELETE(request: Request, { params }: DeleteUploadParams) {
+export async function DELETE(_: Request, { params }: DeleteUploadParams) {
   const videoId = params.id
 
   try {

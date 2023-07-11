@@ -14,8 +14,9 @@ import {
   DotsHorizontalIcon,
   CrossCircledIcon,
   CheckCircledIcon,
+  InfoCircledIcon,
 } from '@radix-ui/react-icons'
-import { Loader2, TrashIcon } from 'lucide-react'
+import { Loader, Loader2, TrashIcon } from 'lucide-react'
 import { TagInput } from './UploadTagInput'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
@@ -24,6 +25,12 @@ import { SyntheticEvent, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { UploadsFormSchema } from '.'
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 export function UploadTable() {
   const {
@@ -35,6 +42,7 @@ export function UploadTable() {
     uploads,
     isRunningAI,
     startUpload,
+    startAudioUpload,
     remove,
     isUploadsEmpty,
     isThereAnyPendingUpload,
@@ -68,8 +76,10 @@ export function UploadTable() {
           <TableRow>
             <TableHead style={{ width: 148 }}></TableHead>
             <TableHead>Title</TableHead>
-            <TableHead style={{ width: 240 }}>File</TableHead>
-            <TableHead style={{ width: 240 }}>Status</TableHead>
+            <TableHead style={{ width: 180 }}>Metadata</TableHead>
+            <TableHead style={{ width: 220 }}>Video upload</TableHead>
+            <TableHead style={{ width: 220 }}>Audio conversion</TableHead>
+            <TableHead style={{ width: 220 }}>Audio upload</TableHead>
             <TableHead style={{ width: 140 }}></TableHead>
           </TableRow>
         </TableHeader>
@@ -148,6 +158,87 @@ export function UploadTable() {
                               variant="link"
                               className="inline p-0 text-inherit"
                               onClick={() => startUpload(id)}
+                            >
+                              (Retry)
+                            </Button>
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircledIcon className="mr-2 h-4 w-4 text-emerald-500" />
+                          <span className="text-emerald-500">
+                            Upload complete
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2 font-medium text-muted-foreground">
+                    {upload.isConvertingAudio ? (
+                      <Progress
+                        max={100}
+                        value={upload.audioProgress}
+                        className="transition-all"
+                      />
+                    ) : upload.audioProgress === 100 ? (
+                      <>
+                        <CheckCircledIcon className="h-4 w-4 text-emerald-500" />
+                        <span className="text-emerald-500">
+                          Conversion complete
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <DotsHorizontalIcon className="h-4 w-4" />
+                        <span className="text-muted-foreground">
+                          Waiting on queue
+                        </span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <InfoCircledIcon className="h-4 w-4 cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-[280px]">
+                              <p className="text-center text-xs text-slate-600">
+                                As we perform the audio conversion in the
+                                browser, each video is converted individually
+                                through a queue.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {upload.isUploadingAudio ? (
+                    <Progress
+                      max={100}
+                      value={upload.audioUploadProgress}
+                      className="transition-all"
+                    />
+                  ) : (
+                    <div className="flex items-center font-medium">
+                      {upload.audioUploadProgress === 0 &&
+                      !upload.audioHasError ? (
+                        <>
+                          <DotsHorizontalIcon className="mr-2 h-4 w-4" />
+                          <span className="text-muted-foreground">
+                            Waiting upload
+                          </span>
+                        </>
+                      ) : upload.audioHasError ? (
+                        <>
+                          <CrossCircledIcon className="mr-2 h-4 w-4 text-red-500" />
+                          <span className="text-red-500">
+                            Upload error{' '}
+                            <Button
+                              variant="link"
+                              className="inline p-0 text-inherit"
+                              onClick={() => startAudioUpload(id)}
                             >
                               (Retry)
                             </Button>
