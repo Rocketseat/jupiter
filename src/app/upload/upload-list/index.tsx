@@ -1,9 +1,9 @@
 'use client'
 
 import { UploadsProvider } from '@/hooks/useUploads'
-import { Header } from './Header'
-import { UploadDropArea } from './UploadDropArea'
-import { UploadTable } from './UploadTable'
+import { Header } from './header'
+import { UploadDropArea } from './upload-drop-area'
+import { UploadTable } from './upload-table'
 import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'

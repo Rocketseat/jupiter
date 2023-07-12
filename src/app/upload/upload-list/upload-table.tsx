@@ -16,8 +16,8 @@ import {
   CheckCircledIcon,
   InfoCircledIcon,
 } from '@radix-ui/react-icons'
-import { Loader, Loader2, TrashIcon } from 'lucide-react'
-import { TagInput } from './UploadTagInput'
+import { Loader2, TrashIcon } from 'lucide-react'
+import { TagInput } from './upload-tag-input'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { useUploads } from '@/hooks/useUploads'

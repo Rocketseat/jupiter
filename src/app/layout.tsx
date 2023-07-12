@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 
 import rocketseatIcon from '@/assets/rocketseat-icon.svg'
 import { PlusCircledIcon } from '@radix-ui/react-icons'
+import Providers from './providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -77,8 +78,13 @@ export default function RootLayout({
               </div>
             </div>
           </div>
-          <div className="flex-1 space-y-4 p-8 pt-6">{children}</div>
+          <div className="flex-1 space-y-4 p-8 pt-6">
+            <Providers>
+              {children}
+            </Providers>
+          </div>
         </div>
+        
         <Toaster />
       </body>
     </html>

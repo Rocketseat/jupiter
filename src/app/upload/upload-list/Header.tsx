@@ -91,10 +91,9 @@ export function Header() {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                Essa ação não pode ser desfeita e todos uploads serão
-                interrompidos e removidos do servidor.
+                This action can't be undone and all uploads will be deleted from the server.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

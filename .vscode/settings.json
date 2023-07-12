@@ -3,6 +3,7 @@
     "barberpole",
     "cloudflare",
     "openai",
-    "PANDAVIDEO"
+    "PANDAVIDEO",
+    "tanstack"
   ]
 }
