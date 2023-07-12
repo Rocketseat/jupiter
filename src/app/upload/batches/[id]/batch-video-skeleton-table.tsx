@@ -1,11 +1,13 @@
-import { Skeleton } from "@/components/ui/skeleton"
-import { TableBody, TableCell, TableRow } from "@/components/ui/table"
+import { Skeleton } from '@/components/ui/skeleton'
+import { TableBody, TableCell, TableRow } from '@/components/ui/table'
 
 export interface BatchVideoSkeletonTableProps {
   rows?: number
 }
 
-export function BatchVideoSkeletonTable({ rows = 8 }: BatchVideoSkeletonTableProps) {
+export function BatchVideoSkeletonTable({
+  rows = 8,
+}: BatchVideoSkeletonTableProps) {
   return (
     <TableBody>
       {Array.from({ length: rows }).map((_, row) => {
@@ -13,18 +15,18 @@ export function BatchVideoSkeletonTable({ rows = 8 }: BatchVideoSkeletonTablePro
           <TableRow key={row}>
             <TableCell>
               <div className="flex flex-col gap-1">
-                <Skeleton className="w-[200px] h-4" />
-                <Skeleton className="w-[240px] h-4" />
+                <Skeleton className="h-4 w-[200px]" />
+                <Skeleton className="h-4 w-[240px]" />
               </div>
             </TableCell>
             <TableCell>
-              <Skeleton className="w-[60px] h-4" />
+              <Skeleton className="h-4 w-[60px]" />
             </TableCell>
             <TableCell>
-              <Skeleton className="w-[200px] h-4" />
+              <Skeleton className="h-4 w-[200px]" />
             </TableCell>
             <TableCell>
-              <Skeleton className="w-[200px] h-4" />
+              <Skeleton className="h-4 w-[200px]" />
             </TableCell>
             <TableCell></TableCell>
           </TableRow>

@@ -29,7 +29,10 @@ export function CopyButton({ textToCopy, ...props }: CopyButtonProps) {
       {...props}
       data-highlight={wasCopiedRecently}
       onClick={handleCopy}
-      className={cn(props.className, 'data-[highlight=true]:transition-none data-[highlight=true]:bg-emerald-500 data-[highlight=true]:border-emerald-500 data-[highlight=true]:text-white')}
+      className={cn(
+        props.className,
+        'data-[highlight=true]:border-emerald-500 data-[highlight=true]:bg-emerald-500 data-[highlight=true]:text-white data-[highlight=true]:transition-none',
+      )}
     >
       {wasCopiedRecently ? 'Copied!' : props.children}
     </Button>

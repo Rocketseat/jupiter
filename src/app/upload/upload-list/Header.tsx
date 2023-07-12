@@ -93,7 +93,8 @@ export function Header() {
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action can't be undone and all uploads will be deleted from the server.
+                This action can&apos;t be undone and all uploads will be deleted
+                from the server.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

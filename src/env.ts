@@ -1,6 +1,6 @@
-import { createEnv } from "@t3-oss/env-nextjs";
-import { z } from "zod";
- 
+import { createEnv } from '@t3-oss/env-nextjs'
+import { z } from 'zod'
+
 export const env = createEnv({
   server: {
     DATABASE_URL: z.string().min(1),
@@ -21,7 +21,8 @@ export const env = createEnv({
   },
   experimental__runtimeEnv: {
     NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NODE_ENV: process.env.NODE_ENV,
-  }
-});
+  },
+})

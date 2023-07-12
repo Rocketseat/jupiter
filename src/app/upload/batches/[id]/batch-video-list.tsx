@@ -1,19 +1,43 @@
 'use client'
 
-import { CopyButton } from "@/components/copy-button"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { formatSecondsToMinutes } from "@/utils/format-seconds-to-minutes"
-import { SymbolIcon, DotsHorizontalIcon } from "@radix-ui/react-icons"
-import { Video, Music2, CopyIcon, Link2, Loader2 } from "lucide-react"
-import { TranscriptionPreview } from "./transcription-preview"
-import { useQuery } from "@tanstack/react-query"
-import axios from "axios"
-import { BatchVideoSkeletonTable } from "./batch-video-skeleton-table"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import dayjs from "dayjs"
-import relativeTime from "dayjs/plugin/relativeTime"
+import { CopyButton } from '@/components/copy-button'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
+import { SymbolIcon, DotsHorizontalIcon } from '@radix-ui/react-icons'
+import { Video, Music2, CopyIcon, Link2, Loader2 } from 'lucide-react'
+import { TranscriptionPreview } from './transcription-preview'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import { BatchVideoSkeletonTable } from './batch-video-skeleton-table'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
 dayjs.extend(relativeTime)
 
@@ -22,12 +46,12 @@ export interface BatchVideoListProps {
 }
 
 export function BatchVideoList({ batchId }: BatchVideoListProps) {
-  const { 
-    data: batch, 
-    isLoading: isLoadingBatch, 
-    isRefetching: isRefetchingBatch 
+  const {
+    data: batch,
+    isLoading: isLoadingBatch,
+    isRefetching: isRefetchingBatch,
   } = useQuery({
-    queryKey: ['batch', batchId], 
+    queryKey: ['batch', batchId],
     queryFn: async () => {
       const response = await axios.get(`/api/batches/${batchId}`)
 
@@ -47,7 +71,9 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
               <TableHead style={{ width: 400 }}>
                 <div className="flex items-center gap-2">
                   <span>Video</span>
-                  {isRefetchingBatch && <Loader2 className="w-3 h-3 text-muted-foreground animate-spin" />}
+                  {isRefetchingBatch && (
+                    <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                  )}
                 </div>
               </TableHead>
               <TableHead style={{ width: 140 }}>Duration</TableHead>
@@ -57,7 +83,9 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
             </TableRow>
           </TableHeader>
 
-          { isLoadingBatch ? <BatchVideoSkeletonTable /> : (
+          {isLoadingBatch ? (
+            <BatchVideoSkeletonTable />
+          ) : (
             <TableBody>
               {batch.videos.length ? (
                 batch.videos.map((video: any) => (
@@ -88,11 +116,15 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
                     <TableCell>
                       {video.externalProviderId ? (
                         <div className="flex items-center gap-2 font-medium">
-                          <span className="text-muted-foreground text-xs truncate">
+                          <span className="truncate text-xs text-muted-foreground">
                             {video.externalProviderId}
                           </span>
-                          <CopyButton size="xs" variant="outline" textToCopy={video.externalProviderId}>
-                            <CopyIcon className="w-3 h-3 mr-1" />
+                          <CopyButton
+                            size="xs"
+                            variant="outline"
+                            textToCopy={video.externalProviderId}
+                          >
+                            <CopyIcon className="mr-1 h-3 w-3" />
                             Copy
                           </CopyButton>
                         </div>
@@ -107,7 +139,6 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
                     </TableCell>
                     <TableCell>
                       <AlertDialog>
-
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
@@ -118,22 +149,37 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
                               <span className="sr-only">Open menu</span>
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-[160px]">
-                            <DropdownMenuItem 
-                              disabled={!video.externalProviderId} 
-                              onClick={() => navigator.clipboard.writeText(`https://b-vz-762f4670-e04.tv.pandavideo.com.br/${video.externalProviderId}/playlist.m3u8`)}
+                          <DropdownMenuContent
+                            align="end"
+                            className="w-[160px]"
+                          >
+                            <DropdownMenuItem
+                              disabled={!video.externalProviderId}
+                              onClick={() =>
+                                navigator.clipboard.writeText(
+                                  `https://b-vz-762f4670-e04.tv.pandavideo.com.br/${video.externalProviderId}/playlist.m3u8`,
+                                )
+                              }
                             >
                               <Link2 className="mr-2 h-4 w-4" />
                               <span>Copy HLS</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                              <a href={`/api/videos/${video.id}/download/video`} target="_blank">
+                              <a
+                                href={`/api/videos/${video.id}/download/video`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
                                 <Video className="mr-2 h-4 w-4" />
                                 <span>Download MP4</span>
                               </a>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                              <a href={`/api/videos/${video.id}/download/audio`} target="_blank">
+                              <a
+                                href={`/api/videos/${video.id}/download/audio`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
                                 <Music2 className="mr-2 h-4 w-4" />
                                 <span>Download MP3</span>
                               </a>
@@ -152,12 +198,15 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action can't be undone and the video will be permanently deleted from the server.
+                              This action can&apos;t be undone and the video
+                              will be permanently deleted from the server.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction variant="destructive" onClick={() => {}}>Delete</AlertDialogAction>
+                            <AlertDialogAction variant="destructive">
+                              Delete
+                            </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -172,7 +221,7 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
                 </TableRow>
               )}
             </TableBody>
-          ) }
+          )}
         </Table>
       </div>
     </>

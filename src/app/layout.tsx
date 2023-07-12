@@ -79,12 +79,10 @@ export default function RootLayout({
             </div>
           </div>
           <div className="flex-1 space-y-4 p-8 pt-6">
-            <Providers>
-              {children}
-            </Providers>
+            <Providers>{children}</Providers>
           </div>
         </div>
-        
+
         <Toaster />
       </body>
     </html>

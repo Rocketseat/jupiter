@@ -13,11 +13,11 @@ const downloadMediaParamsSchema = z.object({
 
 type DownloadMediaParamsSchema = z.infer<typeof downloadMediaParamsSchema>
 
-export async function GET(_: Request, { params }: { params: DownloadMediaParamsSchema }) {
-  const { 
-    id: videoId, 
-    media 
-  } = downloadMediaParamsSchema.parse(params)
+export async function GET(
+  _: Request,
+  { params }: { params: DownloadMediaParamsSchema },
+) {
+  const { id: videoId, media } = downloadMediaParamsSchema.parse(params)
 
   try {
     const video = await prisma.video.findUniqueOrThrow({

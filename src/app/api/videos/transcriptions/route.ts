@@ -96,15 +96,15 @@ export async function POST(request: Request) {
         text: response.data.text,
         segments: {
           createMany: {
-            data: response.data.segments.map(segment => {
+            data: response.data.segments.map((segment) => {
               return {
                 text: segment.text,
                 start: segment.start,
                 end: segment.end,
               }
-            })
-          }
-        }
+            }),
+          },
+        },
       },
     })
 

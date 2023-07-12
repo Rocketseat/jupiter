@@ -678,20 +678,30 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
   }, [audioConversionQueue, convertNextQueueItemToAudio, uploads])
 
   useEffect(() => {
-    const { amountOfItems, percentageSum } = Array.from(uploads.values()).reduce((acc, upload) => {
-      return {
-        amountOfItems: acc.amountOfItems + 1,
-        percentageSum: acc.percentageSum + (
-          (upload.uploadProgress + upload.audioProgress + upload.audioUploadProgress) / 3
-        ),
-      }
-    }, {
-      amountOfItems: 0,
-      percentageSum: 0,
-    })
+    const { amountOfItems, percentageSum } = Array.from(
+      uploads.values(),
+    ).reduce(
+      (acc, upload) => {
+        return {
+          amountOfItems: acc.amountOfItems + 1,
+          percentageSum:
+            acc.percentageSum +
+            (upload.uploadProgress +
+              upload.audioProgress +
+              upload.audioUploadProgress) /
+              3,
+        }
+      },
+      {
+        amountOfItems: 0,
+        percentageSum: 0,
+      },
+    )
 
     if (amountOfItems) {
-      const percentage = amountOfItems ? Math.round(percentageSum / amountOfItems) : 0
+      const percentage = amountOfItems
+        ? Math.round(percentageSum / amountOfItems)
+        : 0
       document.title = `Upload (${percentage}%) | Jupiter`
     }
   }, [uploads])

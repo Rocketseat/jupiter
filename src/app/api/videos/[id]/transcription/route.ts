@@ -19,14 +19,14 @@ export async function GET(_: Request, { params }: GetTranscriptionParams) {
 
     if (!transcription) {
       return NextResponse.json(
-        { message: "Transcription was not generated yet." },
+        { message: 'Transcription was not generated yet.' },
         {
           status: 400,
         },
       )
     }
 
-    return NextResponse.json({ transcription: transcription })
+    return NextResponse.json({ transcription })
   } catch (err) {
     console.log(err)
   }
