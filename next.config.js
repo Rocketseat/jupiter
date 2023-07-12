@@ -14,6 +14,7 @@ const nextConfig = {
     config.resolve.fallback = {
       'aws-crt': false,
       encoding: false,
+      '@aws-sdk/signature-v4-crt': false,
     }
 
     /**

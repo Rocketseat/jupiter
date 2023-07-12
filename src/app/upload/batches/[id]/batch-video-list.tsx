@@ -21,7 +21,6 @@ import {
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 import { SymbolIcon, DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { Video, Music2, CopyIcon, Link2, Loader2 } from 'lucide-react'
-import { TranscriptionPreview } from './transcription-preview'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { BatchVideoSkeletonTable } from './batch-video-skeleton-table'
@@ -38,6 +37,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { TranscriptionPreview } from '@/components/transcription-preview'
 
 dayjs.extend(relativeTime)
 

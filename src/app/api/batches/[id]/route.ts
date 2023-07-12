@@ -1,4 +1,3 @@
-import { buildStorageURL } from '@/lib/cloudflare-r2'
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 
@@ -29,19 +28,7 @@ export async function GET(_: Request, { params }: GetBatchParams) {
       },
     })
 
-    const response = {
-      batch: {
-        ...batch,
-        videos: batch.videos.map((video) => {
-          return {
-            ...video,
-            storageURL: buildStorageURL(video.storageKey),
-          }
-        }),
-      },
-    }
-
-    return NextResponse.json(response)
+    return NextResponse.json({ batch })
   } catch (err) {
     console.log(err)
   }
