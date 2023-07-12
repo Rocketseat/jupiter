@@ -1,3 +1,4 @@
+import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
 import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 
@@ -13,7 +14,7 @@ export async function DELETE(_: Request, { params }: DeleteUploadParams) {
   try {
     await r2.send(
       new DeleteObjectCommand({
-        Bucket: process.env.CLOUDFLARE_BUCKET_NAME,
+        Bucket: env.CLOUDFLARE_BUCKET_NAME,
         Key: `inputs/${videoId}-audio.mp4`,
       }),
     )

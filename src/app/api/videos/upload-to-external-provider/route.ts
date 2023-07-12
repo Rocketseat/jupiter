@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 import FormData from 'form-data'
 import axios from 'axios'
 import { z } from 'zod'
+import { env } from '@/env'
 
 const createTranscriptionBodySchema = z.object({
   videoId: z.string().uuid(),
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
 
     const videoFile = await r2.send(
       new GetObjectCommand({
-        Bucket: process.env.CLOUDFLARE_BUCKET_NAME,
+        Bucket: env.CLOUDFLARE_BUCKET_NAME,
         Key: video.storageKey,
       }),
     )
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
           'Upload-Length': videoFile.ContentLength,
           'Content-Type': 'application/offset+octet-stream',
           'Upload-Metadata': `authorization ${btoa(
-            process.env.PANDAVIDEO_API_KEY || '',
+            env.PANDAVIDEO_API_KEY,
           )}, filename ${btoa(video.id)}, video_id ${btoa(
             video.id,
           )}, folder_id ${btoa('6cf7cc26-f9fc-4e5f-b332-54935d430ab3')}`,

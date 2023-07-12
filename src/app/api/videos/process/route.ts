@@ -1,3 +1,4 @@
+import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
 import { prisma } from '@/lib/prisma'
 import { CopyObjectCommand } from '@aws-sdk/client-s3'
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const bucket = process.env.CLOUDFLARE_BUCKET_NAME
+    const bucket = env.CLOUDFLARE_BUCKET_NAME
 
     const storageKey = `uploads/batch-${video.uploadBatchId}/${video.id}.mp4`
     const audioStorageKey = `uploads/batch-${video.uploadBatchId}/${video.id}.mp3`

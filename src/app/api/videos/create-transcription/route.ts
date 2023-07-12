@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 import FormData from 'form-data'
 import axios from 'axios'
 import { z } from 'zod'
+import { env } from '@/env'
 
 const createTranscriptionBodySchema = z.object({
   videoId: z.string().uuid(),
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
 
     const audioFile = await r2.send(
       new GetObjectCommand({
-        Bucket: process.env.CLOUDFLARE_BUCKET_NAME,
+        Bucket: env.CLOUDFLARE_BUCKET_NAME,
         Key: video.audioStorageKey,
       }),
     )
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
       formData,
       {
         headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${env.OPENAI_API_KEY}`,
           ...formData.getHeaders(),
         },
       },
