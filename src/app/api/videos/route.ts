@@ -25,6 +25,9 @@ export async function GET(request: Request) {
             },
           },
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
         skip: pageIndex * pageSize,
         take: pageSize,
       }),

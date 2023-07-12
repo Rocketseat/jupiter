@@ -25,14 +25,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="antialiased">
       <body className={inter.className}>
-        <div className="flex flex-col">
-          <Header />
-          <div className="flex-1 space-y-4 p-8 pt-6">
-            <Providers>{children}</Providers>
+        <Providers>
+          <div className="flex flex-col">
+            <Header />
+            <div className="flex-1 space-y-4 p-8 pt-6">{children}</div>
           </div>
-        </div>
 
-        <Toaster />
+          <Toaster />
+        </Providers>
       </body>
     </html>
   )

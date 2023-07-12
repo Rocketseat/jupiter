@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { DataTable } from './components/data-table'
 import axios from 'axios'
@@ -30,6 +30,7 @@ export function VideoList() {
       return { videos, pageCount }
     },
     refetchOnWindowFocus: true,
+    keepPreviousData: true,
   })
 
   return (

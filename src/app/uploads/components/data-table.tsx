@@ -77,7 +77,7 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           {isLoading ? (
-            <VideoListSkeletonTable />
+            <VideoListSkeletonTable rows={pagination.pageSize} />
           ) : (
             <TableBody>
               {table.getRowModel().rows?.length ? (

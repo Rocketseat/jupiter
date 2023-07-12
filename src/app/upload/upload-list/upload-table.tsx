@@ -201,7 +201,7 @@ export function UploadTable() {
                               <InfoCircledIcon className="h-4 w-4 cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent className="max-w-[280px]">
-                              <p className="text-center text-xs text-slate-600">
+                              <p className="text-center text-xs text-slate-600 dark:text-slate-400">
                                 As we perform the audio conversion in the
                                 browser, each video is converted individually
                                 through a queue.
@@ -276,7 +276,7 @@ export function UploadTable() {
 
           {isUploadsEmpty && (
             <TableRow>
-              <TableCell colSpan={6} className="h-24 text-center">
+              <TableCell colSpan={7} className="h-24 text-center">
                 No videos selected.
               </TableCell>
             </TableRow>

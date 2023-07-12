@@ -9,3 +9,4 @@ Upload videos, upload to panda and R2, embed om player
 # To-do
 
 - datadog / sentry
+- login

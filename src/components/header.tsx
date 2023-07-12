@@ -7,6 +7,8 @@ import { PlusCircledIcon } from '@radix-ui/react-icons'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { NavLink } from './nav-link'
+import { ThemeSwitcher } from './theme-switcher'
+import { Search } from './search'
 
 export function Header() {
   return (
@@ -27,17 +29,14 @@ export function Header() {
         </nav>
 
         <div className="ml-auto flex items-center space-x-4">
-          <Input
-            type="search"
-            placeholder="Search content..."
-            className="md:w-[100px] lg:w-[300px]"
-          />
+          <Search />
           <Button asChild>
             <Link href="/upload">
               <PlusCircledIcon className="mr-2 h-4 w-4" />
               Upload
             </Link>
           </Button>
+          <ThemeSwitcher />
           {/* <UserNav /> */}
         </div>
       </div>
