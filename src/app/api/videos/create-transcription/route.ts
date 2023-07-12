@@ -11,6 +11,15 @@ const createTranscriptionBodySchema = z.object({
   videoId: z.string().uuid(),
 })
 
+interface OpenAITranscriptionResponse {
+  text: string
+  segments: Array<{
+    start: number
+    end: number
+    text: string
+  }>
+}
+
 export async function POST(request: Request) {
   const { videoId } = createTranscriptionBodySchema.parse(await request.json())
 
@@ -66,11 +75,11 @@ export async function POST(request: Request) {
     })
 
     formData.append('model', 'whisper-1')
-    formData.append('response_format', 'json')
+    formData.append('response_format', 'verbose_json')
     formData.append('temperature', '0')
     formData.append('language', 'pt')
 
-    const response = await axios.post(
+    const response = await axios.post<OpenAITranscriptionResponse>(
       'https://api.openai.com/v1/audio/transcriptions',
       formData,
       {
@@ -85,6 +94,17 @@ export async function POST(request: Request) {
       data: {
         videoId,
         text: response.data.text,
+        segments: {
+          createMany: {
+            data: response.data.segments.map(segment => {
+              return {
+                text: segment.text,
+                start: segment.start,
+                end: segment.end,
+              }
+            })
+          }
+        }
       },
     })
 

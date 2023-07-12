@@ -29,7 +29,20 @@ model Transcription {
   videoId String @unique
   text    String
 
-  video Video @relation(fields: [videoId], references: [id])
+  video    Video                  @relation(fields: [videoId], references: [id])
+  segments TranscriptionSegment[]
+
+  createdAt DateTime @default(now())
+}
+
+model TranscriptionSegment {
+  id              String  @id @default(uuid())
+  transcriptionId String
+  start           Decimal @db.Decimal(10, 2)
+  end             Decimal @db.Decimal(10, 2)
+  text            String
+
+  transcription Transcription @relation(fields: [transcriptionId], references: [id])
 }
 
 model UploadBatch {
