@@ -296,6 +296,17 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
               return
             }
 
+            const progressDiff = progress - videoToBeUpdated.audioProgress
+
+            /**
+             * FFMpeg has a bug that it sometimes report the progress from
+             * another video causing the progress bar to jump to full so we
+             * check if the difference is to big to avoid the glitch.
+             */
+            if (progressDiff > 50) {
+              break
+            }
+
             draft.uploads.set(id, {
               ...videoToBeUpdated,
               audioProgress: progress,

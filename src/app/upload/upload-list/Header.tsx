@@ -107,7 +107,7 @@ export function Header() {
         <Button
           type="submit"
           size="sm"
-          className="w-28"
+          className="w-32"
           disabled={isUploadsEmpty || isThereAnyPendingUpload || isSubmitting}
         >
           {isSubmitting ? (

@@ -17,11 +17,19 @@ export async function GET(_: Request, { params }: GetBatchParams) {
         id: batchId,
       },
       include: {
-        videos: true,
+        videos: {
+          include: {
+            transcription: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
       },
     })
 
-    return NextResponse.json({
+    const response = {
       batch: {
         ...batch,
         videos: batch.videos.map((video) => {
@@ -31,7 +39,9 @@ export async function GET(_: Request, { params }: GetBatchParams) {
           }
         }),
       },
-    })
+    }
+
+    return NextResponse.json(response)
   } catch (err) {
     console.log(err)
   }

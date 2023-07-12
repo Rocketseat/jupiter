@@ -1,6 +1,4 @@
-import { r2 } from '@/lib/cloudflare-r2'
 import { prisma } from '@/lib/prisma'
-import { CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { randomUUID } from 'crypto'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -25,31 +23,6 @@ export async function POST(request: Request) {
   const batchId = randomUUID()
 
   try {
-    const bucket = process.env.CLOUDFLARE_BUCKET_NAME
-
-    const moveFilesPromises = files.map((file) => {
-      return r2.send(
-        new CopyObjectCommand({
-          Bucket: bucket,
-          CopySource: `${bucket}/inputs/${file.id}.mp4`,
-          Key: `uploads/batch-${batchId}/${file.id}.mp4`,
-        }),
-      )
-    })
-
-    await Promise.all(moveFilesPromises)
-
-    const deleteOriginalFilesPromises = files.map((file) => {
-      return r2.send(
-        new DeleteObjectCommand({
-          Bucket: bucket,
-          Key: `inputs/${file.id}.mp4`,
-        }),
-      )
-    })
-
-    await Promise.all(deleteOriginalFilesPromises)
-
     await prisma.uploadBatch.create({
       data: {
         id: batchId,
@@ -58,7 +31,8 @@ export async function POST(request: Request) {
             data: files.map((file) => {
               return {
                 title: file.title,
-                storageKey: `uploads/batch-${batchId}/${file.id}.mp4`,
+                storageKey: `inputs/${file.id}.mp4`,
+                audioStorageKey: `inputs/${file.id}.mp3`,
                 duration: file.duration,
               }
             }),

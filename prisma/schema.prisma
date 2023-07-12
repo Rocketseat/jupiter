@@ -8,17 +8,28 @@ datasource db {
 }
 
 model Video {
-  id                 String   @id @default(uuid())
+  id                 String    @id @default(uuid())
   uploadBatchId      String
   duration           Int
   title              String
   storageKey         String
+  audioStorageKey    String
   description        String?
-  externalProviderId String?  @unique
-  createdAt          DateTime @default(now())
+  externalProviderId String?   @unique
+  processedAt        DateTime?
+  createdAt          DateTime  @default(now())
 
-  tags        Tag[]
-  uploadBatch UploadBatch @relation(fields: [uploadBatchId], references: [id])
+  tags          Tag[]
+  uploadBatch   UploadBatch    @relation(fields: [uploadBatchId], references: [id])
+  transcription Transcription?
+}
+
+model Transcription {
+  id      String @id @default(uuid())
+  videoId String @unique
+  text    String
+
+  video Video @relation(fields: [videoId], references: [id])
 }
 
 model UploadBatch {

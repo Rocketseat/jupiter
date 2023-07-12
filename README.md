@@ -11,3 +11,6 @@ Upload videos, upload to panda and R2, embed om player
 - typed back-end
 - typed env
 - datadog / sentry
+- migrate from cva to tailwind-variants
+- migrate all functions to edge
+- save transcription segments
