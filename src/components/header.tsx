@@ -4,11 +4,11 @@ import Link from 'next/link'
 import rocketseatIcon from '@/assets/rocketseat-icon.svg'
 import { PlusCircledIcon } from '@radix-ui/react-icons'
 
-import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { NavLink } from './nav-link'
 import { ThemeSwitcher } from './theme-switcher'
 import { Search } from './search'
+import { UserProfileButton } from './user-profile-button'
 
 export function Header() {
   return (
@@ -37,7 +37,7 @@ export function Header() {
             </Link>
           </Button>
           <ThemeSwitcher />
-          {/* <UserNav /> */}
+          <UserProfileButton />
         </div>
       </div>
     </div>

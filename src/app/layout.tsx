@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster'
 
 import Providers from './providers'
 import { Header } from '@/components/header'
+import { ClerkProvider } from '@clerk/nextjs'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,16 +24,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="antialiased">
+    <html lang="en" className="antialiased" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>
-          <div className="flex flex-col">
-            <Header />
-            <div className="flex-1 space-y-4 p-8 pt-6">{children}</div>
-          </div>
+        <ClerkProvider>
+          <Providers>
+            <div className="flex flex-col">
+              <Header />
+              <div className="flex-1 space-y-4 p-8 pt-6">{children}</div>
+            </div>
 
-          <Toaster />
-        </Providers>
+            <Toaster />
+          </Providers>
+        </ClerkProvider>
       </body>
     </html>
   )

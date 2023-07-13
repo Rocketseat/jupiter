@@ -1,11 +1,28 @@
 import { BarChart } from 'lucide-react'
+import { prisma } from '@/lib/prisma'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { api } from '@/lib/api'
+import dayjs from 'dayjs'
 
 export async function TotalCount() {
-  const response = await api.get('/api/videos/summary/total-count')
-  const { total, lastMonth } = response.data
+  const [total, lastMonth] = await Promise.all([
+    prisma.video.aggregate({
+      _count: {
+        _all: true,
+      },
+    }),
+
+    prisma.video.aggregate({
+      _count: {
+        _all: true,
+      },
+      where: {
+        createdAt: {
+          gte: dayjs().subtract(30, 'days').toDate(),
+        },
+      },
+    }),
+  ])
 
   return (
     <Card>
@@ -15,10 +32,10 @@ export async function TotalCount() {
       </CardHeader>
       <CardContent className="space-y-1">
         <span className="text-2xl font-bold">
-          {String(total).padStart(4, '0')}
+          {String(total._count._all).padStart(4, '0')}
         </span>
         <p className="text-xs text-muted-foreground">
-          + {lastMonth} in last 30 days
+          + {lastMonth._count._all} in last 30 days
         </p>
       </CardContent>
     </Card>
