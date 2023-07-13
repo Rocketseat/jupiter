@@ -43,7 +43,7 @@ jobs:
           touch .env
           echo DATABASE_URL="${{ secrets.DATABASE_URL}}" >> .env
           echo DIRECT_DATABASE_URL="${{ secrets.DIRECT_DATABASE_URL}}" >> .env
-          pnpm prisma migrate deploy
+          pnpm dlx prisma migrate deploy
 
       - name: Install Vercel CLI
         run: pnpm i -g vercel@latest
