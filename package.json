@@ -11,8 +11,6 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.367.0",
     "@aws-sdk/s3-request-presigner": "3.367.0",
-    "@clerk/nextjs": "4.21.14",
-    "@clerk/themes": "1.7.5",
     "@ffmpeg/core": "0.11.0",
     "@ffmpeg/ffmpeg": "0.11.6",
     "@hookform/resolvers": "3.1.1",
@@ -49,6 +47,7 @@
     "immer": "10.0.2",
     "lucide-react": "0.259.0",
     "next": "13.4.9",
+    "next-auth": "4.22.1",
     "next-themes": "0.2.1",
     "openai-edge": "1.2.0",
     "react": "18.2.0",

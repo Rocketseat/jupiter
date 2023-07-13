@@ -1,6 +1,10 @@
-export function getNameInitials(firstName: string, lastName: string) {
-  const firstInitial = firstName.charAt(0).toUpperCase()
-  const lastInitial = lastName.charAt(0).toUpperCase()
+export function getNameInitials(fullName: string) {
+  const names = fullName.split(' ')
+  let initials = ''
 
-  return firstInitial + lastInitial
+  for (let i = 0; i < names.length && initials.length < 2; i++) {
+    initials += names[i][0].toUpperCase()
+  }
+
+  return initials
 }

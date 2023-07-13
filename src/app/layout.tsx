@@ -5,8 +5,6 @@ import { Inter } from 'next/font/google'
 import { Toaster } from '@/components/ui/toaster'
 
 import Providers from './providers'
-import { Header } from '@/components/header'
-import { ClerkProvider } from '@clerk/nextjs'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,16 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="antialiased" suppressHydrationWarning>
       <body className={inter.className}>
-        <ClerkProvider>
-          <Providers>
-            <div className="flex flex-col">
-              <Header />
-              <div className="flex-1 space-y-4 p-8 pt-6">{children}</div>
-            </div>
+        <Providers>
+          {children}
 
-            <Toaster />
-          </Providers>
-        </ClerkProvider>
+          <Toaster />
+        </Providers>
       </body>
     </html>
   )

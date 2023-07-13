@@ -2,6 +2,12 @@ const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    domains: [
+      'lh3.googleusercontent.com'
+    ]
+  },
+
   /**
    * 
    * @param {import('webpack').Configuration} config
