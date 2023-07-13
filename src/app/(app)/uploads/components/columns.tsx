@@ -11,6 +11,7 @@ import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 import { TranscriptionPreview } from '@/components/transcription-preview'
 import { CopyButton } from '@/components/copy-button'
 import { formatBytes } from '@/utils/format-bytes'
+import Link from 'next/link'
 
 dayjs.extend(relativeTime)
 
@@ -22,7 +23,12 @@ export const columns: ColumnDef<Video>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex flex-col">
-          <span className="font-medium">{row.original.title}</span>
+          <Link
+            href={`/videos/${row.original.id}`}
+            className="font-medium text-violet-500 hover:underline dark:text-violet-300"
+          >
+            {row.original.title}
+          </Link>
           <span className="text-xs text-muted-foreground">
             {row.original.id}
           </span>
@@ -46,21 +52,6 @@ export const columns: ColumnDef<Video>[] = [
       return formatBytes(row.original.sizeInBytes)
     },
   },
-  // {
-  //   accessorKey: 'uploadBatchId',
-  //   header: 'Batch',
-  //   cell: ({ row }) => {
-  //     return (
-  //       <Link
-  //         href={`/upload/batches/${row.original.uploadBatchId}`}
-  //         className="flex items-center text-violet-500"
-  //       >
-  //         <Link2Icon className="mr-2 h-3 w-3" />
-  //         <span className="flex-1 truncate">{row.original.uploadBatchId}</span>
-  //       </Link>
-  //     )
-  //   },
-  // },
   {
     accessorKey: 'transcription',
     header: 'Transcription',

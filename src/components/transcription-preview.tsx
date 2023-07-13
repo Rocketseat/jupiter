@@ -14,6 +14,9 @@ import {
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { Button } from './ui/button'
+import { Edit2 } from 'lucide-react'
+import Link from 'next/link'
 
 export interface TranscriptionPreviewProps {
   videoId: string
@@ -53,13 +56,21 @@ export function TranscriptionPreview({ videoId }: TranscriptionPreviewProps) {
             })}
           </div>
         ) : (
-          <Textarea
-            lang="pt"
-            className="h-[480px] hyphens-auto text-sm leading-relaxed"
-            value={transcription.text}
-            readOnly
-            autoFocus
-          />
+          <>
+            <Textarea
+              lang="pt"
+              className="h-[480px] hyphens-auto text-sm leading-relaxed"
+              value={transcription.text}
+              readOnly
+              autoFocus
+            />
+            <Button variant="secondary" asChild>
+              <Link href={`/transcriptions/${transcription.id}`}>
+                <Edit2 className="mr-2 h-3 w-3" />
+                Review
+              </Link>
+            </Button>
+          </>
         )}
       </DialogContent>
     </Dialog>

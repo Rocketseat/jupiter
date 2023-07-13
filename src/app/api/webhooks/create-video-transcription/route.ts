@@ -12,7 +12,6 @@ const createTranscriptionBodySchema = z.object({
 })
 
 interface OpenAITranscriptionResponse {
-  text: string
   segments: Array<{
     start: number
     end: number
@@ -93,7 +92,6 @@ export async function POST(request: Request) {
     await prisma.transcription.create({
       data: {
         videoId,
-        text: response.data.text,
         segments: {
           createMany: {
             data: response.data.segments.map((segment) => {

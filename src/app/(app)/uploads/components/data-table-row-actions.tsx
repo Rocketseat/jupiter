@@ -1,6 +1,10 @@
 'use client'
 
-import { DotsHorizontalIcon, StackIcon } from '@radix-ui/react-icons'
+import {
+  DotsHorizontalIcon,
+  Pencil2Icon,
+  StackIcon,
+} from '@radix-ui/react-icons'
 import { Row } from '@tanstack/react-table'
 
 import { Button } from '@/components/ui/button'
@@ -46,6 +50,12 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[160px]">
+            <DropdownMenuItem asChild>
+              <Link href={`/videos/${row.original.id}`}>
+                <Pencil2Icon className="mr-2 h-4 w-4" />
+                <span>Review</span>
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem
               disabled={!row.original.externalProviderId}
               onClick={() =>

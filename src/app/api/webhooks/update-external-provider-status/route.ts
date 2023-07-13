@@ -25,8 +25,8 @@ export async function POST(request: Request) {
        * TODO: It would be cool to store the external provider status instead
        * of just storing the external ID.
        *
-       * Here we return a success response as the webhook needs a success
-       * status code to stop retrying.
+       * Here we return a success response as the webhook can be called with
+       * videos that were not stored on jupiter.
        */
       return new Response()
     }

@@ -28,14 +28,13 @@ model Video {
 }
 
 model Transcription {
-  id      String @id @default(uuid())
-  videoId String @unique
-  text    String
+  id         String    @id @default(uuid())
+  videoId    String    @unique
+  reviewedAt DateTime?
+  createdAt  DateTime  @default(now())
 
   video    Video                  @relation(fields: [videoId], references: [id])
   segments TranscriptionSegment[]
-
-  createdAt DateTime @default(now())
 }
 
 model TranscriptionSegment {
