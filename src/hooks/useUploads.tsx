@@ -10,7 +10,7 @@ import {
 import axios from 'axios'
 import { produce, enableMapSet } from 'immer'
 import { useFieldArray, useFormContext } from 'react-hook-form'
-import { UploadsFormSchema } from '@/app/upload/upload-list'
+import { UploadsFormSchema } from '../app/(app)/upload/upload-list'
 import { ffmpeg } from '@/lib/ffmpeg'
 import { fetchFile } from '@ffmpeg/ffmpeg'
 
