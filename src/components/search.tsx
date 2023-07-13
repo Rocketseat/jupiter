@@ -73,7 +73,7 @@ export function Search() {
           placeholder="Search videos..."
         />
         <CommandList>
-          <CommandGroup>
+          <CommandGroup heading="Recent uploads">
             {isLoadingVideos ? (
               <div className="flex cursor-default select-none items-center justify-center gap-2 rounded-sm px-2 py-1.5 text-sm text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" />

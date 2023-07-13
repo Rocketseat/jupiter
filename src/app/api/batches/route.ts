@@ -10,6 +10,7 @@ const createBatchSchema = z.object({
         id: z.string(),
         title: z.string().min(1),
         duration: z.number(),
+        sizeInBytes: z.number(),
         tags: z.array(z.string()).min(1),
       }),
     )
@@ -28,11 +29,13 @@ export async function POST(request: Request) {
         id: batchId,
         videos: {
           createMany: {
-            data: files.map((file) => {
+            data: files.map((file, index) => {
               return {
+                uploadOrder: index + 1,
                 title: file.title,
                 storageKey: `inputs/${file.id}.mp4`,
                 audioStorageKey: `inputs/${file.id}.mp3`,
+                sizeInBytes: file.sizeInBytes,
                 duration: file.duration,
               }
             }),

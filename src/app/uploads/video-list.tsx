@@ -25,8 +25,6 @@ export function VideoList() {
 
       const { videos, pageCount } = response.data
 
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
       return { videos, pageCount }
     },
     refetchOnWindowFocus: true,

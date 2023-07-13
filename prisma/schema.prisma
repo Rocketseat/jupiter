@@ -11,7 +11,9 @@ datasource db {
 model Video {
   id                 String    @id @default(uuid())
   uploadBatchId      String
+  uploadOrder        Int
   duration           Int
+  sizeInBytes        Int
   title              String
   storageKey         String
   audioStorageKey    String

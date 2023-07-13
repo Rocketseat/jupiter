@@ -10,3 +10,4 @@ Upload videos, upload to panda and R2, embed om player
 
 - datadog / sentry
 - login
+- tag logic

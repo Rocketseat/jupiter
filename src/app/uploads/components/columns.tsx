@@ -10,6 +10,7 @@ import { CopyIcon, SymbolIcon } from '@radix-ui/react-icons'
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 import { TranscriptionPreview } from '@/components/transcription-preview'
 import { CopyButton } from '@/components/copy-button'
+import { formatBytes } from '@/utils/format-bytes'
 
 dayjs.extend(relativeTime)
 
@@ -32,9 +33,17 @@ export const columns: ColumnDef<Video>[] = [
   {
     accessorKey: 'duration',
     header: 'Duration',
-    size: 140,
+    size: 120,
     cell: ({ row }) => {
       return formatSecondsToMinutes(row.original.duration)
+    },
+  },
+  {
+    accessorKey: 'sizeInBytes',
+    header: 'Size',
+    size: 120,
+    cell: ({ row }) => {
+      return formatBytes(row.original.sizeInBytes)
     },
   },
   // {
@@ -103,7 +112,7 @@ export const columns: ColumnDef<Video>[] = [
   {
     accessorKey: 'createdAt',
     header: 'Uploaded at',
-    size: 120,
+    size: 150,
     cell: ({ row }) => {
       return (
         <time

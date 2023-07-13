@@ -38,6 +38,7 @@ import {
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { TranscriptionPreview } from '@/components/transcription-preview'
+import { formatBytes } from '@/utils/format-bytes'
 
 dayjs.extend(relativeTime)
 
@@ -68,6 +69,7 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead style={{ width: 40 }}></TableHead>
               <TableHead style={{ width: 400 }}>
                 <div className="flex items-center gap-2">
                   <span>Video</span>
@@ -77,6 +79,7 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
                 </div>
               </TableHead>
               <TableHead style={{ width: 140 }}>Duration</TableHead>
+              <TableHead style={{ width: 140 }}>Size</TableHead>
               <TableHead style={{ width: 200 }}>Transcription</TableHead>
               <TableHead style={{ width: 240 }}>External ID (Panda)</TableHead>
               <TableHead style={{ width: 60 }}></TableHead>
@@ -90,6 +93,9 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
               {batch.videos.length ? (
                 batch.videos.map((video: any) => (
                   <TableRow key={video.id}>
+                    <TableCell className="text-center">
+                      {video.uploadOrder}
+                    </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="font-medium">{video.title}</span>
@@ -101,6 +107,7 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
                     <TableCell>
                       {formatSecondsToMinutes(video.duration)}
                     </TableCell>
+                    <TableCell>{formatBytes(video.sizeInBytes)}</TableCell>
                     <TableCell>
                       {video.transcription ? (
                         <TranscriptionPreview videoId={video.id} />

@@ -77,9 +77,9 @@ export function UploadTable() {
             <TableHead style={{ width: 148 }}></TableHead>
             <TableHead>Title</TableHead>
             <TableHead style={{ width: 180 }}>Metadata</TableHead>
-            <TableHead style={{ width: 220 }}>Video upload</TableHead>
-            <TableHead style={{ width: 220 }}>Audio conversion</TableHead>
-            <TableHead style={{ width: 220 }}>Audio upload</TableHead>
+            <TableHead style={{ width: 200 }}>Video upload</TableHead>
+            <TableHead style={{ width: 200 }}>Audio conversion</TableHead>
+            <TableHead style={{ width: 200 }}>Audio upload</TableHead>
             <TableHead style={{ width: 140 }}></TableHead>
           </TableRow>
         </TableHeader>
@@ -124,6 +124,12 @@ export function UploadTable() {
                         : null}
                     </span>
                   </div>
+
+                  <input
+                    type="hidden"
+                    value={upload.file.size}
+                    {...register(`files.${index}.sizeInBytes`)}
+                  />
 
                   {upload.duration && (
                     <input

@@ -24,6 +24,9 @@ export async function GET(_: Request, { params }: GetBatchParams) {
               },
             },
           },
+          orderBy: {
+            uploadOrder: 'asc',
+          },
         },
       },
     })

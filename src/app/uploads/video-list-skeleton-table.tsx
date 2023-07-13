@@ -23,6 +23,9 @@ export function VideoListSkeletonTable({
               <Skeleton className="h-4 w-[60px]" />
             </TableCell>
             <TableCell>
+              <Skeleton className="h-4 w-[60px]" />
+            </TableCell>
+            <TableCell>
               <Skeleton className="h-4 w-[200px]" />
             </TableCell>
             <TableCell>
