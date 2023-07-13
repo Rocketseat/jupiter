@@ -11,6 +11,6 @@ Upload videos, upload to panda and R2, embed om player
 - datadog / sentry
 - login
 - tag logic
-- use github login when VERCEL_ENV is preview
+- use email magic link login when VERCEL_ENV is preview
 - cache deps ci
 - limit video upload size (for now) [as we have limits on audio transcription size and lambda execution time as well]
