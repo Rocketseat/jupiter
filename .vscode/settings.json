@@ -4,6 +4,9 @@
     "cloudflare",
     "openai",
     "PANDAVIDEO",
-    "tanstack"
+    "qstash",
+    "QSTASH",
+    "tanstack",
+    "upstash"
   ]
 }
