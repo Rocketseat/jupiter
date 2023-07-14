@@ -11,4 +11,3 @@ Upload videos, upload to panda and R2, embed om player
 - datadog / sentry
 - tag logic
 - use email magic link login when VERCEL_ENV is preview
-- cache deps ci
