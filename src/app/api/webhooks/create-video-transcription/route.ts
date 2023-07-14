@@ -6,6 +6,7 @@ import FormData from 'form-data'
 import axios from 'axios'
 import { z } from 'zod'
 import { env } from '@/env'
+import { validateQStashSignature } from '@/lib/qstash'
 
 const createTranscriptionBodySchema = z.object({
   videoId: z.string().uuid(),
@@ -20,9 +21,11 @@ interface OpenAITranscriptionResponse {
 }
 
 export async function POST(request: Request) {
-  const { videoId } = createTranscriptionBodySchema.parse(await request.json())
-
   try {
+    const { bodyAsJSON } = await validateQStashSignature({ request })
+
+    const { videoId } = createTranscriptionBodySchema.parse(bodyAsJSON)
+
     const video = await prisma.video.findUniqueOrThrow({
       where: {
         id: videoId,
@@ -107,7 +110,12 @@ export async function POST(request: Request) {
     })
 
     return new Response()
-  } catch (err) {
-    console.log(err)
+  } catch (err: any) {
+    console.error(err)
+
+    return NextResponse.json(
+      { message: 'Error processing video.', error: err?.message || '' },
+      { status: 401 },
+    )
   }
 }

@@ -26,6 +26,7 @@ export const env = createEnv({
     NEXTAUTH_SECRET: z.string().min(1),
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
+    QSTASH_TOKEN: z.string().refine(requiredOnEnv('production')),
     QSTASH_CURRENT_SIGNING_KEY: z.string().refine(requiredOnEnv('production')),
     QSTASH_NEXT_SIGNING_KEY: z.string().refine(requiredOnEnv('production')),
   },

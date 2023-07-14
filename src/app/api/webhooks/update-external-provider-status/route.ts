@@ -4,7 +4,6 @@ import { z } from 'zod'
 const pandaWebhookBodySchema = z.object({
   action: z.enum(['video.changeStatus']),
   video_id: z.string().uuid(),
-  folder_id: z.string().uuid().optional(),
   status: z.enum(['DRAFT', 'CONVERTING', 'CONVERTED', 'FAILED']),
   video_external_id: z.string().uuid(),
 })
@@ -20,13 +19,11 @@ export async function POST(request: Request) {
       },
     })
 
-    if (video.externalProviderId) {
+    if (!video || video.externalProviderId) {
       /**
-       * TODO: It would be cool to store the external provider status instead
-       * of just storing the external ID.
-       *
        * Here we return a success response as the webhook can be called with
-       * videos that were not stored on jupiter.
+       * videos that were not stored on jupiter or the video could already had
+       * been updated.
        */
       return new Response()
     }

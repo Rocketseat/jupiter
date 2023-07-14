@@ -2,19 +2,21 @@ import { r2 } from '@/lib/cloudflare-r2'
 import { prisma } from '@/lib/prisma'
 import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { NextResponse } from 'next/server'
-import FormData from 'form-data'
 import axios from 'axios'
 import { z } from 'zod'
 import { env } from '@/env'
+import { validateQStashSignature } from '@/lib/qstash'
 
 const createTranscriptionBodySchema = z.object({
   videoId: z.string().uuid(),
 })
 
 export async function POST(request: Request) {
-  const { videoId } = createTranscriptionBodySchema.parse(await request.json())
-
   try {
+    const { bodyAsJSON } = await validateQStashSignature({ request })
+
+    const { videoId } = createTranscriptionBodySchema.parse(bodyAsJSON)
+
     const video = await prisma.video.findUniqueOrThrow({
       where: {
         id: videoId,
@@ -50,19 +52,6 @@ export async function POST(request: Request) {
       return
     }
 
-    // const formData = new FormData()
-
-    // formData.append('file', videoFile.Body, {
-    //   contentType: videoFile.ContentType,
-    //   knownLength: videoFile.ContentLength,
-    //   filename: video.audioStorageKey,
-    // })
-
-    // formData.append('model', 'whisper-1')
-    // formData.append('response_format', 'json')
-    // formData.append('temperature', '0')
-    // formData.append('language', 'pt')
-
     const response = await axios.post(
       'https://uploader-us01.pandavideo.com.br/files',
       videoFile.Body,
@@ -81,7 +70,12 @@ export async function POST(request: Request) {
     )
 
     return NextResponse.json({ data: response.data })
-  } catch (err) {
-    console.log(err)
+  } catch (err: any) {
+    console.error(err)
+
+    return NextResponse.json(
+      { message: 'Error uploading video.', error: err?.message || '' },
+      { status: 401 },
+    )
   }
 }
