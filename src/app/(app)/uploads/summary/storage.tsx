@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatBytes } from '@/utils/format-bytes'
 import dayjs from 'dayjs'
 
+export const revalidate = 60 * 15 // 15 minutes
+
 export async function Storage() {
   const [total, lastMonth] = await Promise.all([
     prisma.video.aggregate({

@@ -16,15 +16,11 @@ import { LogOut } from 'lucide-react'
 export function UserProfileButton() {
   const { data: session } = useSession()
 
-  if (!session || !session.user) {
-    return null
-  }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer" asChild>
         <Avatar>
-          {session.user.image && (
+          {session?.user && session?.user.image ? (
             <Image
               className="aspect-square h-full w-full"
               src={session.user.image}
@@ -32,6 +28,8 @@ export function UserProfileButton() {
               height={48}
               alt=""
             />
+          ) : (
+            <div className="aspect-square h-full w-full bg-accent" />
           )}
         </Avatar>
       </DropdownMenuTrigger>

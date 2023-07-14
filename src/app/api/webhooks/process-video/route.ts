@@ -3,6 +3,7 @@ import { r2 } from '@/lib/cloudflare-r2'
 import { prisma } from '@/lib/prisma'
 import { CopyObjectCommand } from '@aws-sdk/client-s3'
 import { NextResponse } from 'next/server'
+import { Receiver } from '@upstash/qstash/nodejs'
 import { z } from 'zod'
 
 const processVideoBodySchema = z.object({
@@ -10,6 +11,39 @@ const processVideoBodySchema = z.object({
 })
 
 export async function POST(request: Request) {
+  if (env.NODE_ENV === 'production') {
+    const signature = request.headers.get('upstash-signature')
+
+    const receiver = new Receiver({
+      currentSigningKey: env.QSTASH_CURRENT_SIGNING_KEY,
+      nextSigningKey: env.QSTASH_NEXT_SIGNING_KEY,
+    })
+
+    if (!signature) {
+      return NextResponse.json(
+        { message: 'QStash signature not found.' },
+        { status: 401 },
+      )
+    }
+
+    const isValid = await receiver
+      .verify({
+        signature,
+        body: await request.text(),
+      })
+      .catch((err) => {
+        console.error(err)
+        return false
+      })
+
+    if (!isValid) {
+      return NextResponse.json(
+        { message: 'QStash signature is invalid.' },
+        { status: 401 },
+      )
+    }
+  }
+
   const { videoId } = processVideoBodySchema.parse(await request.json())
 
   try {

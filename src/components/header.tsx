@@ -23,6 +23,7 @@ export function Header() {
         />
 
         <nav className="ml-6 flex items-center space-x-4 lg:space-x-6">
+          <NavLink href="/">Dashboard</NavLink>
           <NavLink href="/uploads">Uploads</NavLink>
           <NavLink href="/ai">Search & AI</NavLink>
         </nav>

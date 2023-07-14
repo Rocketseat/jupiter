@@ -13,6 +13,7 @@ export function UploadDropArea() {
     },
     multiple: true,
     onDrop: add,
+    maxSize: 524_288_000, // 500mb
   })
 
   return (
