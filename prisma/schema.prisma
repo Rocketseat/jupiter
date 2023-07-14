@@ -23,7 +23,6 @@ model Video {
   externalProviderId String?   @unique
   processedAt        DateTime?
   createdAt          DateTime  @default(now())
-  newTestColumn      String?
 
   tags          Tag[]
   uploadBatch   UploadBatch    @relation(fields: [uploadBatchId], references: [id])
