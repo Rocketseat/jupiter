@@ -1,27 +1,24 @@
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 
-interface GetTranscriptionParams {
+interface TranscriptionParams {
   params: {
     id: string
   }
 }
 
-export async function GET(_: Request, { params }: GetTranscriptionParams) {
+export async function GET(_: Request, { params }: TranscriptionParams) {
   const videoId = params.id
 
   try {
-    const [transcription] = await prisma.$queryRaw<
-      [{ text: string; id: string }]
-    >/* sql */ `
-      SELECT 
-      "public"."TranscriptionSegment"."transcriptionId" as "id",
-        STRING_AGG("public"."TranscriptionSegment"."text", '') as "text"
-      FROM "public"."TranscriptionSegment"
-      JOIN "public"."Transcription" ON "public"."Transcription"."id" = "public"."TranscriptionSegment"."transcriptionId"
-      WHERE "public"."Transcription"."videoId" = ${videoId}
-      GROUP BY "public"."TranscriptionSegment"."transcriptionId"
-    `
+    const transcription = await prisma.transcription.findUniqueOrThrow({
+      where: {
+        videoId,
+      },
+      include: {
+        segments: true,
+      },
+    })
 
     if (!transcription) {
       return NextResponse.json(
