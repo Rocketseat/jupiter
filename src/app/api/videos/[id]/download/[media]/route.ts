@@ -32,10 +32,16 @@ export async function GET(
         Bucket: env.CLOUDFLARE_BUCKET_NAME,
         Key: media === 'video' ? video.storageKey : video.audioStorageKey,
       }),
-      { expiresIn: 600 },
+      { expiresIn: 60 * 60 /* 1 hour */ },
     )
 
-    return NextResponse.redirect(downloadSignedUrl)
+    return NextResponse.redirect(downloadSignedUrl, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    })
   } catch (err) {
     console.log(err)
   }

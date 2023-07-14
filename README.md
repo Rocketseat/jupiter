@@ -10,3 +10,5 @@ Upload videos, upload to panda and R2, embed om player
 
 - datadog / sentry
 - tag logic
+- deadletter queue (manual retry)
+  - store number of retries and if its the last maybe notice somewhere and display a button for manual retry

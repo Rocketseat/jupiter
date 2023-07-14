@@ -7,6 +7,7 @@ import { Metadata } from 'next'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { DeleteVideoButton } from './delete-video-button'
+import { TranscriptionCard } from './transcription-card'
 
 dayjs.extend(relativeTime)
 
@@ -34,35 +35,41 @@ export default async function VideoPage({ params }: VideoPageProps) {
   })
 
   return (
-    <div className="flex items-center justify-between gap-4">
-      <h2 className="truncate text-3xl font-bold tracking-tight">
-        {video.title}
-      </h2>
+    <>
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="truncate text-3xl font-bold tracking-tight">
+          {video.title}
+        </h2>
 
-      <div className="flex items-center gap-2">
-        <DeleteVideoButton videoId={videoId} />
+        <div className="flex items-center gap-2">
+          <DeleteVideoButton videoId={videoId} />
 
-        <Button variant="secondary" asChild>
-          <a
-            href={`/api/videos/${video.id}/download/video`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <VideoIcon className="mr-2 h-4 w-4" />
-            <span>Download MP4</span>
-          </a>
-        </Button>
-        <Button variant="secondary" asChild>
-          <a
-            href={`/api/videos/${video.id}/download/audio`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Music2 className="mr-2 h-4 w-4" />
-            <span>Download MP3</span>
-          </a>
-        </Button>
+          <Button variant="secondary" asChild>
+            <a
+              href={`/api/videos/${video.id}/download/video`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <VideoIcon className="mr-2 h-4 w-4" />
+              <span>Download MP4</span>
+            </a>
+          </Button>
+          <Button variant="secondary" asChild>
+            <a
+              href={`/api/videos/${video.id}/download/audio`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Music2 className="mr-2 h-4 w-4" />
+              <span>Download MP3</span>
+            </a>
+          </Button>
+        </div>
       </div>
-    </div>
+
+      <div className="grid flex-1 grid-cols-3 gap-4">
+        <TranscriptionCard videoId={video.id} />
+      </div>
+    </>
   )
 }

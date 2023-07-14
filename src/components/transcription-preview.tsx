@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import axios from 'axios'
 import { Link1Icon } from '@radix-ui/react-icons'
 import { useQuery } from '@tanstack/react-query'
@@ -37,6 +37,14 @@ export function TranscriptionPreview({ videoId }: TranscriptionPreviewProps) {
     },
   )
 
+  const transcriptionText = useMemo(() => {
+    if (!transcription) {
+      return ''
+    }
+
+    return transcription.segments.map((segment: any) => segment.text).join('')
+  }, [transcription])
+
   return (
     <Dialog onOpenChange={setIsDialogOpen} open={isDialogOpen}>
       <DialogTrigger asChild>
@@ -60,7 +68,7 @@ export function TranscriptionPreview({ videoId }: TranscriptionPreviewProps) {
             <Textarea
               lang="pt"
               className="h-[480px] hyphens-auto text-sm leading-relaxed"
-              value={transcription.text}
+              value={transcriptionText}
               readOnly
               autoFocus
             />
