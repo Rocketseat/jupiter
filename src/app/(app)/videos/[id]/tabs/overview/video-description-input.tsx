@@ -4,29 +4,33 @@ import { useCompletion } from 'ai/react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { MagicWandIcon } from '@radix-ui/react-icons'
-import { ComponentPropsWithoutRef } from 'react'
+import { ComponentPropsWithoutRef, useEffect } from 'react'
 import { Loader2 } from 'lucide-react'
+import { useFormContext } from 'react-hook-form'
+import { EditVideoFormSchema } from './video-form'
 
-export interface VideoDescriptionInputProps
-  extends ComponentPropsWithoutRef<'textarea'> {
+export interface VideoDescriptionInputProps {
   videoId: string
 }
 
-export function VideoDescriptionInput({
-  videoId,
-  ...props
-}: VideoDescriptionInputProps) {
+export function VideoDescriptionInput({ videoId }: VideoDescriptionInputProps) {
+  const { setValue, register } = useFormContext<EditVideoFormSchema>()
+
   const { completion, complete, isLoading } = useCompletion({
     api: `/api/ai/generate/description?videoId=${videoId}`,
   })
 
+  useEffect(() => {
+    setValue('description', completion)
+  }, [completion, setValue])
+
   return (
     <>
       <Textarea
+        id="description"
         disabled={isLoading}
-        className="min-h-[160px] leading-relaxed"
-        value={completion}
-        {...props}
+        className="min-h-[132px] leading-relaxed"
+        {...register('description')}
       />
       <div>
         <Button

@@ -19,6 +19,8 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { CheckIcon } from '@radix-ui/react-icons'
 import { Tag } from 'lucide-react'
+import { useController, useFormContext } from 'react-hook-form'
+import { EditVideoFormSchema } from './video-form'
 
 const options = [
   'ignite',
@@ -31,8 +33,26 @@ const options = [
 ]
 
 export function VideoTagInput() {
-  const error: any = false
-  const tags = ['ignite', 'node']
+  const { control, setValue } = useFormContext<EditVideoFormSchema>()
+
+  const {
+    field,
+    fieldState: { error },
+  } = useController({
+    name: `tags`,
+    control,
+    defaultValue: [],
+  })
+
+  const { value: tags, onChange } = field
+
+  function handleAddTag(tag: string) {
+    onChange([...tags, tag])
+  }
+
+  function handleRemoveTag(tag: string) {
+    onChange(tags.filter((item) => item !== tag))
+  }
 
   return (
     <Popover>
@@ -92,7 +112,11 @@ export function VideoTagInput() {
                   <CommandItem
                     key={option}
                     onSelect={() => {
-                      // TODO: make it work
+                      if (isSelected) {
+                        handleRemoveTag(option)
+                      } else {
+                        handleAddTag(option)
+                      }
                     }}
                   >
                     <div
