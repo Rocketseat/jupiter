@@ -14,6 +14,7 @@ import { Fragment, useRef, useState } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
+import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 
 interface TranscriptionCardProps {
   videoId: string
@@ -103,14 +104,12 @@ export function TranscriptionCard({ videoId }: TranscriptionCardProps) {
               {transcription.segments.map((segment: any, index: number) => {
                 return (
                   <Fragment key={segment.id}>
-                    {index > 0 && (
-                      <span className="mx-1 text-sm text-primary/40">/</span>
-                    )}
                     <input
                       type="hidden"
                       value={segment.id}
                       {...register(`segments.${index}.id`)}
                     />
+
                     <Controller
                       name={`segments.${index}.text`}
                       control={control}
@@ -123,6 +122,7 @@ export function TranscriptionCard({ videoId }: TranscriptionCardProps) {
                              * cause new rerenders on every input.
                              */
                             value={segment.text}
+                            start={segment.start}
                             onValueChange={field.onChange}
                             onBlur={field.onBlur}
                             onFocus={() =>
