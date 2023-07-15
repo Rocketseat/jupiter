@@ -27,7 +27,7 @@ export function Segment({
     >
       <Badge
         variant="outline"
-        className="px-1.5 py-0 transition-none group-hover:border-white/40 group-focus:border-white/60"
+        className="px-1.5 py-0 transition-none group-hover:border-primary/20 group-focus:border-white/80 group-focus:text-white"
       >
         {formatSecondsToMinutes(start)}
       </Badge>
