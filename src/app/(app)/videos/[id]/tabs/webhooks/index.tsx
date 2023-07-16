@@ -39,8 +39,6 @@ export function Webhooks({ videoId }: WebhooksProps) {
     queryFn: async () => {
       const response = await axios.get(`/api/videos/${videoId}/webhooks`)
 
-      await new Promise((resolve) => setTimeout(resolve, 4000))
-
       return response.data.webhooks
     },
     refetchInterval: 15 * 1000,
