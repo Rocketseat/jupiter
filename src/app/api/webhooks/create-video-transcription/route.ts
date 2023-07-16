@@ -7,6 +7,7 @@ import axios from 'axios'
 import { z } from 'zod'
 import { env } from '@/env'
 import { validateQStashSignature } from '@/lib/qstash'
+import { randomUUID } from 'node:crypto'
 
 const createTranscriptionBodySchema = z.object({
   videoId: z.string().uuid(),
@@ -21,6 +22,8 @@ interface OpenAITranscriptionResponse {
 }
 
 export async function POST(request: Request) {
+  const webhookId = randomUUID()
+
   try {
     const { bodyAsJSON } = await validateQStashSignature({ request })
 
@@ -57,6 +60,15 @@ export async function POST(request: Request) {
       )
     }
 
+    await prisma.webhook.create({
+      data: {
+        id: webhookId,
+        type: 'CREATE_TRANSCRIPTION',
+        videoId,
+        metadata: JSON.stringify(bodyAsJSON),
+      },
+    })
+
     const audioFile = await r2.send(
       new GetObjectCommand({
         Bucket: env.CLOUDFLARE_BUCKET_NAME,
@@ -92,26 +104,47 @@ export async function POST(request: Request) {
       },
     )
 
-    await prisma.transcription.create({
-      data: {
-        videoId,
-        segments: {
-          createMany: {
-            data: response.data.segments.map((segment) => {
-              return {
-                text: segment.text,
-                start: segment.start,
-                end: segment.end,
-              }
-            }),
+    await prisma.$transaction([
+      prisma.transcription.create({
+        data: {
+          videoId,
+          segments: {
+            createMany: {
+              data: response.data.segments.map((segment) => {
+                return {
+                  text: segment.text,
+                  start: segment.start,
+                  end: segment.end,
+                }
+              }),
+            },
           },
         },
-      },
-    })
+      }),
+      prisma.webhook.update({
+        where: {
+          id: webhookId,
+        },
+        data: {
+          status: 'SUCCESS',
+          finishedAt: new Date(),
+        },
+      }),
+    ])
 
     return new Response()
   } catch (err: any) {
     console.error(err)
+
+    await prisma.webhook.update({
+      where: {
+        id: webhookId,
+      },
+      data: {
+        status: 'ERROR',
+        finishedAt: new Date(),
+      },
+    })
 
     return NextResponse.json(
       { message: 'Error processing video.', error: err?.message || '' },

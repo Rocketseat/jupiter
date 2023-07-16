@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 
 const pandaWebhookBodySchema = z.object({
@@ -9,6 +10,8 @@ const pandaWebhookBodySchema = z.object({
 })
 
 export async function POST(request: Request) {
+  const webhookId = randomUUID()
+
   const { video_id: videoId, video_external_id: videoExternalId } =
     pandaWebhookBodySchema.parse(await request.json())
 
@@ -28,17 +31,44 @@ export async function POST(request: Request) {
       return new Response()
     }
 
-    await prisma.video.update({
-      where: {
-        id: videoId,
-      },
-      data: {
-        externalProviderId: videoExternalId,
-      },
-    })
+    await prisma.$transaction([
+      prisma.video.update({
+        where: {
+          id: videoId,
+        },
+        data: {
+          externalProviderId: videoExternalId,
+        },
+      }),
+      prisma.webhook.create({
+        data: {
+          id: webhookId,
+          type: 'UPDATE_EXTERNAL_PROVIDER_STATUS',
+          videoId,
+          status: 'SUCCESS',
+          finishedAt: new Date(),
+          metadata: JSON.stringify({
+            videoExternalId,
+          }),
+        },
+      }),
+    ])
 
     return new Response()
   } catch (err) {
     console.log(err)
+
+    await prisma.webhook.create({
+      data: {
+        id: webhookId,
+        type: 'UPDATE_EXTERNAL_PROVIDER_STATUS',
+        videoId,
+        status: 'ERROR',
+        finishedAt: new Date(),
+        metadata: JSON.stringify({
+          videoExternalId,
+        }),
+      },
+    })
   }
 }

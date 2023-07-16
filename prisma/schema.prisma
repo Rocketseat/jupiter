@@ -27,6 +27,32 @@ model Video {
   tags          Tag[]
   uploadBatch   UploadBatch    @relation(fields: [uploadBatchId], references: [id])
   transcription Transcription?
+  webhooks      Webhook[]
+}
+
+enum WebhookType {
+  PROCESS_VIDEO
+  CREATE_TRANSCRIPTION
+  UPLOAD_TO_EXTERNAL_PROVIDER
+  UPDATE_EXTERNAL_PROVIDER_STATUS
+}
+
+enum WebhookStatus {
+  RUNNING
+  SUCCESS
+  ERROR
+}
+
+model Webhook {
+  id         String        @id @default(uuid())
+  videoId    String
+  type       WebhookType
+  status     WebhookStatus @default(RUNNING)
+  createdAt  DateTime      @default(now())
+  finishedAt DateTime?
+  metadata   String?
+
+  video Video @relation(fields: [videoId], references: [id])
 }
 
 model Transcription {
