@@ -92,6 +92,7 @@ export function UploadTable() {
                     src={upload.previewURL}
                     controls={false}
                     className="pointer-events-none aspect-video rounded-md"
+                    preload="metadata"
                     onLoadedMetadata={(event) =>
                       handleLoadedMetadata(event, id)
                     }

@@ -6,12 +6,15 @@ import axios from 'axios'
 import { z } from 'zod'
 import { env } from '@/env'
 import { validateQStashSignature } from '@/lib/qstash'
+import { randomUUID } from 'node:crypto'
 
 const createTranscriptionBodySchema = z.object({
   videoId: z.string().uuid(),
 })
 
 export async function POST(request: Request) {
+  const webhookId = randomUUID()
+
   try {
     const { bodyAsJSON } = await validateQStashSignature({ request })
 
@@ -41,6 +44,15 @@ export async function POST(request: Request) {
       )
     }
 
+    await prisma.webhook.create({
+      data: {
+        id: webhookId,
+        type: 'UPLOAD_TO_EXTERNAL_PROVIDER',
+        videoId,
+        metadata: JSON.stringify(bodyAsJSON),
+      },
+    })
+
     const videoFile = await r2.send(
       new GetObjectCommand({
         Bucket: env.CLOUDFLARE_BUCKET_NAME,
@@ -69,9 +81,29 @@ export async function POST(request: Request) {
       },
     )
 
+    await prisma.webhook.update({
+      where: {
+        id: webhookId,
+      },
+      data: {
+        status: 'SUCCESS',
+        finishedAt: new Date(),
+      },
+    })
+
     return NextResponse.json({ data: response.data })
   } catch (err: any) {
     console.error(err)
+
+    await prisma.webhook.update({
+      where: {
+        id: webhookId,
+      },
+      data: {
+        status: 'ERROR',
+        finishedAt: new Date(),
+      },
+    })
 
     return NextResponse.json(
       { message: 'Error uploading video.', error: err?.message || '' },

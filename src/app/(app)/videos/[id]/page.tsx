@@ -1,15 +1,12 @@
 import { Button } from '@/components/ui/button'
 
-import { prisma } from '@/lib/prisma'
 import { VideoIcon } from '@radix-ui/react-icons'
 import { Music2 } from 'lucide-react'
 import { Metadata } from 'next'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { DeleteVideoButton } from './delete-video-button'
-import { TranscriptionCard } from './transcription-card'
-
-dayjs.extend(relativeTime)
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Overview } from './tabs/overview'
+import { Webhooks } from './tabs/webhooks'
 
 interface VideoPageProps {
   params: { id: string }
@@ -28,17 +25,11 @@ export async function generateMetadata({
 export default async function VideoPage({ params }: VideoPageProps) {
   const videoId = params.id
 
-  const video = await prisma.video.findFirstOrThrow({
-    where: {
-      id: videoId,
-    },
-  })
-
   return (
     <>
       <div className="flex items-center justify-between gap-4">
         <h2 className="truncate text-3xl font-bold tracking-tight">
-          {video.title}
+          Edit video
         </h2>
 
         <div className="flex items-center gap-2">
@@ -46,7 +37,7 @@ export default async function VideoPage({ params }: VideoPageProps) {
 
           <Button variant="secondary" asChild>
             <a
-              href={`/api/videos/${video.id}/download/video`}
+              href={`/api/videos/${videoId}/download/video`}
               target="_blank"
               rel="noreferrer"
             >
@@ -56,7 +47,7 @@ export default async function VideoPage({ params }: VideoPageProps) {
           </Button>
           <Button variant="secondary" asChild>
             <a
-              href={`/api/videos/${video.id}/download/audio`}
+              href={`/api/videos/${videoId}/download/audio`}
               target="_blank"
               rel="noreferrer"
             >
@@ -67,9 +58,18 @@ export default async function VideoPage({ params }: VideoPageProps) {
         </div>
       </div>
 
-      <div className="grid flex-1 grid-cols-3 gap-4">
-        <TranscriptionCard videoId={video.id} />
-      </div>
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview">
+          <Overview videoId={videoId} />
+        </TabsContent>
+        <TabsContent value="webhooks">
+          <Webhooks videoId={videoId} />
+        </TabsContent>
+      </Tabs>
     </>
   )
 }
