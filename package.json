@@ -58,7 +58,7 @@
     "zod": "3.21.4"
   },
   "devDependencies": {
-    "@rocketseat/eslint-config": "2.0.1",
+    "@rocketseat/eslint-config": "2.1.0",
     "@types/node": "20.4.0",
     "@types/react": "18.2.14",
     "@types/react-dom": "18.2.6",

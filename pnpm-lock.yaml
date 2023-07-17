@@ -149,8 +149,8 @@ dependencies:
 
 devDependencies:
   '@rocketseat/eslint-config':
-    specifier: 2.0.1
-    version: 2.0.1(eslint@8.44.0)(typescript@5.1.6)
+    specifier: 2.1.0
+    version: 2.1.0(eslint@8.44.0)(typescript@5.1.6)
   '@types/node':
     specifier: 20.4.0
     version: 20.4.0
@@ -2320,8 +2320,8 @@ packages:
       '@babel/runtime': 7.22.6
     dev: false
 
-  /@rocketseat/eslint-config@2.0.1(eslint@8.44.0)(typescript@5.1.6):
-    resolution: {integrity: sha512-QYAk0uBAJ5mJrDqo9j77Ka6eRiUbTtqcSa42ky1Ka3BcEu5TREXNOx9xAHKsxxbasAYuHALyXXqEbrFwskfgsg==}
+  /@rocketseat/eslint-config@2.1.0(eslint@8.44.0)(typescript@5.1.6):
+    resolution: {integrity: sha512-E4wdeuDcGtOKXH/hchPabLLsbCqH6yhavyAbGotr7WbzvdBH93+CtTHU5iAdauaQ28EPvFgQNtcebXtfYB0wVg==}
     peerDependencies:
       eslint: ^8.0.0
       typescript: '>=4'

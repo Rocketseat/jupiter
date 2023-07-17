@@ -22,6 +22,8 @@ export async function generateMetadata({
   }
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function VideoPage({ params }: VideoPageProps) {
   const videoId = params.id
 
