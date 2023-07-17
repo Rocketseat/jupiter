@@ -3,7 +3,6 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { VideoDescriptionInput } from './video-description-input'
-import { GithubCommitInput } from './github-commit-input'
 import { VideoTagInput } from './video-tag-input'
 import { Button } from '@/components/ui/button'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -71,7 +70,7 @@ export function VideoForm({ video }: VideoFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="commit">Commit reference</Label>
-          <GithubCommitInput />
+          <Input id="commit" />
           <p className="text-sm text-slate-500 dark:text-slate-400">
             The commit reference will help us finding typos inside the video
             transcription

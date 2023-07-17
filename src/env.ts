@@ -35,9 +35,13 @@ export const env = createEnv({
   },
   shared: {
     NODE_ENV: nodeEnv,
+    VERCEL_ENV: z
+      .enum(['production', 'preview', 'development'])
+      .default('development'),
   },
   experimental__runtimeEnv: {
     NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
     NODE_ENV: process.env.NODE_ENV,
+    VERCEL_ENV: process.env.VERCEL_ENV,
   },
 })
