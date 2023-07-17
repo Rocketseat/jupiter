@@ -74,7 +74,7 @@ export function VideoTagInput() {
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
               <div className="flex gap-1">
-                {tags.length > 2 ? (
+                {tags.length > 5 ? (
                   <Badge
                     variant="secondary"
                     className="pointer-events-none rounded-sm px-1 font-normal"

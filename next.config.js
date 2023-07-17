@@ -4,7 +4,8 @@ const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 const nextConfig = {
   images: {
     domains: [
-      'lh3.googleusercontent.com'
+      'lh3.googleusercontent.com',
+      'github.com'
     ]
   },
 

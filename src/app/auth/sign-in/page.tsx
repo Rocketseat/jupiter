@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 
 import { SignInButton } from './sign-in-button'
+import { SignInForm } from './sign-in-form'
+import { env } from '@/env'
 
 export const metadata: Metadata = {
   title: 'Sign In',
@@ -37,7 +39,7 @@ export default function SignInPage() {
           </div>
         </div>
         <div>
-          <SignInButton />
+          {env.VERCEL_ENV === 'preview' ? <SignInForm /> : <SignInButton />}
         </div>
         <p className="px-8 text-center text-sm leading-relaxed text-muted-foreground">
           By clicking continue, you agree to our{' '}

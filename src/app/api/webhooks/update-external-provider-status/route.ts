@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 const pandaWebhookBodySchema = z.object({
   action: z.enum(['video.changeStatus']),
+  folder_id: z.string().optional().nullable(),
   video_id: z.string().uuid(),
   status: z.enum(['DRAFT', 'CONVERTING', 'CONVERTED', 'FAILED']),
   video_external_id: z.string().uuid(),
@@ -12,8 +13,18 @@ const pandaWebhookBodySchema = z.object({
 export async function POST(request: Request) {
   const webhookId = randomUUID()
 
-  const { video_id: videoId, video_external_id: videoExternalId } =
-    pandaWebhookBodySchema.parse(await request.json())
+  const {
+    video_id: videoId,
+    video_external_id: videoExternalId,
+    folder_id: folderId,
+  } = pandaWebhookBodySchema.parse(await request.json())
+
+  if (!folderId || folderId !== '6cf7cc26-f9fc-4e5f-b332-54935d430ab3') {
+    /**
+     * We want to ignore videos that were not uploaded by Jupiter.
+     */
+    return new Response()
+  }
 
   try {
     const video = await prisma.video.findUniqueOrThrow({
