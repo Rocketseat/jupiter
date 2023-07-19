@@ -22,6 +22,7 @@ model Video {
   description        String?
   externalProviderId String?   @unique
   processedAt        DateTime?
+  commitUrl          String?
   createdAt          DateTime  @default(now())
 
   tags          Tag[]
