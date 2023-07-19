@@ -54,6 +54,7 @@
     "react-dom": "18.2.0",
     "react-dropzone": "14.2.3",
     "react-hook-form": "7.45.1",
+    "recharts": "2.7.2",
     "tailwind-merge": "1.13.2",
     "zod": "3.21.4"
   },
@@ -62,6 +63,7 @@
     "@types/node": "20.4.0",
     "@types/react": "18.2.14",
     "@types/react-dom": "18.2.6",
+    "@types/recharts": "1.8.24",
     "autoprefixer": "10.4.14",
     "eslint": "8.44.0",
     "eslint-config-next": "13.4.9",

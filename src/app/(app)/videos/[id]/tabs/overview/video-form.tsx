@@ -69,7 +69,10 @@ export function VideoForm({ video }: VideoFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="commit">Commit reference</Label>
+          <Label htmlFor="commit">
+            Commit reference{' '}
+            <span className="text-muted-foreground">(synced with Skylab)</span>
+          </Label>
           <Input id="commit" />
           <p className="text-sm text-slate-500 dark:text-slate-400">
             The commit reference will help us finding typos inside the video

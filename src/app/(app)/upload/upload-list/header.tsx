@@ -24,7 +24,11 @@ import { MagicWandIcon, TextIcon } from '@radix-ui/react-icons'
 import { ChevronDownIcon, Loader2 } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
 
-export function Header() {
+interface HeaderProps {
+  onSubmit: () => void
+}
+
+export function Header({ onSubmit }: HeaderProps) {
   const {
     formState: { isSubmitting },
   } = useFormContext()
@@ -105,10 +109,11 @@ export function Header() {
         </AlertDialog>
 
         <Button
-          type="submit"
+          type="button"
           size="sm"
           className="w-32"
           disabled={isUploadsEmpty || isThereAnyPendingUpload || isSubmitting}
+          onClick={onSubmit}
         >
           {isSubmitting ? (
             <Loader2 className="h-3 w-3 animate-spin" />

@@ -660,7 +660,6 @@ export function UploadsProvider({ children }: { children: ReactNode }) {
         )
       })
       .forEach(([id]) => {
-        console.log('oi', id)
         startAudioUpload(id)
       })
   }, [uploads, startAudioUpload])
