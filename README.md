@@ -6,12 +6,12 @@
 
 Upload videos, upload to panda and R2, embed om player
 
-- [ ] Video edit (ongoing)
+- [x] Video edit (ongoing)
+- [x] Finish tags input
+- [x] Remove "Delete video" option
 - [ ] Skylab integration (ongoing)
 
 - [ ] Sync subtitles with Panda
-- [ ] Finish tags input
-- [ ] Remove "Delete video" option
 
 # Thoughts
 
