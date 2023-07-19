@@ -20,3 +20,5 @@ Upload videos, upload to panda and R2, embed om player
 - Find possibly typos in transcription based on commit diff
 - Tests please?!
 - refactor upload table (selectors - too many renders)
+
+- ci
