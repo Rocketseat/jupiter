@@ -62,16 +62,12 @@ export function Overview() {
           stroke="#888888"
           tickLine={false}
           axisLine={false}
-          // @ts-expect-error RechartsTypeError
-          fontSize={12}
         />
         <YAxis
           stroke="#888888"
           tickLine={false}
           axisLine={false}
           tickFormatter={(value: string) => `$${value}`}
-          // @ts-expect-error RechartsTypeError
-          fontSize={12}
         />
         <Bar dataKey="total" fill="#8257e6" radius={[4, 4, 0, 0]} />
       </BarChart>
