@@ -69,14 +69,11 @@ export function UploadList() {
   return (
     <FormProvider {...uploadsForm}>
       <UploadsProvider>
-        <form
-          className="space-y-4"
-          onSubmit={handleSubmit(handleCreateUploads)}
-        >
-          <Header />
+        <div className="space-y-4">
+          <Header onSubmit={handleSubmit(handleCreateUploads)} />
           <UploadDropArea />
           <UploadTable />
-        </form>
+        </div>
       </UploadsProvider>
     </FormProvider>
   )

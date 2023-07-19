@@ -8,14 +8,22 @@ import { Button } from '@/components/ui/button'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
+import { useMutation } from '@tanstack/react-query'
+import axios from 'axios'
+import { useToast } from '@/components/ui/use-toast'
 
 interface VideoFormProps {
   video: any
 }
 
 const editVideoFormSchema = z.object({
-  title: z.string(),
+  title: z.string().min(1, { message: 'Please provide a valid title.' }),
   description: z.string().nullable(),
+  commitUrl: z
+    .string()
+    .url({ message: 'Please provide a valid Github URL.' })
+    .nullable(),
   tags: z.array(z.string()).min(1, {
     message: 'At least one tag is required.',
   }),
@@ -24,19 +32,41 @@ const editVideoFormSchema = z.object({
 export type EditVideoFormSchema = z.infer<typeof editVideoFormSchema>
 
 export function VideoForm({ video }: VideoFormProps) {
+  const { toast } = useToast()
+
   const editVideoForm = useForm<EditVideoFormSchema>({
     resolver: zodResolver(editVideoFormSchema),
     defaultValues: {
       title: video.title,
       description: video.description,
+      tags: video.tags.map((tag: any) => tag.slug),
+      commitUrl: video.commitUrl,
     },
   })
 
-  function handleSaveVideo(data: EditVideoFormSchema) {
-    console.log(data)
+  const { mutateAsync: updateVideo } = useMutation(
+    async (data: EditVideoFormSchema) => {
+      await axios.put(`/api/videos/${video.id}`, data)
+    },
+  )
+
+  async function handleSaveVideo(data: EditVideoFormSchema) {
+    try {
+      await updateVideo(data)
+    } catch {
+      toast({
+        title: 'Uh oh! Something went wrong.',
+        description: `An error ocurred while trying to save the video.`,
+        variant: 'destructive',
+      })
+    }
   }
 
-  const { handleSubmit, register } = editVideoForm
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isSubmitting },
+  } = editVideoForm
 
   return (
     <FormProvider {...editVideoForm}>
@@ -47,6 +77,16 @@ export function VideoForm({ video }: VideoFormProps) {
             <span className="text-muted-foreground">(synced with Skylab)</span>
           </Label>
           <Input id="title" {...register('title')} />
+          {errors.title && (
+            <p className="text-sm font-medium text-red-500 dark:text-red-400">
+              {errors.title.message}
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="commit">Tags</Label>
+          <VideoTagInput />
         </div>
 
         <div className="space-y-2">
@@ -69,20 +109,25 @@ export function VideoForm({ video }: VideoFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="commit">Commit reference</Label>
-          <Input id="commit" />
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            The commit reference will help us finding typos inside the video
-            transcription
-          </p>
+          <Label htmlFor="commit">
+            Commit reference{' '}
+            <span className="text-muted-foreground">(synced with Skylab)</span>
+          </Label>
+          <Input id="commit" {...register('commitUrl')} />
+          {errors.commitUrl && (
+            <p className="text-sm font-medium text-red-500 dark:text-red-400">
+              {errors.commitUrl.message}
+            </p>
+          )}
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="commit">Tags</Label>
-          <VideoTagInput />
-        </div>
-
-        <Button type="submit">Save video</Button>
+        <Button className="w-24" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            'Save'
+          )}
+        </Button>
       </form>
     </FormProvider>
   )

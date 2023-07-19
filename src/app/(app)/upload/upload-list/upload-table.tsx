@@ -17,7 +17,6 @@ import {
   InfoCircledIcon,
 } from '@radix-ui/react-icons'
 import { Loader2, TrashIcon } from 'lucide-react'
-import { TagInput } from './upload-tag-input'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { useUploads } from '@/hooks/useUploads'
@@ -31,6 +30,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { UploadTagInput } from './upload-tag-input'
 
 export function UploadTable() {
   const {
@@ -112,7 +112,7 @@ export function UploadTable() {
                       disabled={isRunningAI}
                       {...register(`files.${index}.title`)}
                     />
-                    <TagInput uploadIndex={index} />
+                    <UploadTagInput uploadIndex={index} />
                   </div>
                 </TableCell>
                 <TableCell>

@@ -18,6 +18,13 @@ export async function Overview({ videoId }: OverviewProps) {
     where: {
       id: videoId,
     },
+    include: {
+      tags: {
+        select: {
+          slug: true,
+        },
+      },
+    },
   })
 
   return (

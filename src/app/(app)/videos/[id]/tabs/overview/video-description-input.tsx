@@ -4,7 +4,7 @@ import { useCompletion } from 'ai/react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { MagicWandIcon } from '@radix-ui/react-icons'
-import { ComponentPropsWithoutRef, useEffect } from 'react'
+import { useEffect } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
 import { EditVideoFormSchema } from './video-form'
@@ -21,7 +21,9 @@ export function VideoDescriptionInput({ videoId }: VideoDescriptionInputProps) {
   })
 
   useEffect(() => {
-    setValue('description', completion)
+    if (completion) {
+      setValue('description', completion)
+    }
   }, [completion, setValue])
 
   return (

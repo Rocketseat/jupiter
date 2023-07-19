@@ -6,11 +6,18 @@
 
 Upload videos, upload to panda and R2, embed om player
 
-# To-do
+- [x] Video edit (ongoing)
+- [x] Finish tags input
+- [x] Remove "Delete video" option
+- [ ] Skylab integration (ongoing)
 
-- datadog / sentry
-- tag logic
-- deadletter queue (manual retry)
+- [ ] Sync subtitles with Panda
+
+# Thoughts
+
+- Datadog / Sentry
+- DeadLetter queue (manual retry)
   - store number of retries and if its the last maybe notice somewhere and display a button for manual retry
-- find possibly typos in transcription based on commit diff
-- tests please?!
+- Find possibly typos in transcription based on commit diff
+- Tests please?!
+- refactor upload table (selectors - too many renders)

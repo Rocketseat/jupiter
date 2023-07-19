@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { randomUUID } from 'crypto'
 import { NextResponse } from 'next/server'
@@ -21,48 +20,53 @@ const createBatchSchema = z.object({
 
 export async function POST(request: Request) {
   const requestBody = await request.json()
-  const { files } = createBatchSchema.parse(requestBody)
+  const { files: videos } = createBatchSchema.parse(requestBody)
 
   const batchId = randomUUID()
 
   try {
     await prisma.$transaction(async (tx) => {
-      const videos: Prisma.VideoCreateManyUploadBatchInput[] = files.map(
-        (file, index) => {
-          return {
-            id: randomUUID(),
-            uploadOrder: index + 1,
-            title: file.title,
-            storageKey: `inputs/${file.id}.mp4`,
-            audioStorageKey: `inputs/${file.id}.mp3`,
-            sizeInBytes: file.sizeInBytes,
-            duration: file.duration,
-          }
-        },
-      )
-
       await tx.uploadBatch.create({
         data: {
           id: batchId,
-          videos: {
-            createMany: {
-              data: videos,
-            },
-          },
         },
       })
 
       await Promise.all(
-        videos.map(async (video) => {
-          await publishMessage({
-            topic: 'jupiter.upload-created',
-            body: {
-              videoId: video.id,
+        videos.map((video, index) => {
+          return tx.video.create({
+            data: {
+              id: video.id,
+              uploadBatchId: batchId,
+              uploadOrder: index + 1,
+              title: video.title,
+              storageKey: `inputs/${video.id}.mp4`,
+              audioStorageKey: `inputs/${video.id}.mp3`,
+              sizeInBytes: video.sizeInBytes,
+              duration: video.duration,
+              tags: {
+                connect: video.tags.map((tag) => {
+                  return {
+                    slug: tag,
+                  }
+                }),
+              },
             },
           })
         }),
       )
     })
+
+    await Promise.all(
+      videos.map(async (video) => {
+        await publishMessage({
+          topic: 'jupiter.upload-created',
+          body: {
+            videoId: video.id,
+          },
+        })
+      }),
+    )
 
     return NextResponse.json({ batchId })
   } catch (err) {

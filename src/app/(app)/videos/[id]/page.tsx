@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import { VideoIcon } from '@radix-ui/react-icons'
 import { Music2 } from 'lucide-react'
 import { Metadata } from 'next'
-import { DeleteVideoButton } from './delete-video-button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Overview } from './tabs/overview'
 import { Webhooks } from './tabs/webhooks'
@@ -22,6 +21,8 @@ export async function generateMetadata({
   }
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function VideoPage({ params }: VideoPageProps) {
   const videoId = params.id
 
@@ -33,8 +34,6 @@ export default async function VideoPage({ params }: VideoPageProps) {
         </h2>
 
         <div className="flex items-center gap-2">
-          <DeleteVideoButton videoId={videoId} />
-
           <Button variant="secondary" asChild>
             <a
               href={`/api/videos/${videoId}/download/video`}
