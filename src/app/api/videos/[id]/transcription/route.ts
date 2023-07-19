@@ -11,7 +11,7 @@ export async function GET(_: Request, { params }: TranscriptionParams) {
   const videoId = params.id
 
   try {
-    const transcription = await prisma.transcription.findUniqueOrThrow({
+    const transcription = await prisma.transcription.findUnique({
       where: {
         videoId,
       },

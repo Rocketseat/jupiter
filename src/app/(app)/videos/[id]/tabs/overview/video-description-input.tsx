@@ -21,7 +21,9 @@ export function VideoDescriptionInput({ videoId }: VideoDescriptionInputProps) {
   })
 
   useEffect(() => {
-    setValue('description', completion)
+    if (completion) {
+      setValue('description', completion)
+    }
   }, [completion, setValue])
 
   return (
