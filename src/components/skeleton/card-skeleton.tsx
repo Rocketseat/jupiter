@@ -11,12 +11,8 @@ export function CardSkeleton() {
         <Skeleton className="h-4 w-4" />
       </CardHeader>
       <CardContent className="space-y-1">
-        <span className="text-2xl font-bold">
-          <Skeleton className="h-6 w-32" />
-        </span>
-        <p className="text-xs text-muted-foreground">
-          <Skeleton className="h-4 w-40" />
-        </p>
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-4 w-40" />
       </CardContent>
     </Card>
   )

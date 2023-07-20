@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
 
-import { cn } from '@/lib/utils'
+import { twMerge } from 'tailwind-merge'
 
 const badgeVariants = tv({
   base: 'inline-flex items-center rounded-md border border-slate-200 px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 dark:border-slate-800 dark:focus:ring-slate-800',
@@ -27,7 +27,10 @@ export interface BadgeProps
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    <div
+      className={twMerge(badgeVariants({ variant }), className)}
+      {...props}
+    />
   )
 }
 

@@ -11,7 +11,7 @@ import {
   CommandList,
 } from './ui/command'
 import { CheckIcon, PlusIcon } from '@radix-ui/react-icons'
-import { cn } from '@/lib/utils'
+import { twMerge } from 'tailwind-merge'
 import { useQuery } from '@tanstack/react-query'
 import useDebounceValue from '@/hooks/useDebounceValue'
 import { useState } from 'react'
@@ -152,14 +152,14 @@ export function TagInput({
                         }}
                       >
                         <div
-                          className={cn(
+                          className={twMerge(
                             'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
                             isSelected
                               ? 'bg-primary text-primary-foreground'
                               : 'opacity-50 [&_svg]:invisible',
                           )}
                         >
-                          <CheckIcon className={cn('h-4 w-4')} />
+                          <CheckIcon className={twMerge('h-4 w-4')} />
                         </div>
                         <span>{option.slug}</span>
                       </CommandItem>
