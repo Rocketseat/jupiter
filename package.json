@@ -36,6 +36,7 @@
     "@t3-oss/env-nextjs": "0.6.0",
     "@tanstack/react-query": "4.29.19",
     "@tanstack/react-table": "8.9.3",
+    "@upstash/kafka": "1.3.3",
     "@upstash/qstash": "0.3.6",
     "ai": "2.1.17",
     "axios": "1.4.0",
