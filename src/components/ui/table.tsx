@@ -9,7 +9,10 @@ const Table = React.forwardRef<
   <div className="w-full overflow-auto">
     <table
       ref={ref}
-      className={twMerge('w-full table-fixed caption-bottom text-sm', className)}
+      className={twMerge(
+        'w-full table-fixed caption-bottom text-sm',
+        className,
+      )}
       {...props}
     />
   </div>
@@ -20,7 +23,11 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className={twMerge('[&_tr]:border-b', className)} {...props} />
+  <thead
+    ref={ref}
+    className={twMerge('[&_tr]:border-b', className)}
+    {...props}
+  />
 ))
 TableHeader.displayName = 'TableHeader'
 
@@ -103,7 +110,10 @@ const TableCaption = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <caption
     ref={ref}
-    className={twMerge('mt-4 text-sm text-slate-500 dark:text-slate-400', className)}
+    className={twMerge(
+      'mt-4 text-sm text-slate-500 dark:text-slate-400',
+      className,
+    )}
     {...props}
   />
 ))
