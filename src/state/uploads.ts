@@ -39,6 +39,7 @@ type Uploads = Map<string, Upload>
  */
 
 export const isRunningAudioConversionAtom = atom(false)
+export const isRunningAIGenerationAtom = atom(false)
 export const audioConversionQueueAtom = atomWithImmer<Set<string>>(new Set())
 export const uploadsAtom = atomWithImmer<Uploads>(new Map())
 
@@ -57,8 +58,8 @@ export const isThereAnyPendingUploadAtom = atom((get) => {
       upload.isUploadingAudio ||
       upload.isConvertingAudio ||
       upload.hasVideoUploadError ||
-      upload.hasAudioUploadError ||
-      upload.hasVideoUploadError
+      upload.hasAudioConversionError ||
+      upload.hasAudioUploadError
     )
   })
 })
@@ -146,16 +147,32 @@ function createUpdateUploadDraft(uploadId: string, update: Partial<Upload>) {
  * Action atoms
  */
 
+export const addToAudioConversionQueueAtom = atom(
+  null,
+  (get, set, uploadId: string) => {
+    set(audioConversionQueueAtom, (draft) => draft.add(uploadId))
+
+    set(
+      uploadsAtom,
+      createUpdateUploadDraft(uploadId, {
+        isConvertingAudio: false,
+        audioConversionProgress: 0,
+        hasAudioConversionError: false,
+      }),
+    )
+
+    if (get(isRunningAudioConversionAtom) === false) {
+      set(runAudioConversionQueueAtom)
+    }
+  },
+)
+
 export const addUploadAtom = atom(null, (get, set, file: File) => {
   const uploadId = crypto.randomUUID()
 
   set(uploadsAtom, (draft) => draft.set(uploadId, createUploadFromFile(file)))
   set(startUploadAtom, uploadId)
-  set(audioConversionQueueAtom, (draft) => draft.add(uploadId))
-
-  if (get(isRunningAudioConversionAtom) === false) {
-    set(runAudioConversionQueueAtom)
-  }
+  set(addToAudioConversionQueueAtom, uploadId)
 
   return uploadId
 })
@@ -293,25 +310,36 @@ export const convertUploadVideoToAudioAtom = atom(
     try {
       const { file } = get(getUploadById(uploadId))
 
-      const audioFile = await convertVideoToMP3(file, (progress) => {
-        set(
-          uploadsAtom,
-          createUpdateUploadDraft(uploadId, {
-            audioConversionProgress: progress,
-          }),
-        )
-      })
+      const result = await Promise.race<[Promise<File>, Promise<'timeout'>]>([
+        convertVideoToMP3(file, (progress) => {
+          set(
+            uploadsAtom,
+            createUpdateUploadDraft(uploadId, {
+              audioConversionProgress: progress,
+            }),
+          )
+        }),
+        new Promise((resolve) => setTimeout(resolve, 15_000, 'timeout')),
+      ])
+
+      if (result === 'timeout') {
+        throw new Error('Audio conversion timeout')
+      }
 
       set(
         uploadsAtom,
         createUpdateUploadDraft(uploadId, {
           isConvertingAudio: false,
-          audioFile,
+          audioFile: result,
         }),
       )
 
       set(startAudioUploadAtom, uploadId)
     } catch (err) {
+      if (ffmpeg.isLoaded()) {
+        ffmpeg.exit()
+      }
+
       set(
         uploadsAtom,
         createUpdateUploadDraft(uploadId, {
@@ -329,7 +357,7 @@ export const convertUploadVideoToAudioAtom = atom(
   },
 )
 
-export const runAudioConversionQueueAtom = atom(null, (get, set) => {
+export const runAudioConversionQueueAtom = atom(null, async (get, set) => {
   const queue = get(audioConversionQueueAtom)
 
   if (queue.size === 0) {

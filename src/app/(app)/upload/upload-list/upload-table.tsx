@@ -33,8 +33,10 @@ import { UploadTagInput } from './upload-tag-input'
 import { useAtomValue, useSetAtom } from 'jotai'
 
 import {
+  addToAudioConversionQueueAtom,
   areUploadsEmptyAtom,
   deleteUploadAtom,
+  isRunningAIGenerationAtom,
   isThereAnyPendingUploadAtom,
   startAudioUploadAtom,
   startUploadAtom,
@@ -51,9 +53,11 @@ export function UploadTable() {
   const areUploadsEmpty = useAtomValue(areUploadsEmptyAtom)
   const isThereAnyPendingUpload = useAtomValue(isThereAnyPendingUploadAtom)
   const uploads = useAtomValue(uploadsAtom)
+  const isRunningAI = useAtomValue(isRunningAIGenerationAtom)
 
   const updateDuration = useSetAtom(updateUploadDurationAtom)
   const startUpload = useSetAtom(startUploadAtom)
+  const addToAudioConversionQueue = useSetAtom(addToAudioConversionQueueAtom)
   const startAudioUpload = useSetAtom(startAudioUploadAtom)
   const deleteUpload = useSetAtom(deleteUploadAtom)
 
@@ -76,8 +80,6 @@ export function UploadTable() {
   ) {
     updateDuration(id, event.currentTarget.duration)
   }
-
-  const isRunningAI = false
 
   return (
     <div className="rounded-md border">
@@ -200,6 +202,20 @@ export function UploadTable() {
                         value={upload.audioConversionProgress}
                         className="transition-all"
                       />
+                    ) : upload.hasAudioConversionError ? (
+                      <>
+                        <CrossCircledIcon className="mr-2 h-4 w-4 text-red-500 dark:text-red-400" />
+                        <span className="text-red-500 dark:text-red-400">
+                          Error{' '}
+                          <Button
+                            variant="link"
+                            className="inline p-0 text-inherit dark:text-inherit"
+                            onClick={() => addToAudioConversionQueue(id)}
+                          >
+                            (Retry)
+                          </Button>
+                        </span>
+                      </>
                     ) : upload.audioConversionProgress === 100 ? (
                       <>
                         <CheckCircledIcon className="h-4 w-4 text-emerald-500" />

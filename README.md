@@ -12,6 +12,10 @@ Upload videos, upload to panda and R2, embed om player
 - [ ] Skylab integration (ongoing)
 - [ ] Sync subtitles with Panda
 
+## Jotai Migration
+
+- Split in more components
+
 # Thoughts
 
 - Datadog / Sentry

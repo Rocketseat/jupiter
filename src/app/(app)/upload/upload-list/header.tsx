@@ -23,10 +23,13 @@ import {
   amountOfUploadsAtom,
   areUploadsEmptyAtom,
   clearUploadsAtom,
+  isRunningAIGenerationAtom,
   isThereAnyPendingUploadAtom,
+  uploadsAtom,
 } from '@/state/uploads'
 import { MagicWandIcon, TextIcon } from '@radix-ui/react-icons'
-import { useAtomValue, useSetAtom } from 'jotai'
+import axios from 'axios'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { ChevronDownIcon, Loader2 } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
 
@@ -37,17 +40,39 @@ interface HeaderProps {
 export function Header({ onSubmit }: HeaderProps) {
   const {
     formState: { isSubmitting },
+    setValue,
   } = useFormContext()
 
+  const [isRunningAI, setIsRunningAI] = useAtom(isRunningAIGenerationAtom)
+
+  const uploads = useAtomValue(uploadsAtom)
   const amountOfUploads = useAtomValue(amountOfUploadsAtom)
   const isThereAnyPendingUpload = useAtomValue(isThereAnyPendingUploadAtom)
   const areUploadsEmpty = useAtomValue(areUploadsEmptyAtom)
   const clearUploads = useSetAtom(clearUploadsAtom)
 
-  const isRunningAI = false
+  async function generateAITitles() {
+    setIsRunningAI(true)
 
-  function generateAITitles() {
-    // todo
+    await Promise.allSettled(
+      Array.from(uploads.values()).map(async (upload, index) => {
+        const fileName = upload.file.name
+
+        const response = await axios.get('/api/ai/generate/title', {
+          params: {
+            slug: fileName,
+          },
+        })
+
+        const { title } = response.data
+
+        setValue(`files.${index}.title`, title, {
+          shouldValidate: true,
+        })
+      }),
+    )
+
+    setIsRunningAI(false)
   }
 
   return (

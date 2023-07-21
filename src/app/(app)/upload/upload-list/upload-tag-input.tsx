@@ -1,8 +1,10 @@
 'use client'
 
-import { useController, useFormContext } from 'react-hook-form'
+import { useController, useFieldArray, useFormContext } from 'react-hook-form'
 import { UploadsFormSchema } from '.'
 import { TagInput } from '@/components/tag-input'
+import { useAtomValue } from 'jotai'
+import { amountOfUploadsAtom } from '@/state/uploads'
 
 interface TagInputProps {
   uploadIndex: number
@@ -10,6 +12,7 @@ interface TagInputProps {
 
 export function UploadTagInput({ uploadIndex }: TagInputProps) {
   const { control, setValue } = useFormContext<UploadsFormSchema>()
+  const amountOfUploads = useAtomValue(amountOfUploadsAtom)
 
   const {
     field,
@@ -23,12 +26,11 @@ export function UploadTagInput({ uploadIndex }: TagInputProps) {
   const { value, onChange } = field
 
   function handleApplyToAllUploads() {
-    // todo
-    // Array.from(uploads.entries()).forEach((_, index) => {
-    //   setValue(`files.${index}.tags`, value, {
-    //     shouldValidate: true,
-    //   })
-    // })
+    Array.from({ length: amountOfUploads }).forEach((_, index) => {
+      setValue(`files.${index}.tags`, value, {
+        shouldValidate: true,
+      })
+    })
   }
 
   return (
