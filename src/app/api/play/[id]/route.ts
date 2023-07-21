@@ -7,7 +7,9 @@ interface PlayVideoParams {
   }
 }
 
-export async function GET(_: Request, { params }: PlayVideoParams) {
+export async function GET(request: Request, { params }: PlayVideoParams) {
+  const { search } = new URL(request.url)
+
   const video = await prisma.video.findUniqueOrThrow({
     where: {
       id: params.id,
@@ -17,13 +19,17 @@ export async function GET(_: Request, { params }: PlayVideoParams) {
     },
   })
 
-  return NextResponse.redirect(
-    `https://b-vz-762f4670-e04.tv.pandavideo.com.br/${video.externalProviderId}/playlist.m3u8`,
-    {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      },
-    },
+  const redirectUrl = new URL(
+    '/embed',
+    'https://player-vz-762f4670-e04.tv.pandavideo.com.br',
   )
+
+  redirectUrl.search = search.concat(`&videoId=${video.externalProviderId}`)
+
+  return NextResponse.redirect(redirectUrl, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    },
+  })
 }
