@@ -6,12 +6,8 @@
 
 Upload videos, upload to panda and R2, embed om player
 
-- [x] Video edit (ongoing)
-- [x] Finish tags input
-- [x] Remove "Delete video" option
-- [ ] Skylab integration (ongoing)
-  - [x] On Video Created
 - [ ] Sync subtitles with Panda
+- [ ] Play route (edge redirect)
 
 # Thoughts
 
@@ -21,5 +17,6 @@ Upload videos, upload to panda and R2, embed om player
 - Find possibly typos in transcription based on commit diff
 - Tests please?!
 - refactor upload table (selectors - too many renders)
+- remove some preload links from listings
 
 - ci
