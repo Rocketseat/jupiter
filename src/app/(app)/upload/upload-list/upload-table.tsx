@@ -10,39 +10,26 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatBytes } from '@/utils/format-bytes'
-import {
-  DotsHorizontalIcon,
-  CrossCircledIcon,
-  CheckCircledIcon,
-  InfoCircledIcon,
-} from '@radix-ui/react-icons'
 import { Loader2, TrashIcon } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { Progress } from '@/components/ui/progress'
 import { SyntheticEvent, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { UploadsFormSchema } from '.'
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
 import { UploadTagInput } from './upload-tag-input'
 import { useAtomValue, useSetAtom } from 'jotai'
 
 import {
-  addToAudioConversionQueueAtom,
   areUploadsEmptyAtom,
   deleteUploadAtom,
   isRunningAIGenerationAtom,
   isThereAnyPendingUploadAtom,
-  startAudioUploadAtom,
-  startUploadAtom,
   updateUploadDurationAtom,
   uploadsAtom,
 } from '@/state/uploads'
+import { VideoUploadProgressColumn } from './columns/video-upload-progress-column'
+import { AudioConversionProgressColumn } from './columns/audio-conversion-progress-column'
+import { AudioUploadProgressColumn } from './columns/audio-upload-progress-column'
 
 export function UploadTable() {
   const {
@@ -56,9 +43,6 @@ export function UploadTable() {
   const isRunningAI = useAtomValue(isRunningAIGenerationAtom)
 
   const updateDuration = useSetAtom(updateUploadDurationAtom)
-  const startUpload = useSetAtom(startUploadAtom)
-  const addToAudioConversionQueue = useSetAtom(addToAudioConversionQueueAtom)
-  const startAudioUpload = useSetAtom(startAudioUploadAtom)
   const deleteUpload = useSetAtom(deleteUploadAtom)
 
   /**
@@ -153,141 +137,13 @@ export function UploadTable() {
                   )}
                 </TableCell>
                 <TableCell>
-                  {upload.isUploadingVideo ? (
-                    <Progress
-                      max={100}
-                      value={upload.videoUploadProgress}
-                      className="transition-all"
-                    />
-                  ) : (
-                    <div className="flex items-center font-medium">
-                      {upload.videoUploadProgress === 0 &&
-                      !upload.hasVideoUploadError ? (
-                        <>
-                          <DotsHorizontalIcon className="mr-2 h-4 w-4" />
-                          <span className="text-muted-foreground">
-                            Waiting upload
-                          </span>
-                        </>
-                      ) : upload.hasVideoUploadError ? (
-                        <>
-                          <CrossCircledIcon className="mr-2 h-4 w-4 text-red-500" />
-                          <span className="text-red-500">
-                            Upload error{' '}
-                            <Button
-                              variant="link"
-                              className="inline p-0 text-inherit"
-                              onClick={() => startUpload(id)}
-                            >
-                              (Retry)
-                            </Button>
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircledIcon className="mr-2 h-4 w-4 text-emerald-500" />
-                          <span className="text-emerald-500">
-                            Upload complete
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  )}
+                  <VideoUploadProgressColumn uploadId={id} />
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2 font-medium text-muted-foreground">
-                    {upload.isConvertingAudio ? (
-                      <Progress
-                        max={100}
-                        value={upload.audioConversionProgress}
-                        className="transition-all"
-                      />
-                    ) : upload.hasAudioConversionError ? (
-                      <>
-                        <CrossCircledIcon className="mr-2 h-4 w-4 text-red-500 dark:text-red-400" />
-                        <span className="text-red-500 dark:text-red-400">
-                          Error{' '}
-                          <Button
-                            variant="link"
-                            className="inline p-0 text-inherit dark:text-inherit"
-                            onClick={() => addToAudioConversionQueue(id)}
-                          >
-                            (Retry)
-                          </Button>
-                        </span>
-                      </>
-                    ) : upload.audioConversionProgress === 100 ? (
-                      <>
-                        <CheckCircledIcon className="h-4 w-4 text-emerald-500" />
-                        <span className="text-emerald-500">
-                          Conversion complete
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <DotsHorizontalIcon className="h-4 w-4" />
-                        <span className="text-muted-foreground">
-                          Waiting on queue
-                        </span>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <InfoCircledIcon className="h-4 w-4 cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-[280px]">
-                              <p className="text-center text-xs text-slate-600 dark:text-slate-400">
-                                As we perform the audio conversion in the
-                                browser, each video is converted individually
-                                through a queue.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </>
-                    )}
-                  </div>
+                  <AudioConversionProgressColumn uploadId={id} />
                 </TableCell>
                 <TableCell>
-                  {upload.isUploadingAudio ? (
-                    <Progress
-                      max={100}
-                      value={upload.audioUploadProgress}
-                      className="transition-all"
-                    />
-                  ) : (
-                    <div className="flex items-center font-medium">
-                      {upload.audioUploadProgress === 0 &&
-                      !upload.hasAudioUploadError ? (
-                        <>
-                          <DotsHorizontalIcon className="mr-2 h-4 w-4" />
-                          <span className="text-muted-foreground">
-                            Waiting upload
-                          </span>
-                        </>
-                      ) : upload.hasAudioUploadError ? (
-                        <>
-                          <CrossCircledIcon className="mr-2 h-4 w-4 text-red-500" />
-                          <span className="text-red-500">
-                            Upload error{' '}
-                            <Button
-                              variant="link"
-                              className="inline p-0 text-inherit"
-                              onClick={() => startAudioUpload(id)}
-                            >
-                              (Retry)
-                            </Button>
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircledIcon className="mr-2 h-4 w-4 text-emerald-500" />
-                          <span className="text-emerald-500">
-                            Upload complete
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  )}
+                  <AudioUploadProgressColumn uploadId={id} />
                 </TableCell>
                 <TableCell>
                   <Button

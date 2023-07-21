@@ -13,10 +13,6 @@ Upload videos, upload to panda and R2, embed om player
   - [x] On Video Created
 - [ ] Sync subtitles with Panda
 
-## Jotai Migration
-
-- Split in more components
-
 # Thoughts
 
 - Datadog / Sentry

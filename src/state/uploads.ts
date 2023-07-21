@@ -10,26 +10,16 @@ enableMapSet()
 
 interface Upload {
   file: File
-
+  audioFile?: File
   previewURL: string
   duration?: number
   isRemoving: boolean
+}
 
-  /** Video Upload */
-  isUploadingVideo: boolean
-  videoUploadProgress: number
-  hasVideoUploadError: boolean
-
-  /** Audio Conversion */
-  audioFile?: File
-  isConvertingAudio: boolean
-  audioConversionProgress: number
-  hasAudioConversionError: boolean
-
-  /** Audio Upload */
-  isUploadingAudio: boolean
-  audioUploadProgress: number
-  hasAudioUploadError: boolean
+interface AsyncActionWithProgress {
+  isRunning: boolean
+  progress: number
+  error: boolean
 }
 
 type Uploads = Map<string, Upload>
@@ -43,6 +33,18 @@ export const isRunningAIGenerationAtom = atom(false)
 export const audioConversionQueueAtom = atomWithImmer<Set<string>>(new Set())
 export const uploadsAtom = atomWithImmer<Uploads>(new Map())
 
+export const videoUploadAtom = atomWithImmer<
+  Map<string, AsyncActionWithProgress>
+>(new Map())
+
+export const audioConversionAtom = atomWithImmer<
+  Map<string, AsyncActionWithProgress>
+>(new Map())
+
+export const audioUploadAtom = atomWithImmer<
+  Map<string, AsyncActionWithProgress>
+>(new Map())
+
 /**
  * State selectors
  */
@@ -52,48 +54,38 @@ export const areUploadsEmptyAtom = atom((get) => {
 })
 
 export const isThereAnyPendingUploadAtom = atom((get) => {
-  return Array.from(get(uploadsAtom).values()).some((upload) => {
+  return Array.from(get(uploadsAtom).keys()).some((id) => {
+    const videoUpload = get(videoUploadAtom).get(id)
+    const audioConversion = get(audioConversionAtom).get(id)
+    const audioUpload = get(audioUploadAtom).get(id)
+
     return (
-      upload.isUploadingVideo ||
-      upload.isUploadingAudio ||
-      upload.isConvertingAudio ||
-      upload.hasVideoUploadError ||
-      upload.hasAudioConversionError ||
-      upload.hasAudioUploadError
+      videoUpload?.isRunning ||
+      videoUpload?.error ||
+      audioConversion?.isRunning ||
+      audioConversion?.error ||
+      audioUpload?.isRunning ||
+      audioUpload?.error
     )
   })
 })
 
 export const summarizedPercentageAtom = atom((get) => {
-  const { amountOfItems, percentageSum } = Array.from(
-    get(uploadsAtom).values(),
-  ).reduce(
-    (acc, upload) => {
-      return {
-        amountOfItems: acc.amountOfItems + 1,
-        percentageSum:
-          acc.percentageSum +
-          (upload.videoUploadProgress +
-            upload.audioUploadProgress +
-            upload.audioUploadProgress) /
-            3,
-      }
-    },
-    {
-      amountOfItems: 0,
-      percentageSum: 0,
-    },
+  const videoUploadProgress = summarizePercentage(
+    Array.from(get(videoUploadAtom).values()),
   )
 
-  if (amountOfItems === 0) {
-    return 0
-  }
+  const audioConversionProgress = summarizePercentage(
+    Array.from(get(audioConversionAtom).values()),
+  )
 
-  const percentage = amountOfItems
-    ? Math.round(percentageSum / amountOfItems)
-    : 0
+  const audioUploadProgress = summarizePercentage(
+    Array.from(get(audioUploadAtom).values()),
+  )
 
-  return percentage
+  return (
+    (videoUploadProgress + audioConversionProgress + audioUploadProgress) / 3
+  )
 })
 
 export const amountOfUploadsAtom = atom((get) => get(uploadsAtom).size)
@@ -101,23 +93,6 @@ export const amountOfUploadsAtom = atom((get) => get(uploadsAtom).size)
 /**
  * Helpers
  */
-
-function createUploadFromFile(file: File): Upload {
-  return {
-    file,
-    previewURL: URL.createObjectURL(file),
-    isRemoving: false,
-    isUploadingVideo: false,
-    isConvertingAudio: false,
-    isUploadingAudio: false,
-    hasVideoUploadError: false,
-    hasAudioConversionError: false,
-    hasAudioUploadError: false,
-    videoUploadProgress: 0,
-    audioConversionProgress: 0,
-    audioUploadProgress: 0,
-  }
-}
 
 function getUploadById(uploadId: string) {
   return selectAtom(uploadsAtom, (state) => {
@@ -143,6 +118,18 @@ function createUpdateUploadDraft(uploadId: string, update: Partial<Upload>) {
   }
 }
 
+function summarizePercentage(actions: AsyncActionWithProgress[]) {
+  if (actions.length === 0) {
+    return 0
+  }
+
+  const percentageSum = actions.reduce((acc, action) => {
+    return acc + action.progress
+  }, 0)
+
+  return percentageSum / actions.length
+}
+
 /**
  * Action atoms
  */
@@ -152,14 +139,15 @@ export const addToAudioConversionQueueAtom = atom(
   (get, set, uploadId: string) => {
     set(audioConversionQueueAtom, (draft) => draft.add(uploadId))
 
-    set(
-      uploadsAtom,
-      createUpdateUploadDraft(uploadId, {
-        isConvertingAudio: false,
-        audioConversionProgress: 0,
-        hasAudioConversionError: false,
-      }),
-    )
+    set(audioConversionAtom, (draft) => {
+      const audioConversion = draft.get(uploadId)
+
+      if (!audioConversion) return
+
+      audioConversion.isRunning = false
+      audioConversion.progress = 0
+      audioConversion.error = false
+    })
 
     if (get(isRunningAudioConversionAtom) === false) {
       set(runAudioConversionQueueAtom)
@@ -167,11 +155,42 @@ export const addToAudioConversionQueueAtom = atom(
   },
 )
 
-export const addUploadAtom = atom(null, (get, set, file: File) => {
+export const addUploadAtom = atom(null, (_, set, file: File) => {
   const uploadId = crypto.randomUUID()
 
-  set(uploadsAtom, (draft) => draft.set(uploadId, createUploadFromFile(file)))
-  set(startUploadAtom, uploadId)
+  set(uploadsAtom, (draft) =>
+    draft.set(uploadId, {
+      file,
+      previewURL: URL.createObjectURL(file),
+      isRemoving: false,
+    }),
+  )
+
+  set(videoUploadAtom, (draft) =>
+    draft.set(uploadId, {
+      isRunning: false,
+      error: false,
+      progress: 0,
+    }),
+  )
+
+  set(audioConversionAtom, (draft) =>
+    draft.set(uploadId, {
+      isRunning: false,
+      error: false,
+      progress: 0,
+    }),
+  )
+
+  set(audioUploadAtom, (draft) =>
+    draft.set(uploadId, {
+      isRunning: false,
+      error: false,
+      progress: 0,
+    }),
+  )
+
+  set(startVideoUploadAtom, uploadId)
   set(addToAudioConversionQueueAtom, uploadId)
 
   return uploadId
@@ -188,17 +207,18 @@ export const updateUploadDurationAtom = atom(
   },
 )
 
-export const startUploadAtom = atom(
+export const startVideoUploadAtom = atom(
   null,
   async (get, set, uploadId: string) => {
-    set(
-      uploadsAtom,
-      createUpdateUploadDraft(uploadId, {
-        isUploadingVideo: true,
-        videoUploadProgress: 0,
-        hasVideoUploadError: false,
-      }),
-    )
+    set(videoUploadAtom, (draft) => {
+      const videoUpload = draft.get(uploadId)
+
+      if (!videoUpload) return
+
+      videoUpload.isRunning = true
+      videoUpload.progress = 0
+      videoUpload.error = false
+    })
 
     const upload = get(getUploadById(uploadId))
     const abortController = new AbortController()
@@ -217,23 +237,25 @@ export const startUploadAtom = atom(
             ? Math.round(progressEvent.progress * 100)
             : 0
 
-          set(
-            uploadsAtom,
-            createUpdateUploadDraft(uploadId, {
-              videoUploadProgress: progress,
-              isUploadingVideo: progress < 100,
-            }),
-          )
+          set(videoUploadAtom, (draft) => {
+            const videoUpload = draft.get(uploadId)
+
+            if (!videoUpload) return
+
+            videoUpload.progress = progress
+            videoUpload.isRunning = progress < 100
+          })
         },
       })
     } catch (err) {
-      set(
-        uploadsAtom,
-        createUpdateUploadDraft(uploadId, {
-          isUploadingVideo: false,
-          hasVideoUploadError: true,
-        }),
-      )
+      set(videoUploadAtom, (draft) => {
+        const videoUpload = draft.get(uploadId)
+
+        if (!videoUpload) return
+
+        videoUpload.isRunning = false
+        videoUpload.error = true
+      })
     }
   },
 )
@@ -241,14 +263,15 @@ export const startUploadAtom = atom(
 export const startAudioUploadAtom = atom(
   null,
   async (get, set, uploadId: string) => {
-    set(
-      uploadsAtom,
-      createUpdateUploadDraft(uploadId, {
-        isUploadingAudio: true,
-        audioUploadProgress: 0,
-        hasAudioUploadError: false,
-      }),
-    )
+    set(audioUploadAtom, (draft) => {
+      const audioUpload = draft.get(uploadId)
+
+      if (!audioUpload) return
+
+      audioUpload.progress = 0
+      audioUpload.isRunning = true
+      audioUpload.error = false
+    })
 
     try {
       const upload = get(getUploadById(uploadId))
@@ -274,23 +297,25 @@ export const startAudioUploadAtom = atom(
             ? Math.round(progressEvent.progress * 100)
             : 0
 
-          set(
-            uploadsAtom,
-            createUpdateUploadDraft(uploadId, {
-              audioUploadProgress: progress,
-              isUploadingAudio: progress < 100,
-            }),
-          )
+          set(audioUploadAtom, (draft) => {
+            const audioUpload = draft.get(uploadId)
+
+            if (!audioUpload) return
+
+            audioUpload.progress = progress
+            audioUpload.isRunning = progress < 100
+          })
         },
       })
     } catch (err) {
-      set(
-        uploadsAtom,
-        createUpdateUploadDraft(uploadId, {
-          isUploadingAudio: false,
-          hasAudioUploadError: true,
-        }),
-      )
+      set(audioUploadAtom, (draft) => {
+        const audioUpload = draft.get(uploadId)
+
+        if (!audioUpload) return
+
+        audioUpload.isRunning = false
+        audioUpload.error = true
+      })
     }
   },
 )
@@ -298,26 +323,28 @@ export const startAudioUploadAtom = atom(
 export const convertUploadVideoToAudioAtom = atom(
   null,
   async (get, set, uploadId: string) => {
-    set(
-      uploadsAtom,
-      createUpdateUploadDraft(uploadId, {
-        isConvertingAudio: true,
-        audioConversionProgress: 0,
-        hasAudioConversionError: false,
-      }),
-    )
+    set(audioConversionAtom, (draft) => {
+      const audioConversion = draft.get(uploadId)
+
+      if (!audioConversion) return
+
+      audioConversion.progress = 0
+      audioConversion.isRunning = true
+      audioConversion.error = false
+    })
 
     try {
       const { file } = get(getUploadById(uploadId))
 
       const result = await Promise.race<[Promise<File>, Promise<'timeout'>]>([
         convertVideoToMP3(file, (progress) => {
-          set(
-            uploadsAtom,
-            createUpdateUploadDraft(uploadId, {
-              audioConversionProgress: progress,
-            }),
-          )
+          set(audioConversionAtom, (draft) => {
+            const audioConversion = draft.get(uploadId)
+
+            if (!audioConversion) return
+
+            audioConversion.progress = progress
+          })
         }),
         new Promise((resolve) => setTimeout(resolve, 15_000, 'timeout')),
       ])
@@ -326,10 +353,17 @@ export const convertUploadVideoToAudioAtom = atom(
         throw new Error('Audio conversion timeout')
       }
 
+      set(audioConversionAtom, (draft) => {
+        const audioConversion = draft.get(uploadId)
+
+        if (!audioConversion) return
+
+        audioConversion.isRunning = false
+      })
+
       set(
         uploadsAtom,
         createUpdateUploadDraft(uploadId, {
-          isConvertingAudio: false,
           audioFile: result,
         }),
       )
@@ -340,13 +374,14 @@ export const convertUploadVideoToAudioAtom = atom(
         ffmpeg.exit()
       }
 
-      set(
-        uploadsAtom,
-        createUpdateUploadDraft(uploadId, {
-          isConvertingAudio: false,
-          hasAudioConversionError: true,
-        }),
-      )
+      set(audioConversionAtom, (draft) => {
+        const audioConversion = draft.get(uploadId)
+
+        if (!audioConversion) return
+
+        audioConversion.isRunning = false
+        audioConversion.error = true
+      })
     } finally {
       set(audioConversionQueueAtom, (draft) => {
         draft.delete(uploadId)
@@ -381,13 +416,13 @@ export const deleteUploadAtom = atom(
   async (get, set, uploadId: string) => {
     set(uploadsAtom, createUpdateUploadDraft(uploadId, { isRemoving: true }))
 
-    const { isUploadingVideo, isUploadingAudio, isConvertingAudio } = get(
-      getUploadById(uploadId),
-    )
+    // const { isUploadingVideo, isUploadingAudio, isConvertingAudio } = get(
+    //   getUploadById(uploadId),
+    // )
 
-    if (isConvertingAudio) {
-      ffmpeg.exit()
-    }
+    // if (isConvertingAudio) {
+    //   ffmpeg.exit()
+    // }
 
     set(uploadsAtom, (draft) => draft.delete(uploadId))
   },
