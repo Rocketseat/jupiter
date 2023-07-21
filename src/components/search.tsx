@@ -71,7 +71,7 @@ export function Search() {
           onValueChange={setSearch}
           placeholder="Search videos..."
         />
-        <CommandList>
+        <CommandList className="h-auto">
           <CommandGroup heading="Recent uploads">
             {isLoadingVideos ? (
               <div className="flex cursor-default select-none items-center justify-center gap-2 rounded-sm px-2 py-1.5 text-sm text-muted-foreground">

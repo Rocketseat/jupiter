@@ -18,6 +18,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import { Dialog } from './ui/dialog'
 import { CreateNewTagDialog } from './create-new-tag-dialog'
+import { ScrollArea } from './ui/scroll-area'
 
 export interface TagInputProps {
   value: string[]
@@ -116,57 +117,59 @@ export function TagInput({
             />
 
             <CommandList>
-              <CommandGroup>
-                <CommandItem
-                  onSelect={() => {
-                    setCreateTagDialogOpen(true)
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <PlusIcon className="h-3 w-3" />
-                  Create new
-                </CommandItem>
-                {isLoadingTagOptions ? (
-                  <div className="flex cursor-default select-none items-center justify-center gap-2 rounded-sm p-2 text-sm text-muted-foreground">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    <span>Loading tags...</span>
-                  </div>
-                ) : tagOptions.length === 0 ? (
-                  <div className="flex cursor-default select-none items-center justify-center gap-2 rounded-sm p-2 text-sm text-muted-foreground">
-                    No tags found.
-                  </div>
-                ) : (
-                  tagOptions.map((option: any) => {
-                    const isSelected = value.includes(option.slug)
+              <ScrollArea className="h-[160px] w-full">
+                <CommandGroup>
+                  <CommandItem
+                    onSelect={() => {
+                      setCreateTagDialogOpen(true)
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <PlusIcon className="h-3 w-3" />
+                    Create new
+                  </CommandItem>
+                  {isLoadingTagOptions ? (
+                    <div className="flex cursor-default select-none items-center justify-center gap-2 rounded-sm p-2 text-sm text-muted-foreground">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      <span>Loading tags...</span>
+                    </div>
+                  ) : tagOptions.length === 0 ? (
+                    <div className="flex cursor-default select-none items-center justify-center gap-2 rounded-sm p-2 text-sm text-muted-foreground">
+                      No tags found.
+                    </div>
+                  ) : (
+                    tagOptions.map((option: any) => {
+                      const isSelected = value.includes(option.slug)
 
-                    return (
-                      <CommandItem
-                        key={option.id}
-                        value={option.id}
-                        onSelect={() => {
-                          if (isSelected) {
-                            handleRemoveTag(option.slug)
-                          } else {
-                            handleAddTag(option.slug)
-                          }
-                        }}
-                      >
-                        <div
-                          className={twMerge(
-                            'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
-                            isSelected
-                              ? 'bg-primary text-primary-foreground'
-                              : 'opacity-50 [&_svg]:invisible',
-                          )}
+                      return (
+                        <CommandItem
+                          key={option.id}
+                          value={option.id}
+                          onSelect={() => {
+                            if (isSelected) {
+                              handleRemoveTag(option.slug)
+                            } else {
+                              handleAddTag(option.slug)
+                            }
+                          }}
                         >
-                          <CheckIcon className={twMerge('h-4 w-4')} />
-                        </div>
-                        <span>{option.slug}</span>
-                      </CommandItem>
-                    )
-                  })
-                )}
-              </CommandGroup>
+                          <div
+                            className={twMerge(
+                              'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                              isSelected
+                                ? 'bg-primary text-primary-foreground'
+                                : 'opacity-50 [&_svg]:invisible',
+                            )}
+                          >
+                            <CheckIcon className={twMerge('h-4 w-4')} />
+                          </div>
+                          <span>{option.slug}</span>
+                        </CommandItem>
+                      )
+                    })
+                  )}
+                </CommandGroup>
+              </ScrollArea>
             </CommandList>
 
             <div className="border-t">

@@ -7,7 +7,6 @@ import { Search } from 'lucide-react'
 
 import { twMerge } from 'tailwind-merge'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { ScrollArea } from './scroll-area'
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -66,7 +65,7 @@ const CommandList = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
 >(({ children, ...props }, ref) => (
   <CommandPrimitive.List ref={ref} {...props}>
-    <ScrollArea className="h-[160px] w-full">{children}</ScrollArea>
+    {children}
   </CommandPrimitive.List>
 ))
 
