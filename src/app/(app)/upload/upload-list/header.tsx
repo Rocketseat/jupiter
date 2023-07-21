@@ -19,8 +19,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
-import { useUploads } from '@/hooks/useUploads'
+import {
+  amountOfUploadsAtom,
+  areUploadsEmptyAtom,
+  clearUploadsAtom,
+  isRunningAIGenerationAtom,
+  isThereAnyPendingUploadAtom,
+  uploadsAtom,
+} from '@/state/uploads'
 import { MagicWandIcon, TextIcon } from '@radix-ui/react-icons'
+import axios from 'axios'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { ChevronDownIcon, Loader2 } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
 
@@ -31,16 +40,40 @@ interface HeaderProps {
 export function Header({ onSubmit }: HeaderProps) {
   const {
     formState: { isSubmitting },
+    setValue,
   } = useFormContext()
 
-  const {
-    uploads,
-    clear,
-    isThereAnyPendingUpload,
-    isUploadsEmpty,
-    isRunningAI,
-    generateAITitles,
-  } = useUploads()
+  const [isRunningAI, setIsRunningAI] = useAtom(isRunningAIGenerationAtom)
+
+  const uploads = useAtomValue(uploadsAtom)
+  const amountOfUploads = useAtomValue(amountOfUploadsAtom)
+  const isThereAnyPendingUpload = useAtomValue(isThereAnyPendingUploadAtom)
+  const areUploadsEmpty = useAtomValue(areUploadsEmptyAtom)
+  const clearUploads = useSetAtom(clearUploadsAtom)
+
+  async function generateAITitles() {
+    setIsRunningAI(true)
+
+    await Promise.allSettled(
+      Array.from(uploads.values()).map(async (upload, index) => {
+        const fileName = upload.file.name
+
+        const response = await axios.get('/api/ai/generate/title', {
+          params: {
+            slug: fileName,
+          },
+        })
+
+        const { title } = response.data
+
+        setValue(`files.${index}.title`, title, {
+          shouldValidate: true,
+        })
+      }),
+    )
+
+    setIsRunningAI(false)
+  }
 
   return (
     <div className="flex items-center justify-between">
@@ -59,7 +92,7 @@ export function Header({ onSubmit }: HeaderProps) {
               size="sm"
               variant="secondary"
               className="flex gap-2"
-              disabled={isUploadsEmpty || isSubmitting}
+              disabled={areUploadsEmpty || isSubmitting}
             >
               {isRunningAI ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -88,7 +121,7 @@ export function Header({ onSubmit }: HeaderProps) {
             <Button
               size="sm"
               variant="ghost"
-              disabled={isUploadsEmpty || isSubmitting}
+              disabled={areUploadsEmpty || isSubmitting}
             >
               Clear all
             </Button>
@@ -103,7 +136,9 @@ export function Header({ onSubmit }: HeaderProps) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={clear}>Prosseguir</AlertDialogAction>
+              <AlertDialogAction onClick={clearUploads}>
+                Prosseguir
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -112,13 +147,13 @@ export function Header({ onSubmit }: HeaderProps) {
           type="button"
           size="sm"
           className="w-32"
-          disabled={isUploadsEmpty || isThereAnyPendingUpload || isSubmitting}
+          disabled={areUploadsEmpty || isThereAnyPendingUpload || isSubmitting}
           onClick={onSubmit}
         >
           {isSubmitting ? (
             <Loader2 className="h-3 w-3 animate-spin" />
           ) : (
-            <>Create all ({uploads.size})</>
+            <>Create all ({amountOfUploads})</>
           )}
         </Button>
       </div>

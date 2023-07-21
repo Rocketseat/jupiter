@@ -19,7 +19,6 @@ import {
 import { Loader2, TrashIcon } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
-import { useUploads } from '@/hooks/useUploads'
 import { SyntheticEvent, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { UploadsFormSchema } from '.'
@@ -31,6 +30,19 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { UploadTagInput } from './upload-tag-input'
+import { useAtomValue, useSetAtom } from 'jotai'
+
+import {
+  addToAudioConversionQueueAtom,
+  areUploadsEmptyAtom,
+  deleteUploadAtom,
+  isRunningAIGenerationAtom,
+  isThereAnyPendingUploadAtom,
+  startAudioUploadAtom,
+  startUploadAtom,
+  updateUploadDurationAtom,
+  uploadsAtom,
+} from '@/state/uploads'
 
 export function UploadTable() {
   const {
@@ -38,16 +50,16 @@ export function UploadTable() {
     formState: { errors },
   } = useFormContext<UploadsFormSchema>()
 
-  const {
-    uploads,
-    isRunningAI,
-    startUpload,
-    startAudioUpload,
-    remove,
-    isUploadsEmpty,
-    isThereAnyPendingUpload,
-    updateDuration,
-  } = useUploads()
+  const areUploadsEmpty = useAtomValue(areUploadsEmptyAtom)
+  const isThereAnyPendingUpload = useAtomValue(isThereAnyPendingUploadAtom)
+  const uploads = useAtomValue(uploadsAtom)
+  const isRunningAI = useAtomValue(isRunningAIGenerationAtom)
+
+  const updateDuration = useSetAtom(updateUploadDurationAtom)
+  const startUpload = useSetAtom(startUploadAtom)
+  const addToAudioConversionQueue = useSetAtom(addToAudioConversionQueueAtom)
+  const startAudioUpload = useSetAtom(startAudioUploadAtom)
+  const deleteUpload = useSetAtom(deleteUploadAtom)
 
   /**
    * Intercept window closing when there is any upload in progress
@@ -141,22 +153,23 @@ export function UploadTable() {
                   )}
                 </TableCell>
                 <TableCell>
-                  {upload.isUploading ? (
+                  {upload.isUploadingVideo ? (
                     <Progress
                       max={100}
-                      value={upload.uploadProgress}
+                      value={upload.videoUploadProgress}
                       className="transition-all"
                     />
                   ) : (
                     <div className="flex items-center font-medium">
-                      {upload.uploadProgress === 0 && !upload.hasError ? (
+                      {upload.videoUploadProgress === 0 &&
+                      !upload.hasVideoUploadError ? (
                         <>
                           <DotsHorizontalIcon className="mr-2 h-4 w-4" />
                           <span className="text-muted-foreground">
                             Waiting upload
                           </span>
                         </>
-                      ) : upload.hasError ? (
+                      ) : upload.hasVideoUploadError ? (
                         <>
                           <CrossCircledIcon className="mr-2 h-4 w-4 text-red-500" />
                           <span className="text-red-500">
@@ -186,10 +199,24 @@ export function UploadTable() {
                     {upload.isConvertingAudio ? (
                       <Progress
                         max={100}
-                        value={upload.audioProgress}
+                        value={upload.audioConversionProgress}
                         className="transition-all"
                       />
-                    ) : upload.audioProgress === 100 ? (
+                    ) : upload.hasAudioConversionError ? (
+                      <>
+                        <CrossCircledIcon className="mr-2 h-4 w-4 text-red-500 dark:text-red-400" />
+                        <span className="text-red-500 dark:text-red-400">
+                          Error{' '}
+                          <Button
+                            variant="link"
+                            className="inline p-0 text-inherit dark:text-inherit"
+                            onClick={() => addToAudioConversionQueue(id)}
+                          >
+                            (Retry)
+                          </Button>
+                        </span>
+                      </>
+                    ) : upload.audioConversionProgress === 100 ? (
                       <>
                         <CheckCircledIcon className="h-4 w-4 text-emerald-500" />
                         <span className="text-emerald-500">
@@ -230,14 +257,14 @@ export function UploadTable() {
                   ) : (
                     <div className="flex items-center font-medium">
                       {upload.audioUploadProgress === 0 &&
-                      !upload.audioHasError ? (
+                      !upload.hasAudioUploadError ? (
                         <>
                           <DotsHorizontalIcon className="mr-2 h-4 w-4" />
                           <span className="text-muted-foreground">
                             Waiting upload
                           </span>
                         </>
-                      ) : upload.audioHasError ? (
+                      ) : upload.hasAudioUploadError ? (
                         <>
                           <CrossCircledIcon className="mr-2 h-4 w-4 text-red-500" />
                           <span className="text-red-500">
@@ -264,7 +291,7 @@ export function UploadTable() {
                 </TableCell>
                 <TableCell>
                   <Button
-                    onClick={() => remove(id)}
+                    onClick={() => deleteUpload(id)}
                     size="sm"
                     variant="destructive"
                     disabled={upload.isRemoving}
@@ -281,7 +308,7 @@ export function UploadTable() {
             )
           })}
 
-          {isUploadsEmpty && (
+          {areUploadsEmpty && (
             <TableRow>
               <TableCell colSpan={7} className="h-24 text-center">
                 No videos selected.

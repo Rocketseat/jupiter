@@ -10,7 +10,7 @@ import {
   useFormContext,
 } from 'react-hook-form'
 
-import { cn } from '@/lib/utils'
+import { twMerge } from 'tailwind-merge'
 import { Label } from '@/components/ui/label'
 
 const Form = FormProvider
@@ -78,7 +78,7 @@ const FormItem = React.forwardRef<
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn('space-y-2', className)} {...props} />
+      <div ref={ref} className={twMerge('space-y-2', className)} {...props} />
     </FormItemContext.Provider>
   )
 })
@@ -93,7 +93,7 @@ const FormLabel = React.forwardRef<
   return (
     <Label
       ref={ref}
-      className={cn(error && 'text-red-500 dark:text-red-900', className)}
+      className={twMerge(error && 'text-red-500 dark:text-red-900', className)}
       htmlFor={formItemId}
       {...props}
     />
@@ -133,7 +133,10 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn('text-sm text-slate-500 dark:text-slate-400', className)}
+      className={twMerge(
+        'text-sm text-slate-500 dark:text-slate-400',
+        className,
+      )}
       {...props}
     />
   )
@@ -155,7 +158,7 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn(
+      className={twMerge(
         'text-sm font-medium text-red-500 dark:text-red-900',
         className,
       )}

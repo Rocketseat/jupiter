@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider } from 'next-themes'
 import { SessionProvider } from 'next-auth/react'
 import { ReactNode, useState } from 'react'
+import { Provider as JotaiProvider } from 'jotai'
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
@@ -17,7 +18,7 @@ export default function Providers({ children }: { children: ReactNode }) {
     >
       <SessionProvider>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <JotaiProvider>{children}</JotaiProvider>
         </QueryClientProvider>
       </SessionProvider>
     </ThemeProvider>

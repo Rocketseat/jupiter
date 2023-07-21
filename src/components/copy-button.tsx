@@ -2,7 +2,7 @@
 
 import { ComponentProps, useRef, useState } from 'react'
 import { Button } from './ui/button'
-import { cn } from '@/lib/utils'
+import { twMerge } from 'tailwind-merge'
 
 export interface CopyButtonProps extends ComponentProps<typeof Button> {
   textToCopy: string
@@ -29,9 +29,9 @@ export function CopyButton({ textToCopy, ...props }: CopyButtonProps) {
       {...props}
       data-highlight={wasCopiedRecently}
       onClick={handleCopy}
-      className={cn(
-        props.className,
+      className={twMerge(
         'data-[highlight=true]:border-emerald-500 data-[highlight=true]:bg-emerald-500 data-[highlight=true]:text-white data-[highlight=true]:transition-none',
+        props.className,
       )}
     >
       {wasCopiedRecently ? 'Copied!' : props.children}

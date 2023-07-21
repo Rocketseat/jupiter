@@ -79,7 +79,7 @@ export function Search() {
                 <span>Loading videos...</span>
               </div>
             ) : videos.length === 0 ? (
-              <div className="flex cursor-default select-none items-center justify-center gap-2 rounded-sm px-2 py-1.5 text-sm text-muted-foreground">
+              <div className="flex h-full cursor-default select-none items-center justify-center gap-2 rounded-sm px-2 py-1.5 text-sm text-muted-foreground">
                 No results found.
               </div>
             ) : (

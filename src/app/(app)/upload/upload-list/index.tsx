@@ -1,6 +1,5 @@
 'use client'
 
-import { UploadsProvider } from '@/hooks/useUploads'
 import { Header } from './header'
 import { UploadDropArea } from './upload-drop-area'
 import { UploadTable } from './upload-table'
@@ -41,7 +40,9 @@ export function UploadList() {
     formState: { isSubmitting },
   } = uploadsForm
 
-  async function handleCreateUploads(data: UploadsFormSchema) {
+  console.log()
+
+  async function handleCreateUploadBatch(data: UploadsFormSchema) {
     try {
       const response = await axios.post('/api/batches', data)
       const { batchId } = response.data
@@ -57,7 +58,7 @@ export function UploadList() {
           <ToastAction
             altText="Try again"
             disabled={isSubmitting}
-            onClick={handleSubmit(handleCreateUploads)}
+            onClick={handleSubmit(handleCreateUploadBatch)}
           >
             Try again
           </ToastAction>
@@ -68,13 +69,11 @@ export function UploadList() {
 
   return (
     <FormProvider {...uploadsForm}>
-      <UploadsProvider>
-        <div className="space-y-4">
-          <Header onSubmit={handleSubmit(handleCreateUploads)} />
-          <UploadDropArea />
-          <UploadTable />
-        </div>
-      </UploadsProvider>
+      <div className="space-y-4">
+        <Header onSubmit={handleSubmit(handleCreateUploadBatch)} />
+        <UploadDropArea />
+        <UploadTable />
+      </div>
     </FormProvider>
   )
 }

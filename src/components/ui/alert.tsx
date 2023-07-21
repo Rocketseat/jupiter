@@ -1,23 +1,21 @@
 import * as React from 'react'
-import { cva, type VariantProps } from 'class-variance-authority'
+import { tv, type VariantProps } from 'tailwind-variants'
 
-import { cn } from '@/lib/utils'
+import { twMerge } from 'tailwind-merge'
 
-const alertVariants = cva(
-  'relative w-full rounded-lg border border-slate-200 p-4 [&:has(svg)]:pl-11 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-slate-950 dark:border-slate-800 dark:[&>svg]:text-slate-50',
-  {
-    variants: {
-      variant: {
-        default: 'bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-50',
-        destructive:
-          'border-red-500/50 text-red-500 dark:border-red-500 [&>svg]:text-red-500 dark:border-red-900/50 dark:text-red-900 dark:dark:border-red-900 dark:[&>svg]:text-red-900',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
+const alertVariants = tv({
+  base: 'relative w-full rounded-lg border border-slate-200 p-4 [&:has(svg)]:pl-11 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-slate-950 dark:border-slate-800 dark:[&>svg]:text-slate-50',
+  variants: {
+    variant: {
+      default: 'bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-50',
+      destructive:
+        'border-red-500/50 text-red-500 dark:border-red-500 [&>svg]:text-red-500 dark:border-red-900/50 dark:text-red-900 dark:dark:border-red-900 dark:[&>svg]:text-red-900',
     },
   },
-)
+  defaultVariants: {
+    variant: 'default',
+  },
+})
 
 const Alert = React.forwardRef<
   HTMLDivElement,
@@ -26,7 +24,7 @@ const Alert = React.forwardRef<
   <div
     ref={ref}
     role="alert"
-    className={cn(alertVariants({ variant }), className)}
+    className={twMerge(alertVariants({ variant }), className)}
     {...props}
   />
 ))
@@ -38,7 +36,10 @@ const AlertTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h5
     ref={ref}
-    className={cn('mb-1 font-medium leading-none tracking-tight', className)}
+    className={twMerge(
+      'mb-1 font-medium leading-none tracking-tight',
+      className,
+    )}
     {...props}
   />
 ))
@@ -50,7 +51,7 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn('text-sm [&_p]:leading-relaxed', className)}
+    className={twMerge('text-sm [&_p]:leading-relaxed', className)}
     {...props}
   />
 ))
