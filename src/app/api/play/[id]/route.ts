@@ -21,7 +21,7 @@ export async function GET(_: Request, { params }: PlayVideoParams) {
     `https://b-vz-762f4670-e04.tv.pandavideo.com.br/${video.externalProviderId}/playlist.m3u8`,
     {
       headers: {
-        'Access-Control-Allow-Origin': 'https://app.rocketseat.com.br',
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
       },
     },
