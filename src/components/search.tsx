@@ -16,7 +16,7 @@ import axios from 'axios'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useRouter } from 'next/navigation'
-import useDebounceValue from '@/hooks/useDebounceValue'
+import useDebounceValue from '@/state/useDebounceValue'
 
 dayjs.extend(relativeTime)
 

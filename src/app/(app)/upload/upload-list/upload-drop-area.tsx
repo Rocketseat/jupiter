@@ -1,18 +1,19 @@
 'use client'
 
-import { useUploads } from '@/hooks/useUploads'
+import { addUploadsAtom } from '@/state/uploads'
 import { UploadIcon } from '@radix-ui/react-icons'
+import { useSetAtom } from 'jotai'
 import { useDropzone } from 'react-dropzone'
 
 export function UploadDropArea() {
-  const { add } = useUploads()
+  const addUploads = useSetAtom(addUploadsAtom)
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       'video/mp4': ['.mp4'],
     },
     multiple: true,
-    onDrop: add,
+    onDrop: addUploads,
     maxSize: 524_288_000, // 500mb
   })
 

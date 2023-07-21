@@ -2,7 +2,6 @@
 
 import { useController, useFormContext } from 'react-hook-form'
 import { UploadsFormSchema } from '.'
-import { useUploads } from '@/hooks/useUploads'
 import { TagInput } from '@/components/tag-input'
 
 interface TagInputProps {
@@ -10,7 +9,6 @@ interface TagInputProps {
 }
 
 export function UploadTagInput({ uploadIndex }: TagInputProps) {
-  const { uploads } = useUploads()
   const { control, setValue } = useFormContext<UploadsFormSchema>()
 
   const {
@@ -25,11 +23,12 @@ export function UploadTagInput({ uploadIndex }: TagInputProps) {
   const { value, onChange } = field
 
   function handleApplyToAllUploads() {
-    Array.from(uploads.entries()).forEach((_, index) => {
-      setValue(`files.${index}.tags`, value, {
-        shouldValidate: true,
-      })
-    })
+    // todo
+    // Array.from(uploads.entries()).forEach((_, index) => {
+    //   setValue(`files.${index}.tags`, value, {
+    //     shouldValidate: true,
+    //   })
+    // })
   }
 
   return (

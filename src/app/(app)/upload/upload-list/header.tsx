@@ -19,8 +19,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
-import { useUploads } from '@/hooks/useUploads'
+import {
+  amountOfUploadsAtom,
+  areUploadsEmptyAtom,
+  clearUploadsAtom,
+  isThereAnyPendingUploadAtom,
+} from '@/state/uploads'
 import { MagicWandIcon, TextIcon } from '@radix-ui/react-icons'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { ChevronDownIcon, Loader2 } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
 
@@ -33,14 +39,16 @@ export function Header({ onSubmit }: HeaderProps) {
     formState: { isSubmitting },
   } = useFormContext()
 
-  const {
-    uploads,
-    clear,
-    isThereAnyPendingUpload,
-    isUploadsEmpty,
-    isRunningAI,
-    generateAITitles,
-  } = useUploads()
+  const amountOfUploads = useAtomValue(amountOfUploadsAtom)
+  const isThereAnyPendingUpload = useAtomValue(isThereAnyPendingUploadAtom)
+  const areUploadsEmpty = useAtomValue(areUploadsEmptyAtom)
+  const clearUploads = useSetAtom(clearUploadsAtom)
+
+  const isRunningAI = false
+
+  function generateAITitles() {
+    // todo
+  }
 
   return (
     <div className="flex items-center justify-between">
@@ -59,7 +67,7 @@ export function Header({ onSubmit }: HeaderProps) {
               size="sm"
               variant="secondary"
               className="flex gap-2"
-              disabled={isUploadsEmpty || isSubmitting}
+              disabled={areUploadsEmpty || isSubmitting}
             >
               {isRunningAI ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -88,7 +96,7 @@ export function Header({ onSubmit }: HeaderProps) {
             <Button
               size="sm"
               variant="ghost"
-              disabled={isUploadsEmpty || isSubmitting}
+              disabled={areUploadsEmpty || isSubmitting}
             >
               Clear all
             </Button>
@@ -103,7 +111,9 @@ export function Header({ onSubmit }: HeaderProps) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={clear}>Prosseguir</AlertDialogAction>
+              <AlertDialogAction onClick={clearUploads}>
+                Prosseguir
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -112,13 +122,13 @@ export function Header({ onSubmit }: HeaderProps) {
           type="button"
           size="sm"
           className="w-32"
-          disabled={isUploadsEmpty || isThereAnyPendingUpload || isSubmitting}
+          disabled={areUploadsEmpty || isThereAnyPendingUpload || isSubmitting}
           onClick={onSubmit}
         >
           {isSubmitting ? (
             <Loader2 className="h-3 w-3 animate-spin" />
           ) : (
-            <>Create all ({uploads.size})</>
+            <>Create all ({amountOfUploads})</>
           )}
         </Button>
       </div>
