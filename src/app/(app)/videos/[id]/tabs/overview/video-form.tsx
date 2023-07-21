@@ -12,6 +12,7 @@ import { Loader2 } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 import { useToast } from '@/components/ui/use-toast'
+import { CheckCircledIcon } from '@radix-ui/react-icons'
 
 interface VideoFormProps {
   video: any
@@ -65,7 +66,7 @@ export function VideoForm({ video }: VideoFormProps) {
   const {
     handleSubmit,
     register,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isSubmitSuccessful },
   } = editVideoForm
 
   return (
@@ -121,13 +122,21 @@ export function VideoForm({ video }: VideoFormProps) {
           )}
         </div>
 
-        <Button className="w-24" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            'Save'
+        <div className="flex items-center gap-4">
+          <Button className="w-24" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              'Save'
+            )}
+          </Button>
+          {isSubmitSuccessful && (
+            <div className="flex items-center gap-2 text-sm text-emerald-500 dark:text-emerald-400">
+              <CheckCircledIcon className="h-3 w-3" />
+              <span>Saved!</span>
+            </div>
           )}
-        </Button>
+        </div>
       </form>
     </FormProvider>
   )
