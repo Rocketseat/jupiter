@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { publishMessage } from '@/lib/qstash'
+import { publishMessagesOnTopic } from '@/lib/kafka'
 
 const createBatchSchema = z.object({
   files: z
@@ -67,6 +68,20 @@ export async function POST(request: Request) {
         })
       }),
     )
+
+    await publishMessagesOnTopic({
+      topic: 'jupiter.video-created',
+      messages: videos.map((video) => {
+        return {
+          id: video.id,
+          title: video.title,
+          duration: video.duration,
+          description: null,
+          commitUrl: null,
+          tags: video.tags,
+        }
+      }),
+    })
 
     return NextResponse.json({ batchId })
   } catch (err) {

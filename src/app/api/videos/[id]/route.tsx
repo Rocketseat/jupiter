@@ -1,3 +1,4 @@
+import { publishMessagesOnTopic } from '@/lib/kafka'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
@@ -22,7 +23,7 @@ export async function PUT(request: Request, { params }: UpdateVideoParams) {
     updateVideoBodySchema.parse(requestBody)
 
   try {
-    await prisma.video.update({
+    const { duration } = await prisma.video.update({
       where: {
         id: videoId,
       },
@@ -38,6 +39,20 @@ export async function PUT(request: Request, { params }: UpdateVideoParams) {
           }),
         },
       },
+    })
+
+    await publishMessagesOnTopic({
+      topic: 'jupiter.video-updated',
+      messages: [
+        {
+          id: videoId,
+          duration,
+          title,
+          commitUrl,
+          description,
+          tags,
+        },
+      ],
     })
 
     return new Response()

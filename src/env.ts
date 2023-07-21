@@ -29,6 +29,9 @@ export const env = createEnv({
     QSTASH_TOKEN: z.string().refine(requiredOnEnv('production')),
     QSTASH_CURRENT_SIGNING_KEY: z.string().refine(requiredOnEnv('production')),
     QSTASH_NEXT_SIGNING_KEY: z.string().refine(requiredOnEnv('production')),
+    KAFKA_BROKER_URL: z.string().refine(requiredOnEnv('production')),
+    KAFKA_USERNAME: z.string().refine(requiredOnEnv('production')),
+    KAFKA_PASSWORD: z.string().refine(requiredOnEnv('production')),
   },
   client: {
     NEXT_PUBLIC_VERCEL_URL: z.string().url().min(1),

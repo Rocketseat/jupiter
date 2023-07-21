@@ -15,7 +15,9 @@ export async function publishMessage<T = any>({
   runInDev?: boolean
 }) {
   if (env.NODE_ENV === 'development' && runInDev === false) {
-    console.log(`[Skipped] Publish to "${topic}: ${JSON.stringify(body)}"`)
+    console.log(
+      `[Skipped] [QStash] Publish to "${topic}: ${JSON.stringify(body)}"`,
+    )
 
     return
   }
