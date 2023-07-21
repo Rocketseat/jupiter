@@ -25,7 +25,8 @@ export const columns: ColumnDef<Video>[] = [
         <div className="flex flex-col">
           <Link
             href={`/videos/${row.original.id}`}
-            className="font-medium text-violet-500 hover:underline dark:text-violet-300"
+            prefetch={false}
+            className="text-violet-500 hover:underline dark:text-violet-300"
           >
             {row.original.title}
           </Link>

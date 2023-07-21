@@ -37,7 +37,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem asChild>
-          <Link href={`/videos/${row.original.id}`}>
+          <Link href={`/videos/${row.original.id}`} prefetch={false}>
             <Pencil2Icon className="mr-2 h-4 w-4" />
             <span>Review</span>
           </Link>
@@ -54,7 +54,10 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           <span>Copy HLS</span>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href={`/upload/batches/${row.original.uploadBatchId}`}>
+          <Link
+            href={`/upload/batches/${row.original.uploadBatchId}`}
+            prefetch={false}
+          >
             <StackIcon className="mr-2 h-4 w-4" />
             <span>View batch</span>
           </Link>

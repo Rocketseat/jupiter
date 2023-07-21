@@ -12,6 +12,7 @@ export function NavLink(props: NavLinkProps) {
   return (
     <Link
       {...props}
+      prefetch={false}
       data-current={pathName === props.href}
       className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[current=true]:text-primary"
     />

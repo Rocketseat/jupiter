@@ -73,7 +73,7 @@ export function TranscriptionPreview({ videoId }: TranscriptionPreviewProps) {
               autoFocus
             />
             <Button variant="secondary" asChild>
-              <Link href={`/transcriptions/${transcription.id}`}>
+              <Link href={`/videos/${transcription.videoId}`}>
                 <Edit2 className="mr-2 h-3 w-3" />
                 Review
               </Link>
