@@ -7,7 +7,7 @@
 Upload videos, upload to panda and R2, embed om player
 
 - [ ] Sync subtitles with Panda
-- [ ] Play route (edge redirect)
+- [ ] Sync transcription/video with Houston
 
 # Thoughts
 

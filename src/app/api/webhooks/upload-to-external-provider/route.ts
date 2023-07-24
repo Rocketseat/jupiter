@@ -69,6 +69,7 @@ export async function POST(request: Request) {
       videoFile.Body,
       {
         headers: {
+          Authorization: env.PANDAVIDEO_API_KEY,
           'Tus-Resumable': '1.0.0',
           'Upload-Length': videoFile.ContentLength,
           'Content-Type': 'application/offset+octet-stream',

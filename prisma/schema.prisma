@@ -11,19 +11,20 @@ datasource db {
 }
 
 model Video {
-  id                 String    @id @default(uuid())
-  uploadBatchId      String
-  uploadOrder        Int
-  duration           Int
-  sizeInBytes        Int
-  title              String
-  storageKey         String
-  audioStorageKey    String
-  description        String?
-  externalProviderId String?   @unique
-  processedAt        DateTime?
-  commitUrl          String?
-  createdAt          DateTime  @default(now())
+  id                  String    @id @default(uuid())
+  uploadBatchId       String
+  uploadOrder         Int
+  duration            Int
+  sizeInBytes         Int
+  title               String
+  storageKey          String
+  audioStorageKey     String
+  subtitlesStorageKey String?
+  description         String?
+  externalProviderId  String?   @unique
+  processedAt         DateTime?
+  commitUrl           String?
+  createdAt           DateTime  @default(now())
 
   tags          Tag[]
   uploadBatch   UploadBatch    @relation(fields: [uploadBatchId], references: [id])
@@ -36,6 +37,7 @@ enum WebhookType {
   CREATE_TRANSCRIPTION
   UPLOAD_TO_EXTERNAL_PROVIDER
   UPDATE_EXTERNAL_PROVIDER_STATUS
+  CREATE_SUBTITLES_FROM_TRANSCRIPTION
 }
 
 enum WebhookStatus {
