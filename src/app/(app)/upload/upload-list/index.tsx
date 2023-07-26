@@ -40,8 +40,6 @@ export function UploadList() {
     formState: { isSubmitting },
   } = uploadsForm
 
-  console.log()
-
   async function handleCreateUploadBatch(data: UploadsFormSchema) {
     try {
       const response = await axios.post('/api/batches', data)

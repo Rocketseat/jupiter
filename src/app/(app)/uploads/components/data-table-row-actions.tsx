@@ -82,7 +82,6 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             <span>Download MP3</span>
           </a>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
       </DropdownMenuContent>
     </DropdownMenu>
   )

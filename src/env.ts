@@ -5,7 +5,7 @@ const nodeEnv = z.enum(['development', 'production', 'test'])
 
 function requiredOnEnv(env: z.infer<typeof nodeEnv>) {
   return (value: any) => {
-    if (env === 'production' && !value) {
+    if (env === process.env.NODE_ENV && !value) {
       return false
     }
 
