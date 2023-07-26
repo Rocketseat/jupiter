@@ -1,14 +1,5 @@
 import { Metadata } from 'next'
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Overview } from './components/overview'
-import { RecentSales } from './components/recent-sales'
 import { Storage } from '@/components/summary/storage'
 import { TotalCount } from '@/components/summary/total-count'
 import { ViewsCount } from '@/components/summary/views-count'
