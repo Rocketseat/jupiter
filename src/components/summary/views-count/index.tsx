@@ -39,15 +39,15 @@ export async function ViewsCount() {
 
   const analyticsData: PandaAnalyticsResponse = await response.json()
 
-  const chartData = Object.entries(analyticsData.views_data).map(
-    ([date, metrics]) => {
+  const chartData = Object.entries(analyticsData.views_data)
+    .sort(([date], [compareDate]) => dayjs(date).diff(compareDate, 'days'))
+    .map(([date, metrics]) => {
       return {
         date: dayjs(date).format('MMM D'),
         plays: metrics.play,
         unique: metrics.unique_play,
       }
-    },
-  )
+    })
 
   return (
     <Card>
