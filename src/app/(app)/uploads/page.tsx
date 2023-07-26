@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { VideoList } from './video-list'
-import { Storage } from './summary/storage'
-import { TotalCount } from './summary/total-count'
+import { Storage } from '@/components/summary/storage'
+import { TotalCount } from '@/components/summary/total-count'
 import { Suspense } from 'react'
 import { CardSkeleton } from '@/components/skeleton/card-skeleton'
 
