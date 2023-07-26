@@ -34,14 +34,14 @@ export async function POST(request: Request) {
       },
     })
 
-    // if (video.subtitlesStorageKey) {
-    //   return NextResponse.json(
-    //     { message: 'Video subtitles has already been generated.' },
-    //     {
-    //       status: 409,
-    //     },
-    //   )
-    // }
+    if (video.subtitlesStorageKey) {
+      return NextResponse.json(
+        { message: 'Video subtitles has already been generated.' },
+        {
+          status: 409,
+        },
+      )
+    }
 
     if (!video.externalProviderId) {
       return NextResponse.json(

@@ -77,7 +77,7 @@ export async function POST(request: Request) {
             env.PANDAVIDEO_API_KEY,
           )}, filename ${btoa(video.id)}, video_id ${btoa(
             video.id,
-          )}, folder_id ${btoa('6cf7cc26-f9fc-4e5f-b332-54935d430ab3')}`,
+          )}, folder_id ${btoa(env.PANDAVIDEO_UPLOAD_FOLDER)}`,
         },
       },
     )

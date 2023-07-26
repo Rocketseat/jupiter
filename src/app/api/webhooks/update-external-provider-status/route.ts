@@ -1,3 +1,4 @@
+import { env } from '@/env'
 import { prisma } from '@/lib/prisma'
 import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
     folder_id: folderId,
   } = pandaWebhookBodySchema.parse(await request.json())
 
-  if (!folderId || folderId !== '6cf7cc26-f9fc-4e5f-b332-54935d430ab3') {
+  if (!folderId || folderId !== env.PANDAVIDEO_UPLOAD_FOLDER) {
     /**
      * We want to ignore videos that were not uploaded by Jupiter.
      */
