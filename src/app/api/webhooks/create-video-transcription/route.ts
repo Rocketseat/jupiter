@@ -6,7 +6,7 @@ import FormData from 'form-data'
 import axios from 'axios'
 import { z } from 'zod'
 import { env } from '@/env'
-import { validateQStashSignature } from '@/lib/qstash'
+import { publishMessage, validateQStashSignature } from '@/lib/qstash'
 import { randomUUID } from 'node:crypto'
 
 const createTranscriptionBodySchema = z.object({
@@ -131,6 +131,13 @@ export async function POST(request: Request) {
         },
       }),
     ])
+
+    await publishMessage({
+      topic: 'jupiter.transcription-created',
+      body: {
+        videoId,
+      },
+    })
 
     return new Response()
   } catch (err: any) {

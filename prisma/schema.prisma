@@ -11,22 +11,23 @@ datasource db {
 }
 
 model Video {
-  id                 String    @id @default(uuid())
-  uploadBatchId      String
-  uploadOrder        Int
-  duration           Int
-  sizeInBytes        Int
-  title              String
-  storageKey         String
-  audioStorageKey    String
-  description        String?
-  externalProviderId String?   @unique
-  processedAt        DateTime?
-  commitUrl          String?
-  createdAt          DateTime  @default(now())
+  id                  String    @id @default(uuid())
+  uploadBatchId       String?
+  uploadOrder         Int
+  duration            Int
+  sizeInBytes         Int
+  title               String
+  storageKey          String
+  audioStorageKey     String
+  subtitlesStorageKey String?
+  description         String?
+  externalProviderId  String?   @unique
+  processedAt         DateTime?
+  commitUrl           String?
+  createdAt           DateTime  @default(now())
 
   tags          Tag[]
-  uploadBatch   UploadBatch    @relation(fields: [uploadBatchId], references: [id])
+  uploadBatch   UploadBatch?   @relation(fields: [uploadBatchId], references: [id], onDelete: SetNull)
   transcription Transcription?
   webhooks      Webhook[]
 }
@@ -36,6 +37,7 @@ enum WebhookType {
   CREATE_TRANSCRIPTION
   UPLOAD_TO_EXTERNAL_PROVIDER
   UPDATE_EXTERNAL_PROVIDER_STATUS
+  CREATE_SUBTITLES_FROM_TRANSCRIPTION
 }
 
 enum WebhookStatus {
@@ -53,7 +55,7 @@ model Webhook {
   finishedAt DateTime?
   metadata   String?
 
-  video Video @relation(fields: [videoId], references: [id])
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
 }
 
 model Transcription {
@@ -62,7 +64,7 @@ model Transcription {
   reviewedAt DateTime?
   createdAt  DateTime  @default(now())
 
-  video    Video                  @relation(fields: [videoId], references: [id])
+  video    Video                  @relation(fields: [videoId], references: [id], onDelete: Cascade)
   segments TranscriptionSegment[]
 }
 
@@ -73,7 +75,7 @@ model TranscriptionSegment {
   end             Decimal @db.Decimal(10, 2)
   text            String
 
-  transcription Transcription @relation(fields: [transcriptionId], references: [id])
+  transcription Transcription @relation(fields: [transcriptionId], references: [id], onDelete: Cascade)
 }
 
 model UploadBatch {
