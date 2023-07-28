@@ -7,7 +7,6 @@ const pandaWebhookBodySchema = z.object({
   action: z.enum(['video.changeStatus']),
   folder_id: z.string().optional().nullable(),
   video_id: z.string().uuid(),
-  status: z.enum(['DRAFT', 'CONVERTING', 'CONVERTED', 'FAILED']),
   video_external_id: z.string().uuid(),
 })
 
