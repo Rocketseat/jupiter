@@ -26,10 +26,13 @@ export async function GET(request: Request, { params }: PlayVideoParams) {
 
   redirectUrl.search = search.concat(`&videoId=${video.externalProviderId}`)
 
+  console.log(redirectUrl)
+
   return NextResponse.redirect(redirectUrl, {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
     },
+    status: 301,
   })
 }
