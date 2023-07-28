@@ -24,9 +24,7 @@ export async function GET(request: Request, { params }: PlayVideoParams) {
     'https://player-vz-762f4670-e04.tv.pandavideo.com.br',
   )
 
-  redirectUrl.search = search.concat(`&videoId=${video.externalProviderId}`)
-
-  console.log(redirectUrl)
+  redirectUrl.search = search.concat(`&v=${video.externalProviderId}`)
 
   return NextResponse.redirect(redirectUrl, {
     headers: {
