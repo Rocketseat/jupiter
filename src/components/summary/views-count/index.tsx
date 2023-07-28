@@ -23,7 +23,7 @@ interface PandaAnalyticsResponse {
 }
 
 export async function ViewsCount() {
-  const startDate = dayjs().subtract(1, 'month').format('YYYY-MM-DD')
+  const startDate = dayjs().subtract(15, 'days').format('YYYY-MM-DD')
   const endDate = dayjs().format('YYYY-MM-DD')
 
   const analyticsURL = new URL('/general', 'https://data.pandavideo.com')
