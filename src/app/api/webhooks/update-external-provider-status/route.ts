@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const video = await prisma.video.findUniqueOrThrow({
+    const video = await prisma.video.findUnique({
       where: {
         id: videoId,
       },
