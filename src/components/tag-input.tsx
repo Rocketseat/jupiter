@@ -108,7 +108,7 @@ export function TagInput({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0" align="start">
+        <PopoverContent className="w-[320px] p-0" align="start">
           <Command shouldFilter={false}>
             <CommandInput
               placeholder="Tags"
@@ -117,7 +117,7 @@ export function TagInput({
             />
 
             <CommandList>
-              <ScrollArea className="h-[160px] w-full">
+              <ScrollArea className="h-[240px] w-full">
                 <CommandGroup>
                   <CommandItem
                     onSelect={() => {

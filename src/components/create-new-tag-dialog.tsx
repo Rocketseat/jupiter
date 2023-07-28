@@ -12,10 +12,11 @@ import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useToast } from './ui/use-toast'
+import { Badge } from './ui/badge'
 
 const newTagFormSchema = z.object({
   tag: z
@@ -23,7 +24,7 @@ const newTagFormSchema = z.object({
       required_error: 'The tag name is required.',
     })
     .regex(/^[a-zA-Z]+(-[a-zA-Z]+)*$/, {
-      message: 'Use only contains letters and hyphens.',
+      message: 'Use only letters and hyphens.',
     }),
 })
 
@@ -80,12 +81,41 @@ export function CreateNewTagDialog({
   }
 
   return (
-    <DialogContent className="outline-none sm:max-w-[425px]">
+    <DialogContent className="outline-none sm:max-w-[600px]">
       <DialogHeader>
         <DialogTitle>Create new tag</DialogTitle>
-        <DialogDescription>
-          Remember to avoid creating tags unnecessarily and to keep a maximum of
-          three tags per video.
+        <DialogDescription className="space-y-3">
+          <p>
+            Remember to avoid creating tags unnecessarily and to keep a maximum
+            of{' '}
+            <span className="font-semibold text-accent-foreground">
+              3 tags per video
+            </span>
+            .
+          </p>
+          <p className="flex items-center">
+            <AlertCircle className="mr-2 inline h-4 w-4" />
+            <span>
+              Use the{' '}
+              <span className="font-semibold text-accent-foreground">
+                following examples
+              </span>{' '}
+              to name your tags:
+            </span>
+          </p>
+          <ol className="space-y-2">
+            <li>
+              <Badge variant="outline">ignite</Badge> - reference to the product
+            </li>
+            <li>
+              <Badge variant="outline">react</Badge> - reference to the main
+              technology
+            </li>
+            <li>
+              <Badge variant="outline">fundamentos-do-react</Badge> - reference
+              to the course
+            </li>
+          </ol>
         </DialogDescription>
       </DialogHeader>
 
