@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       {
         role: 'system',
         content:
-          'Se comporte como um especialista em programação que cria resumos a partir da transcrição de uma aula.',
+          'Se comporte como um especialista em programação que cria resumos a partir da transcrição de uma aula. Os resumos devem ter foco educacional para dar contexto sobre uma aula que será publicada numa plataforma de vídeos e deve explicar detalhes sobre o vídeo sem necessariamente replicar o passo à passo do vídeo.',
       },
       {
         role: 'system',
