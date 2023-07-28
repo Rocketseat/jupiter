@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       {
         role: 'system',
         content:
-          'Responda em primeira pessoa como se você fosse o instrutor da aula. Utilize uma linguagem menos formal.',
+          'Responda em primeira pessoa como se você fosse o instrutor da aula. Utilize uma linguagem menos formal. Evite repetir as palavras muitas vezes, use sinônimos sempre que possível.',
       },
       {
         role: 'system',

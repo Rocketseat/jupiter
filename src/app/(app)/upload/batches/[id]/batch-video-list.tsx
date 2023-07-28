@@ -39,6 +39,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { TranscriptionPreview } from '@/components/transcription-preview'
 import { formatBytes } from '@/utils/format-bytes'
+import Link from 'next/link'
 
 dayjs.extend(relativeTime)
 
@@ -98,7 +99,14 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-medium">{video.title}</span>
+                        <span className="font-medium"></span>
+                        <Link
+                          href={`/videos/${video.id}`}
+                          prefetch={false}
+                          className="text-violet-500 hover:underline dark:text-violet-300"
+                        >
+                          {video.title}
+                        </Link>
                         <span className="text-xs text-muted-foreground">
                           {video.id}
                         </span>
