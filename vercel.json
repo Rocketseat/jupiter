@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/webhooks/upload-to-external-provider": {
+      "memory": 3008
+    }
+  }
+}
