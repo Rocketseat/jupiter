@@ -30,6 +30,8 @@ const nextConfig = {
       'aws-crt': false,
       encoding: false,
       '@aws-sdk/signature-v4-crt': false,
+      'bufferutil': false,
+      'utf-8-validate': false,
     }
 
     /**

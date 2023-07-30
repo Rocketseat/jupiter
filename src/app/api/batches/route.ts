@@ -41,8 +41,6 @@ export async function POST(request: Request) {
               uploadBatchId: batchId,
               uploadOrder: index + 1,
               title: video.title,
-              storageKey: `inputs/${video.id}.mp4`,
-              audioStorageKey: `inputs/${video.id}.mp3`,
               sizeInBytes: video.sizeInBytes,
               duration: video.duration,
               tags: {

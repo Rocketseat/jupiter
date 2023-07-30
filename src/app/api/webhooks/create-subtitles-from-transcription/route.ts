@@ -72,15 +72,22 @@ export async function POST(request: Request) {
 
     const subtitlesStorageKey = `batch-${video.uploadBatchId}/${videoId}.vtt`
 
-    const segments: Cue[] = video.transcription.segments.map((segment) => {
-      return {
-        start: segment.start.toNumber(),
-        end: segment.end.toNumber(),
-        text: segment.text,
-        identifier: '',
-        styles: '',
-      }
-    })
+    const segments: Cue[] = video.transcription.segments
+      .map((segment) => {
+        return {
+          start: segment.start.toNumber(),
+          end: segment.end.toNumber(),
+          text: segment.text,
+          identifier: '',
+          styles: '',
+        }
+      })
+      /**
+       * Filter cues where "end" and "start" time are equal
+       */
+      .filter((cue) => {
+        return cue.end > cue.start
+      })
 
     const vtt = compile({
       cues: segments,

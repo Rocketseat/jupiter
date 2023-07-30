@@ -106,18 +106,6 @@ export async function POST(request: Request) {
       },
     })
 
-    const memory = process.memoryUsage() as any
-
-    Object.keys(memory).forEach((memoryKey) => {
-      console.log(
-        `${memoryKey.toUpperCase()}: ${(
-          memory[memoryKey] /
-          1024 /
-          1024
-        ).toFixed(2)}MB`,
-      )
-    })
-
     return new Response()
   } catch (err: any) {
     console.error(err)

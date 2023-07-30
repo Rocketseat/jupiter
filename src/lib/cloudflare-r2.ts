@@ -11,10 +11,3 @@ export const r2 = new S3Client({
     secretAccessKey: env.CLOUDFLARE_SECRET_KEY,
   },
 })
-
-export function buildStorageURL(key: string) {
-  const bucket = env.CLOUDFLARE_BUCKET_NAME
-  const url = new URL(`${bucket}/${key}`, endpoint)
-
-  return url.toString()
-}
