@@ -1,12 +1,16 @@
-import { r2 } from '@/lib/cloudflare-r2'
 import { prisma } from '@/lib/prisma'
-import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { NextResponse } from 'next/server'
 import axios from 'axios'
 import { z } from 'zod'
 import { env } from '@/env'
 import { validateQStashSignature } from '@/lib/qstash'
+import WebSocket from 'ws'
 import { randomUUID } from 'node:crypto'
+
+type PandaMessage = {
+  action: 'progress' | 'success'
+  payload: any
+}
 
 const createTranscriptionBodySchema = z.object({
   videoId: z.string().uuid(),
@@ -53,34 +57,44 @@ export async function POST(request: Request) {
       },
     })
 
-    const videoFile = await r2.send(
-      new GetObjectCommand({
-        Bucket: env.CLOUDFLARE_BUCKET_NAME,
-        Key: video.storageKey,
-      }),
-    )
-
-    if (!videoFile.Body) {
-      return
-    }
+    const videoDownloadURL = `https://pub-${env.CLOUDFLARE_UPLOAD_BUCKET_ID}.r2.dev/${video.id}.mp4`
 
     const response = await axios.post(
-      'https://uploader-us01.pandavideo.com.br/files',
-      videoFile.Body,
+      'https://import.pandavideo.com:9443/videos',
+      {
+        folder_id: env.PANDAVIDEO_UPLOAD_FOLDER,
+        video_id: video.id,
+        title: video.id,
+        url: videoDownloadURL,
+      },
       {
         headers: {
           Authorization: env.PANDAVIDEO_API_KEY,
-          'Tus-Resumable': '1.0.0',
-          'Upload-Length': videoFile.ContentLength,
-          'Content-Type': 'application/offset+octet-stream',
-          'Upload-Metadata': `authorization ${btoa(
-            env.PANDAVIDEO_API_KEY,
-          )}, filename ${btoa(video.id)}, video_id ${btoa(
-            video.id,
-          )}, folder_id ${btoa(env.PANDAVIDEO_UPLOAD_FOLDER)}`,
         },
       },
     )
+
+    const { websocket_url: websocketURL } = response.data
+
+    await new Promise((resolve, reject) => {
+      const socket = new WebSocket(websocketURL)
+
+      socket.on('message', (data) => {
+        try {
+          const message: PandaMessage = JSON.parse(data.toString())
+
+          if (message.action === 'success' && message.payload?.complete) {
+            resolve(true)
+          }
+        } catch (err) {
+          return reject(err)
+        }
+      })
+
+      socket.on('close', () => {
+        resolve(true)
+      })
+    })
 
     await prisma.webhook.update({
       where: {
@@ -92,7 +106,19 @@ export async function POST(request: Request) {
       },
     })
 
-    return NextResponse.json({ data: response.data })
+    const memory = process.memoryUsage() as any
+
+    Object.keys(memory).forEach((memoryKey) => {
+      console.log(
+        `${memoryKey.toUpperCase()}: ${(
+          memory[memoryKey] /
+          1024 /
+          1024
+        ).toFixed(2)}MB`,
+      )
+    })
+
+    return new Response()
   } catch (err: any) {
     console.error(err)
 

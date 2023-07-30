@@ -2,6 +2,12 @@
 
 - intercept route to videos / analytics most watched videos / no watched videos
 
+# Memory improvements
+
+- Whisper JAX
+- Upload via URL (Pre-signed)
+- 
+
 # MVP
 
 Upload videos, upload to panda and R2, embed om player

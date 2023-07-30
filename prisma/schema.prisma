@@ -17,8 +17,8 @@ model Video {
   duration            Int
   sizeInBytes         Int
   title               String
-  storageKey          String
-  audioStorageKey     String
+  storageKey          String?
+  audioStorageKey     String?
   subtitlesStorageKey String?
   description         String?
   externalProviderId  String?   @unique

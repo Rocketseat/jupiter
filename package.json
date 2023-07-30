@@ -59,6 +59,7 @@
     "recharts": "2.7.2",
     "tailwind-merge": "1.13.2",
     "tailwind-variants": "0.1.13",
+    "ws": "8.13.0",
     "zod": "3.21.4"
   },
   "devDependencies": {
@@ -67,6 +68,7 @@
     "@types/react": "18.2.14",
     "@types/react-dom": "18.2.6",
     "@types/recharts": "1.8.24",
+    "@types/ws": "8.5.5",
     "autoprefixer": "10.4.14",
     "eslint": "8.44.0",
     "eslint-config-next": "13.4.9",

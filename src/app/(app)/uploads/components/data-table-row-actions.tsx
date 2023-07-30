@@ -62,7 +62,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             <span>View batch</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem disabled={!row.original.storageKey} asChild>
           <a
             href={`/api/videos/${row.original.id}/download/video`}
             target="_blank"
@@ -72,7 +72,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             <span>Download MP4</span>
           </a>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem disabled={!row.original.audioStorageKey} asChild>
           <a
             href={`/api/videos/${row.original.id}/download/audio`}
             target="_blank"

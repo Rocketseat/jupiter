@@ -70,7 +70,7 @@ export async function POST(request: Request) {
       },
     })
 
-    const subtitlesStorageKey = `subtitles/${videoId}.vtt`
+    const subtitlesStorageKey = `batch-${video.uploadBatchId}/${videoId}.vtt`
 
     const segments: Cue[] = video.transcription.segments.map((segment) => {
       return {
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     await Promise.all([
       await r2.send(
         new PutObjectCommand({
-          Bucket: env.CLOUDFLARE_BUCKET_NAME,
+          Bucket: env.CLOUDFLARE_STORAGE_BUCKET_NAME,
           Key: subtitlesStorageKey,
           Body: vtt,
           ContentType: 'text/vtt',

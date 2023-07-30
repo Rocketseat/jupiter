@@ -40,23 +40,21 @@ export async function POST(request: Request) {
       },
     })
 
-    const bucket = env.CLOUDFLARE_BUCKET_NAME
-
-    const storageKey = `uploads/batch-${video.uploadBatchId}/${video.id}.mp4`
-    const audioStorageKey = `uploads/batch-${video.uploadBatchId}/${video.id}.mp3`
+    const storageKey = `batch-${video.uploadBatchId}/${video.id}.mp4`
+    const audioStorageKey = `batch-${video.uploadBatchId}/${video.id}.mp3`
 
     const moveVideoFilePromise = r2.send(
       new CopyObjectCommand({
-        Bucket: bucket,
-        CopySource: `${bucket}/${video.storageKey}`,
+        Bucket: env.CLOUDFLARE_STORAGE_BUCKET_NAME,
+        CopySource: `${env.CLOUDFLARE_UPLOAD_BUCKET_NAME}/${video.id}.mp4`,
         Key: storageKey,
       }),
     )
 
     const moveAudioFilePromise = r2.send(
       new CopyObjectCommand({
-        Bucket: bucket,
-        CopySource: `${bucket}/${video.audioStorageKey}`,
+        Bucket: env.CLOUDFLARE_STORAGE_BUCKET_NAME,
+        CopySource: `${env.CLOUDFLARE_UPLOAD_BUCKET_NAME}/${video.id}.mp3`,
         Key: audioStorageKey,
       }),
     )

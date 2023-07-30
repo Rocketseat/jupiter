@@ -26,11 +26,23 @@ export async function GET(
       },
     })
 
+    const columnKey = media === 'video' ? 'storageKey' : 'audioStorageKey'
+    const downloadKey = video[columnKey]
+
+    if (downloadKey === null) {
+      return NextResponse.json(
+        { message: 'Media file not found.' },
+        {
+          status: 400,
+        },
+      )
+    }
+
     const downloadSignedUrl = await getSignedUrl(
       r2,
       new GetObjectCommand({
-        Bucket: env.CLOUDFLARE_BUCKET_NAME,
-        Key: media === 'video' ? video.storageKey : video.audioStorageKey,
+        Bucket: env.CLOUDFLARE_STORAGE_BUCKET_NAME,
+        Key: downloadKey,
       }),
       { expiresIn: 60 * 60 /* 1 hour */ },
     )

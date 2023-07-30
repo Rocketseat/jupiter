@@ -11,8 +11,8 @@ export async function POST(request: Request) {
     const signedUrl = await getSignedUrl(
       r2,
       new PutObjectCommand({
-        Bucket: env.CLOUDFLARE_BUCKET_NAME,
-        Key: `inputs/${videoId}.mp4`,
+        Bucket: env.CLOUDFLARE_UPLOAD_BUCKET_NAME,
+        Key: `${videoId}.mp4`,
         ContentType: 'video/mp4',
       }),
       { expiresIn: 600 },

@@ -51,6 +51,15 @@ export async function POST(request: Request) {
       )
     }
 
+    if (!video.audioStorageKey) {
+      return NextResponse.json(
+        { message: 'No audio media found.' },
+        {
+          status: 400,
+        },
+      )
+    }
+
     if (video.transcription) {
       return NextResponse.json(
         { message: 'Video transcription has already been generated.' },
@@ -71,7 +80,7 @@ export async function POST(request: Request) {
 
     const audioFile = await r2.send(
       new GetObjectCommand({
-        Bucket: env.CLOUDFLARE_BUCKET_NAME,
+        Bucket: env.CLOUDFLARE_STORAGE_BUCKET_NAME,
         Key: video.audioStorageKey,
       }),
     )
