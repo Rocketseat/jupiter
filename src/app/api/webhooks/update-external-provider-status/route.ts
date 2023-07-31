@@ -1,4 +1,5 @@
 import { env } from '@/env'
+import { publishMessagesOnTopic } from '@/lib/kafka'
 import { prisma } from '@/lib/prisma'
 import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
@@ -30,6 +31,9 @@ export async function POST(request: Request) {
     const video = await prisma.video.findUnique({
       where: {
         id: videoId,
+      },
+      include: {
+        tags: true,
       },
     })
 
@@ -64,6 +68,21 @@ export async function POST(request: Request) {
         },
       }),
     ])
+
+    await publishMessagesOnTopic({
+      topic: 'jupiter.video-updated',
+      messages: [
+        {
+          id: videoId,
+          duration: video.duration,
+          title: video.title,
+          commitUrl: video.commitUrl,
+          description: video.description,
+          externalProviderId: videoExternalId,
+          tags: video.tags.map((tag) => tag.slug),
+        },
+      ],
+    })
 
     return new Response()
   } catch (err) {

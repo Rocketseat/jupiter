@@ -23,7 +23,7 @@ export async function PUT(request: Request, { params }: UpdateVideoParams) {
     updateVideoBodySchema.parse(requestBody)
 
   try {
-    const { duration } = await prisma.video.update({
+    const { duration, externalProviderId } = await prisma.video.update({
       where: {
         id: videoId,
       },
@@ -50,6 +50,7 @@ export async function PUT(request: Request, { params }: UpdateVideoParams) {
           title,
           commitUrl,
           description,
+          externalProviderId,
           tags,
         },
       ],
