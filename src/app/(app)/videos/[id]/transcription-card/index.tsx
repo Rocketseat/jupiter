@@ -14,7 +14,6 @@ import { Fragment, useRef, useState } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
-import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 
 interface TranscriptionCardProps {
   videoId: string
@@ -53,6 +52,7 @@ export function TranscriptionCard({ videoId }: TranscriptionCardProps) {
 
         return 15 * 1000 // 15 seconds
       },
+      refetchOnWindowFocus: false,
     },
   )
 
