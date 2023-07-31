@@ -6,6 +6,7 @@ import { Metadata } from 'next'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Overview } from './tabs/overview'
 import { Webhooks } from './tabs/webhooks'
+import { prisma } from '@/lib/prisma'
 
 interface VideoPageProps {
   params: { id: string }
@@ -14,10 +15,15 @@ interface VideoPageProps {
 export async function generateMetadata({
   params,
 }: VideoPageProps): Promise<Metadata> {
-  const id = params.id
+  const videoId = params.id
+
+  const { title } = await prisma.video.findFirstOrThrow({
+    where: { id: videoId },
+    select: { title: true },
+  })
 
   return {
-    title: `Video ${id}`,
+    title: `${title}`,
   }
 }
 
