@@ -16,7 +16,11 @@ export async function GET(_: Request, { params }: TranscriptionParams) {
         videoId,
       },
       include: {
-        segments: true,
+        segments: {
+          orderBy: {
+            start: 'asc',
+          },
+        },
       },
     })
 
