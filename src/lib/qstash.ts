@@ -1,5 +1,5 @@
 import { env } from '@/env'
-import { Receiver, Client } from '@upstash/qstash/nodejs'
+import { Receiver, Client, PublishJsonRequest } from '@upstash/qstash/nodejs'
 
 const qstash = new Client({
   token: env.QSTASH_TOKEN,
@@ -9,10 +9,12 @@ export async function publishMessage<T = any>({
   topic,
   body,
   runInDev = false,
+  options,
 }: {
   topic: string
   body: T
   runInDev?: boolean
+  options?: Pick<PublishJsonRequest, 'delay'>
 }) {
   if (env.NODE_ENV === 'development' && runInDev === false) {
     console.log(
@@ -26,6 +28,7 @@ export async function publishMessage<T = any>({
     topic,
     contentBasedDeduplication: true,
     body,
+    ...options,
   })
 }
 

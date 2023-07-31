@@ -146,6 +146,9 @@ export async function POST(request: Request) {
       body: {
         videoId,
       },
+      options: {
+        delay: 10,
+      },
     })
 
     return new Response()
