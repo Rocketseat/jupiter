@@ -28,7 +28,11 @@ export async function POST(request: Request) {
       include: {
         transcription: {
           include: {
-            segments: true,
+            segments: {
+              orderBy: {
+                start: 'asc',
+              },
+            },
           },
         },
       },
