@@ -57,9 +57,15 @@ const handler = NextAuth({
       const googleProfile = profile as GoogleProfile
 
       if (account?.provider === 'google') {
+        const emailDomain = googleProfile.email.match(/@([^@]+)$/)
+
+        if (!emailDomain) {
+          return false
+        }
+
         return (
           googleProfile.email_verified &&
-          googleProfile.email.endsWith('@rocketseat.team')
+          ['@rocketseat.team', '@digitalhouse.com'].includes(emailDomain[0])
         )
       } else if (account?.provider === 'credentials') {
         return true
