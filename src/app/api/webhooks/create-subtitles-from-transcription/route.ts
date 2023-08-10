@@ -70,7 +70,7 @@ export async function POST(request: Request) {
         id: webhookId,
         type: 'CREATE_SUBTITLES_FROM_TRANSCRIPTION',
         videoId,
-        metadata: JSON.stringify(bodyAsJSON),
+        metadata: JSON.stringify({ videoId }),
       },
     })
 

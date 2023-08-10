@@ -56,11 +56,11 @@ export function TranscriptionCard({ videoId }: TranscriptionCardProps) {
     },
   )
 
-  const { mutateAsync: saveTranscriptions } = useMutation(
-    async (data: TranscriptionSegmentsFormSchema) => {
-      await axios.put(`/api/transcriptions`, data)
-    },
-  )
+  // const { mutateAsync: saveTranscriptions } = useMutation(
+  //   async (data: TranscriptionSegmentsFormSchema) => {
+  //     await axios.put(`/api/transcriptions`, data)
+  //   },
+  // )
 
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -83,7 +83,7 @@ export function TranscriptionCard({ videoId }: TranscriptionCardProps) {
   async function handleSaveTranscriptionSegments(
     data: TranscriptionSegmentsFormSchema,
   ) {
-    await saveTranscriptions(data)
+    // await saveTranscriptions(data)
   }
 
   return (
@@ -155,7 +155,8 @@ export function TranscriptionCard({ videoId }: TranscriptionCardProps) {
             onClick={handleSubmit(handleSaveTranscriptionSegments)}
             variant="secondary"
             className="w-20"
-            disabled={!transcription || isSubmitting}
+            // disabled={!transcription || isSubmitting}
+            disabled
           >
             {isSubmitting ? (
               <Loader2 className="h-3 w-3 animate-spin" />

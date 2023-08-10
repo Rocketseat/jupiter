@@ -2,6 +2,7 @@ import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
 import { publishMessagesOnTopic } from '@/lib/kafka'
 import { prisma } from '@/lib/prisma'
+import { publishMessage } from '@/lib/qstash'
 import {
   DeleteObjectsCommand,
   DeleteObjectsRequest,
@@ -136,14 +137,25 @@ export async function DELETE(_: Request, { params }: VideoParams) {
 
     await Promise.all(deletionPromises)
 
-    await publishMessagesOnTopic({
-      topic: 'jupiter.video-deleted',
-      messages: [
-        {
-          id: videoId,
+    await Promise.all([
+      // QStash
+      publishMessage({
+        topic: 'jupiter.video-deleted',
+        body: {
+          videoId,
         },
-      ],
-    })
+      }),
+
+      // Kafka
+      publishMessagesOnTopic({
+        topic: 'jupiter.video-deleted',
+        messages: [
+          {
+            id: videoId,
+          },
+        ],
+      }),
+    ])
 
     return new Response()
   } catch (err) {
