@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -115,7 +114,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             <Link2 className="mr-2 h-4 w-4" />
             <span>Copy HLS</span>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
+          <DropdownMenuItem disabled={!row.original.uploadBatchId} asChild>
             <Link
               href={`/upload/batches/${row.original.uploadBatchId}`}
               prefetch={false}
