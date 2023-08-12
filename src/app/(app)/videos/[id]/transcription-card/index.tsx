@@ -152,13 +152,17 @@ export function TranscriptionCard({
           )}
         </ScrollArea>
         <CardFooter className="flex items-center justify-between border-t p-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              checked={shouldFollowUserFocus}
-              onCheckedChange={setShouldFollowUserFocus}
-            />
-            <Label htmlFor="airplane-mode">Sync video & clicks</Label>
-          </div>
+          {shouldDisplayVideo ? (
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={shouldFollowUserFocus}
+                onCheckedChange={setShouldFollowUserFocus}
+              />
+              <Label htmlFor="airplane-mode">Sync video & clicks</Label>
+            </div>
+          ) : (
+            <div />
+          )}
 
           <Button
             onClick={handleSubmit(handleSaveTranscriptionSegments)}
