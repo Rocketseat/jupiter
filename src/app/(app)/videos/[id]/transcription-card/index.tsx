@@ -94,7 +94,7 @@ export function TranscriptionCard({
     <div className="relative">
       <Card
         data-video-displayed={shouldDisplayVideo}
-        className="absolute bottom-0 left-0 right-0 top-0 grid grid-rows-[min-content_1fr_min-content] data-[video-displayed=true]:grid-rows-[1fr_min-content]"
+        className="absolute bottom-0 left-0 right-0 top-0 grid grid-rows-[min-content_1fr_min-content] data-[video-displayed=false]:grid-rows-[1fr_min-content]"
       >
         {shouldDisplayVideo && (
           <video
