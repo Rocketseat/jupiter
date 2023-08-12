@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: 'Uploads',
 }
 
+// 15 minutes
+export const revalidate = 900
+
 export default async function UploadsPage() {
   return (
     <>

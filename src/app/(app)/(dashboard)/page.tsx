@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   description: 'Example dashboard app using the components.',
 }
 
+// 15 minutes
+export const revalidate = 900
+
 export default function DashboardPage() {
   return (
     <>
