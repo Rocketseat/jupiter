@@ -1,19 +1,9 @@
-# ideas
+Jupiter is a video upload hub that automates the generation of titles, descriptions and transcripts through AI.
 
-- intercept route to videos / analytics most watched videos / no watched videos
-
-# Memory improvements
+### To-do
 
 - Whisper JAX
-
-# MVP
-
-Upload videos, upload to panda and R2, embed om player
-
-- [ ] Sync transcription/video with Houston
-
-# Thoughts
-
+- New FFMPeg
 - Datadog / Sentry
 - DeadLetter queue (manual retry)
   - store number of retries and if its the last maybe notice somewhere and display a button for manual retry
