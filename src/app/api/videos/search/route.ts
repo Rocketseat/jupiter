@@ -4,14 +4,14 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
 
-  const search = searchParams.get('q')
+  const search = searchParams.get('q') ?? ''
 
   try {
     const videos = await prisma.video.findMany({
       where: search
         ? {
             title: {
-              search,
+              search: search.split(' ').join(' & '),
             },
           }
         : undefined,
