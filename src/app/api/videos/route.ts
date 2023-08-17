@@ -15,6 +15,8 @@ export async function GET(request: Request) {
     .default(10)
     .parse(searchParams.get('pageSize'))
 
+  const tags = z.coerce.boolean().default(false).parse(searchParams.get('tags'))
+
   try {
     const [videos, count] = await Promise.all([
       prisma.video.findMany({
@@ -24,6 +26,8 @@ export async function GET(request: Request) {
               id: true,
             },
           },
+
+          tags,
         },
         orderBy: {
           createdAt: 'desc',

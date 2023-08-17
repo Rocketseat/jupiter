@@ -12,6 +12,7 @@ import { TranscriptionPreview } from '@/components/transcription-preview'
 import { CopyButton } from '@/components/copy-button'
 import { formatBytes } from '@/utils/format-bytes'
 import Link from 'next/link'
+import { Badge } from '@/components/ui/badge'
 
 dayjs.extend(relativeTime)
 
@@ -23,13 +24,29 @@ export const columns: ColumnDef<Video>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex flex-col">
-          <Link
-            href={`/videos/${row.original.id}`}
-            prefetch={false}
-            className="text-violet-500 hover:underline dark:text-violet-300"
-          >
-            {row.original.title}
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/videos/${row.original.id}`}
+              prefetch={false}
+              className="text-violet-500 hover:underline dark:text-violet-300"
+            >
+              {row.original.title}
+            </Link>
+
+            {row.original.tags && (
+              <div className="flex gap-1 py-0.5">
+                {row.original.tags?.map((tag) => (
+                  <Badge
+                    variant="secondary"
+                    key={tag.id}
+                    className="pointer-events-none rounded-sm px-1 font-normal"
+                  >
+                    {tag.slug}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
           <span className="text-xs text-muted-foreground">
             {row.original.id}
           </span>
