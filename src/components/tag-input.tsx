@@ -25,6 +25,7 @@ export interface TagInputProps {
   onValueChange: (tags: string[]) => void
   error?: string
   previewTagsAmount?: number
+  allowTagCreation?: boolean
   onApplyToAll?: () => void
 }
 
@@ -33,6 +34,7 @@ export function TagInput({
   onValueChange,
   error,
   previewTagsAmount = 5,
+  allowTagCreation = true,
   onApplyToAll,
 }: TagInputProps) {
   const [createTagDialogOpen, setCreateTagDialogOpen] = useState(false)
@@ -119,15 +121,18 @@ export function TagInput({
             <CommandList>
               <ScrollArea className="h-[240px] w-full">
                 <CommandGroup>
-                  <CommandItem
-                    onSelect={() => {
-                      setCreateTagDialogOpen(true)
-                    }}
-                    className="flex items-center gap-2"
-                  >
-                    <PlusIcon className="h-3 w-3" />
-                    Create new
-                  </CommandItem>
+                  {allowTagCreation && (
+                    <CommandItem
+                      onSelect={() => {
+                        setCreateTagDialogOpen(true)
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <PlusIcon className="h-3 w-3" />
+                      Create new
+                    </CommandItem>
+                  )}
+
                   {isLoadingTagOptions ? (
                     <div className="flex cursor-default select-none items-center justify-center gap-2 rounded-sm p-2 text-sm text-muted-foreground">
                       <Loader2 className="h-3 w-3 animate-spin" />
@@ -172,24 +177,28 @@ export function TagInput({
               </ScrollArea>
             </CommandList>
 
-            <div className="border-t">
-              <CommandItem
-                disabled={value.length === 0}
-                onSelect={onApplyToAll}
-                className="m-1 justify-center text-center text-sm font-normal"
-              >
-                Apply to all
-              </CommandItem>
-            </div>
+            {onApplyToAll && (
+              <div className="border-t">
+                <CommandItem
+                  disabled={value.length === 0}
+                  onSelect={onApplyToAll}
+                  className="m-1 justify-center text-center text-sm font-normal"
+                >
+                  Apply to all
+                </CommandItem>
+              </div>
+            )}
           </Command>
         </PopoverContent>
       </Popover>
 
-      <CreateNewTagDialog
-        onRequestClose={() => {
-          setCreateTagDialogOpen(false)
-        }}
-      />
+      {allowTagCreation && (
+        <CreateNewTagDialog
+          onRequestClose={() => {
+            setCreateTagDialogOpen(false)
+          }}
+        />
+      )}
     </Dialog>
   )
 }

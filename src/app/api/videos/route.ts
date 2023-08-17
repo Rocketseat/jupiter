@@ -15,6 +15,12 @@ export async function GET(request: Request) {
     .default(10)
     .parse(searchParams.get('pageSize'))
 
+  const tagsFilter = z
+    .array(z.string())
+    .parse(searchParams.getAll('tagsFilter[]'))
+
+  const titleFilter = z.string().parse(searchParams.get('titleFilter'))
+
   try {
     const [videos, count] = await Promise.all([
       prisma.video.findMany({
@@ -24,6 +30,23 @@ export async function GET(request: Request) {
               id: true,
             },
           },
+        },
+        where: {
+          title: titleFilter
+            ? {
+                search: titleFilter.split(' ').join(' & '),
+              }
+            : undefined,
+          tags:
+            tagsFilter.length > 0
+              ? {
+                  every: {
+                    slug: {
+                      in: tagsFilter,
+                    },
+                  },
+                }
+              : undefined,
         },
         orderBy: {
           createdAt: 'desc',
