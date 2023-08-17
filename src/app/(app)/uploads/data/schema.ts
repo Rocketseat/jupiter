@@ -16,6 +16,15 @@ export const videoSchema = z.object({
       id: z.string(),
     })
     .optional(),
+  tags: z
+    .array(
+      z.object({
+        id: z.string().uuid(),
+        slug: z.string(),
+        createdAt: z.coerce.date(),
+      }),
+    )
+    .optional(),
 })
 
 export type Video = z.infer<typeof videoSchema>
