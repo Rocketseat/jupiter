@@ -54,7 +54,25 @@ export async function GET(request: Request) {
         skip: pageIndex * pageSize,
         take: pageSize,
       }),
-      prisma.video.count(),
+      prisma.video.count({
+        where: {
+          title: titleFilter
+            ? {
+                search: titleFilter.split(' ').join(' & '),
+              }
+            : undefined,
+          tags:
+            tagsFilter.length > 0
+              ? {
+                  some: {
+                    slug: {
+                      in: tagsFilter,
+                    },
+                  },
+                }
+              : undefined,
+        },
+      }),
     ])
 
     const pageCount = Math.ceil(count / pageSize)
