@@ -40,9 +40,9 @@ export async function GET(request: Request) {
           tags:
             tagsFilter.length > 0
               ? {
-                  none: {
+                  some: {
                     slug: {
-                      notIn: tagsFilter,
+                      in: tagsFilter,
                     },
                   },
                 }
