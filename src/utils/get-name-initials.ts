@@ -1,10 +1,10 @@
 export function getNameInitials(fullName: string) {
-  const names = fullName.split(' ')
-  let initials = ''
+  const names = fullName.split(' ').filter(Boolean)
 
-  for (let i = 0; i < names.length && initials.length < 2; i++) {
-    initials += names[i][0].toUpperCase()
-  }
+  const initials = names
+    .map((name) => name[0].toUpperCase())
+    .join('')
+    .slice(0, 2)
 
   return initials
 }

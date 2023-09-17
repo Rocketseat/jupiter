@@ -15,6 +15,12 @@ export async function GET(request: Request) {
     .default(10)
     .parse(searchParams.get('pageSize'))
 
+  const tagsFilter = z
+    .array(z.string())
+    .parse(searchParams.getAll('tagsFilter[]'))
+
+  const titleFilter = z.string().parse(searchParams.get('titleFilter'))
+
   try {
     const [videos, count] = await Promise.all([
       prisma.video.findMany({
@@ -25,13 +31,48 @@ export async function GET(request: Request) {
             },
           },
         },
+        where: {
+          title: titleFilter
+            ? {
+                search: titleFilter.split(' ').join(' & '),
+              }
+            : undefined,
+          tags:
+            tagsFilter.length > 0
+              ? {
+                  some: {
+                    slug: {
+                      in: tagsFilter,
+                    },
+                  },
+                }
+              : undefined,
+        },
         orderBy: {
           createdAt: 'desc',
         },
         skip: pageIndex * pageSize,
         take: pageSize,
       }),
-      prisma.video.count(),
+      prisma.video.count({
+        where: {
+          title: titleFilter
+            ? {
+                search: titleFilter.split(' ').join(' & '),
+              }
+            : undefined,
+          tags:
+            tagsFilter.length > 0
+              ? {
+                  some: {
+                    slug: {
+                      in: tagsFilter,
+                    },
+                  },
+                }
+              : undefined,
+        },
+      }),
     ])
 
     const pageCount = Math.ceil(count / pageSize)

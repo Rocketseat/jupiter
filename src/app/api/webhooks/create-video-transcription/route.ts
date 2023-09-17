@@ -14,6 +14,7 @@ const createTranscriptionBodySchema = z.object({
 })
 
 interface OpenAITranscriptionResponse {
+  text: string
   segments: Array<{
     start: number
     end: number
@@ -145,6 +146,8 @@ export async function POST(request: Request) {
       topic: 'jupiter.transcription-created',
       body: {
         videoId,
+        title: video.title,
+        transcription: response.data.text,
       },
       options: {
         delay: 10,

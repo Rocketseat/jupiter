@@ -41,6 +41,11 @@ export function Search() {
     enabled: open,
   })
 
+  function handleItemSelected(videoId: string) {
+    setOpen(false)
+    router.push(`/videos/${videoId}`)
+  }
+
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && e.metaKey) {
@@ -86,7 +91,7 @@ export function Search() {
               videos.map((video: any) => {
                 return (
                   <CommandItem
-                    onSelect={() => router.push(`/videos/${video.id}`)}
+                    onSelect={() => handleItemSelected(video.id)}
                     key={video.id}
                     value={video.id}
                   >

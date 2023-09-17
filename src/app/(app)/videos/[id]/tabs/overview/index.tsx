@@ -38,7 +38,10 @@ export async function Overview({ videoId }: OverviewProps) {
           <VideoForm video={video} />
         </CardContent>
       </Card>
-      <TranscriptionCard videoId={videoId} />
+      <TranscriptionCard
+        videoId={videoId}
+        shouldDisplayVideo={!!video.storageKey}
+      />
     </div>
   )
 }

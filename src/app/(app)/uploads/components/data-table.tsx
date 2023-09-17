@@ -21,8 +21,9 @@ import {
 
 import { DataTablePagination } from './data-table-pagination'
 import { VideoListSkeletonTable } from '../video-list-skeleton-table'
+import { DataTableFilters, DataTableFiltersProps } from './data-table-filters'
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData, TValue> extends DataTableFiltersProps {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   pageCount: number
@@ -38,14 +39,16 @@ export function DataTable<TData, TValue>({
   pagination,
   onPaginationChange,
   isLoading,
+  titleFilter,
+  tagsFilter,
+  onTitleFilterChange,
+  onTagsFilterChange,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     pageCount,
-    state: {
-      pagination,
-    },
+    state: { pagination },
     onPaginationChange,
     manualPagination: true,
     getCoreRowModel: getCoreRowModel(),
@@ -53,6 +56,13 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
+      <DataTableFilters
+        titleFilter={titleFilter}
+        tagsFilter={tagsFilter}
+        onTitleFilterChange={onTitleFilterChange}
+        onTagsFilterChange={onTagsFilterChange}
+      />
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>

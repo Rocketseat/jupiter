@@ -17,6 +17,7 @@ import { Loader2 } from 'lucide-react'
 
 interface TranscriptionCardProps {
   videoId: string
+  shouldDisplayVideo: boolean
 }
 
 const transcriptionSegmentsFormSchema = z.object({
@@ -32,7 +33,10 @@ type TranscriptionSegmentsFormSchema = z.infer<
   typeof transcriptionSegmentsFormSchema
 >
 
-export function TranscriptionCard({ videoId }: TranscriptionCardProps) {
+export function TranscriptionCard({
+  videoId,
+  shouldDisplayVideo,
+}: TranscriptionCardProps) {
   const [shouldFollowUserFocus, setShouldFollowUserFocus] = useState(true)
 
   const { data: transcription } = useQuery(
@@ -56,11 +60,11 @@ export function TranscriptionCard({ videoId }: TranscriptionCardProps) {
     },
   )
 
-  const { mutateAsync: saveTranscriptions } = useMutation(
-    async (data: TranscriptionSegmentsFormSchema) => {
-      await axios.put(`/api/transcriptions`, data)
-    },
-  )
+  // const { mutateAsync: saveTranscriptions } = useMutation(
+  //   async (data: TranscriptionSegmentsFormSchema) => {
+  //     await axios.put(`/api/transcriptions`, data)
+  //   },
+  // )
 
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -83,20 +87,25 @@ export function TranscriptionCard({ videoId }: TranscriptionCardProps) {
   async function handleSaveTranscriptionSegments(
     data: TranscriptionSegmentsFormSchema,
   ) {
-    await saveTranscriptions(data)
+    // await saveTranscriptions(data)
   }
 
   return (
     <div className="relative">
-      <Card className="absolute bottom-0 left-0 right-0 top-0 grid grid-rows-[min-content_1fr_min-content]">
-        <video
-          ref={videoRef}
-          crossOrigin="anonymous"
-          controls
-          preload="metadata"
-          src={`/api/videos/${videoId}/download/video`}
-          className="aspect-video w-full"
-        />
+      <Card
+        data-video-displayed={shouldDisplayVideo}
+        className="absolute bottom-0 left-0 right-0 top-0 grid grid-rows-[min-content_1fr_min-content] data-[video-displayed=false]:grid-rows-[1fr_min-content]"
+      >
+        {shouldDisplayVideo && (
+          <video
+            ref={videoRef}
+            crossOrigin="anonymous"
+            controls
+            preload="metadata"
+            src={`/api/videos/${videoId}/download/video`}
+            className="aspect-video w-full"
+          />
+        )}
 
         <ScrollArea className="h-full w-full">
           {transcription ? (
@@ -143,19 +152,24 @@ export function TranscriptionCard({ videoId }: TranscriptionCardProps) {
           )}
         </ScrollArea>
         <CardFooter className="flex items-center justify-between border-t p-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              checked={shouldFollowUserFocus}
-              onCheckedChange={setShouldFollowUserFocus}
-            />
-            <Label htmlFor="airplane-mode">Sync video & clicks</Label>
-          </div>
+          {shouldDisplayVideo ? (
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={shouldFollowUserFocus}
+                onCheckedChange={setShouldFollowUserFocus}
+              />
+              <Label htmlFor="airplane-mode">Sync video & clicks</Label>
+            </div>
+          ) : (
+            <div />
+          )}
 
           <Button
             onClick={handleSubmit(handleSaveTranscriptionSegments)}
             variant="secondary"
             className="w-20"
-            disabled={!transcription || isSubmitting}
+            // disabled={!transcription || isSubmitting}
+            disabled
           >
             {isSubmitting ? (
               <Loader2 className="h-3 w-3 animate-spin" />

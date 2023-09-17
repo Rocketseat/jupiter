@@ -23,7 +23,7 @@ export const env = createEnv({
     CLOUDFLARE_UPLOAD_BUCKET_NAME: z.string().min(1),
     CLOUDFLARE_STORAGE_BUCKET_NAME: z.string().min(1),
     OPENAI_API_KEY: z.string().min(1),
-    PANDAVIDEO_API_KEY: z.string().min(1),
+    PANDAVIDEO_API_KEY: z.string().refine(requiredOnEnv('production')),
     PANDAVIDEO_UPLOAD_FOLDER: z.string().uuid().min(1),
     NEXTAUTH_URL: z.string().optional(),
     NEXTAUTH_SECRET: z.string().min(1),

@@ -1,12 +1,5 @@
 'use client'
 
-import {
-  DotsHorizontalIcon,
-  Pencil2Icon,
-  StackIcon,
-} from '@radix-ui/react-icons'
-import { Row } from '@tanstack/react-table'
-
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -15,6 +8,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+import { Video, Music2, Link2, Loader2, Trash2 } from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -25,37 +22,31 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Video } from '../data/schema'
-import {
-  Link2,
-  Loader2,
-  Music2,
-  Trash2,
-  Video as VideoIcon,
-} from 'lucide-react'
-import Link from 'next/link'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
-import { useToast } from '@/components/ui/use-toast'
-import { ToastAction } from '@/components/ui/toast'
 import { useState } from 'react'
+import { ToastAction } from '@/components/ui/toast'
+import { useToast } from '@/components/ui/use-toast'
 
-interface DataTableRowActionsProps {
-  row: Row<Video>
+type BatchVideoListActionsProps = {
+  batchId: string
+  video: any
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+export function BatchVideoListActions({
+  video,
+  batchId,
+}: BatchVideoListActionsProps) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
   const { toast } = useToast()
   const queryClient = useQueryClient()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const { isLoading: isDeletingVideo, mutateAsync: deleteVideo } = useMutation(
     async () => {
-      await axios.delete(`/api/videos/${row.original.id}`)
+      await axios.delete(`/api/videos/${video.id}`)
     },
     {
       onSuccess() {
-        queryClient.invalidateQueries(['videos'])
+        queryClient.invalidateQueries(['batch', batchId])
       },
     },
   )
@@ -97,45 +88,30 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem asChild>
-            <Link href={`/videos/${row.original.id}`} prefetch={false}>
-              <Pencil2Icon className="mr-2 h-4 w-4" />
-              <span>Review</span>
-            </Link>
-          </DropdownMenuItem>
           <DropdownMenuItem
-            disabled={!row.original.externalProviderId}
+            disabled={!video.externalProviderId}
             onClick={() =>
               navigator.clipboard.writeText(
-                `https://b-vz-762f4670-e04.tv.pandarow.original.com.br/${row.original.externalProviderId}/playlist.m3u8`,
+                `https://b-vz-762f4670-e04.tv.pandavideo.com.br/${video.externalProviderId}/playlist.m3u8`,
               )
             }
           >
             <Link2 className="mr-2 h-4 w-4" />
             <span>Copy HLS</span>
           </DropdownMenuItem>
-          <DropdownMenuItem disabled={!row.original.uploadBatchId} asChild>
-            <Link
-              href={`/upload/batches/${row.original.uploadBatchId}`}
-              prefetch={false}
-            >
-              <StackIcon className="mr-2 h-4 w-4" />
-              <span>View batch</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled={!row.original.storageKey} asChild>
+          <DropdownMenuItem asChild>
             <a
-              href={`/api/videos/${row.original.id}/download/video`}
+              href={`/api/videos/${video.id}/download/video`}
               target="_blank"
               rel="noreferrer"
             >
-              <VideoIcon className="mr-2 h-4 w-4" />
+              <Video className="mr-2 h-4 w-4" />
               <span>Download MP4</span>
             </a>
           </DropdownMenuItem>
-          <DropdownMenuItem disabled={!row.original.audioStorageKey} asChild>
+          <DropdownMenuItem asChild>
             <a
-              href={`/api/videos/${row.original.id}/download/audio`}
+              href={`/api/videos/${video.id}/download/audio`}
               target="_blank"
               rel="noreferrer"
             >
@@ -143,7 +119,9 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
               <span>Download MP3</span>
             </a>
           </DropdownMenuItem>
+
           <DropdownMenuSeparator />
+
           <AlertDialogTrigger asChild>
             <DropdownMenuItem disabled={isDeletingVideo}>
               <Trash2 className="mr-2 h-4 w-4" />
