@@ -28,8 +28,7 @@ export async function convertVideoToMP3(
   await ffmpeg.run(
     '-i',
     inputFile.name,
-    '-map',
-    '0:a',
+    '-vn',
     '-b:a',
     '20k',
     '-acodec',
