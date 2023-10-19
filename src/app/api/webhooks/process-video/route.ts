@@ -11,9 +11,7 @@ const processVideoBodySchema = z.object({
   videoId: z.string().uuid(),
 })
 
-export const config = {
-  maxDuration: 60,
-}
+export const maxDuration = 60
 
 export async function POST(request: Request) {
   const webhookId = randomUUID()
