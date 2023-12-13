@@ -150,6 +150,7 @@ export async function POST(request: Request) {
         videoId,
         title: video.title,
         transcription: response.data.text,
+        segments: response.data.segments,
       },
       options: {
         delay: 10,
