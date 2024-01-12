@@ -346,7 +346,7 @@ export const convertUploadVideoToAudioAtom = atom(
             audioConversion.progress = progress
           })
         }),
-        new Promise((resolve) => setTimeout(resolve, 15_000, 'timeout')),
+        new Promise((resolve) => setTimeout(resolve, 50_000, 'timeout')),
       ])
 
       if (result === 'timeout') {
