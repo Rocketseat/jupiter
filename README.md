@@ -1,5 +1,7 @@
 Jupiter is a video upload hub that automates the generation of titles, descriptions and transcripts through AI.
 
+Jupiter supports portuguese and spanish.
+
 ### To-do
 
 - Whisper JAX
