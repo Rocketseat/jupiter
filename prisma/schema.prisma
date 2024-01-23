@@ -13,6 +13,7 @@ datasource db {
 model Video {
   id                  String    @id @default(uuid())
   uploadBatchId       String?
+  language            String    @default("pt")
   uploadOrder         Int
   duration            Int
   sizeInBytes         Int

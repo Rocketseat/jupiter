@@ -65,12 +65,12 @@ export function AudioConversionProgressColumn({
       ) : progress === 100 ? (
         <>
           <CheckCircledIcon className="h-4 w-4 text-emerald-500" />
-          <span className="text-emerald-500">Conversion complete</span>
+          <span className="text-emerald-500">Complete</span>
         </>
       ) : (
         <>
           <DotsHorizontalIcon className="h-4 w-4" />
-          <span className="text-muted-foreground">Waiting on queue</span>
+          <span className="text-muted-foreground">Waiting...</span>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>

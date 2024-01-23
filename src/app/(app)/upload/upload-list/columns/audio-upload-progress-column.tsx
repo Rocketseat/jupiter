@@ -43,13 +43,13 @@ export function AudioUploadProgressColumn({
           {progress === 0 && !error ? (
             <>
               <DotsHorizontalIcon className="mr-2 h-4 w-4" />
-              <span className="text-muted-foreground">Waiting upload</span>
+              <span className="text-muted-foreground">Waiting...</span>
             </>
           ) : error ? (
             <>
               <CrossCircledIcon className="mr-2 h-4 w-4 text-red-500" />
               <span className="text-red-500">
-                Upload error{' '}
+                Error{' '}
                 <Button
                   variant="link"
                   className="inline p-0 text-inherit"
@@ -62,7 +62,7 @@ export function AudioUploadProgressColumn({
           ) : (
             <>
               <CheckCircledIcon className="mr-2 h-4 w-4 text-emerald-500" />
-              <span className="text-emerald-500">Upload complete</span>
+              <span className="text-emerald-500">Complete</span>
             </>
           )}
         </div>

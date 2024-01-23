@@ -18,6 +18,7 @@ const uploadsFormSchema = z.object({
         id: z.string(),
         title: z.string().min(1),
         duration: z.coerce.number().transform(Math.round),
+        language: z.string(),
         sizeInBytes: z.coerce.number(),
         tags: z.array(z.string()).min(1, 'At least one tag is required.'),
       }),

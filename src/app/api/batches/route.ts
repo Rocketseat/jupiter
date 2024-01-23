@@ -11,6 +11,7 @@ const createBatchSchema = z.object({
       z.object({
         id: z.string(),
         title: z.string().min(1),
+        language: z.string(),
         duration: z.number(),
         sizeInBytes: z.number(),
         tags: z.array(z.string()).min(1),
@@ -38,6 +39,7 @@ export async function POST(request: Request) {
           return tx.video.create({
             data: {
               id: video.id,
+              language: video.language,
               uploadBatchId: batchId,
               uploadOrder: index + 1,
               title: video.title,

@@ -30,6 +30,16 @@ import {
 import { VideoUploadProgressColumn } from './columns/video-upload-progress-column'
 import { AudioConversionProgressColumn } from './columns/audio-conversion-progress-column'
 import { AudioUploadProgressColumn } from './columns/audio-upload-progress-column'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { UploadLanguageInput } from './upload-language-input'
 
 export function UploadTable() {
   const {
@@ -108,7 +118,10 @@ export function UploadTable() {
                       disabled={isRunningAI}
                       {...register(`files.${index}.title`)}
                     />
-                    <UploadTagInput uploadIndex={index} />
+                    <div className="flex gap-2">
+                      <UploadLanguageInput uploadIndex={index} />
+                      <UploadTagInput uploadIndex={index} />
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>

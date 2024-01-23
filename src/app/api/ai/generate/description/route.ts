@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       },
       {
         role: 'user',
-        content: `Gere um resumo da transcrição abaixo: \n\n ${transcription.text}`,
+        content: `Gere um resumo da transcrição abaixo. Retorne o resumo no mesmo idioma da transcrição. \n\n ${transcription.text}`,
       },
     ],
     temperature: 0,

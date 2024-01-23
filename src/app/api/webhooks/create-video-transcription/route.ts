@@ -103,7 +103,7 @@ export async function POST(request: Request) {
     formData.append('model', 'whisper-1')
     formData.append('response_format', 'verbose_json')
     formData.append('temperature', '0')
-    formData.append('language', 'pt')
+    formData.append('language', video.language)
 
     const response = await axios.post<OpenAITranscriptionResponse>(
       'https://api.openai.com/v1/audio/transcriptions',
