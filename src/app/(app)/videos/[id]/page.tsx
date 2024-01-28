@@ -1,12 +1,13 @@
 import { Button } from '@/components/ui/button'
 
-import { VideoIcon } from '@radix-ui/react-icons'
+import { StackIcon, VideoIcon } from '@radix-ui/react-icons'
 import { Music2 } from 'lucide-react'
 import { Metadata } from 'next'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Overview } from './tabs/overview'
 import { Webhooks } from './tabs/webhooks'
 import { prisma } from '@/lib/prisma'
+import Link from 'next/link'
 
 interface VideoPageProps {
   params: { id: string }
@@ -32,6 +33,10 @@ export const dynamic = 'force-dynamic'
 export default async function VideoPage({ params }: VideoPageProps) {
   const videoId = params.id
 
+  const video = await prisma.video.findFirstOrThrow({
+    where: { id: videoId },
+  })
+
   return (
     <>
       <div className="flex items-center justify-between gap-4">
@@ -40,6 +45,15 @@ export default async function VideoPage({ params }: VideoPageProps) {
         </h2>
 
         <div className="flex items-center gap-2">
+          <Button variant="secondary" asChild>
+            <Link
+              prefetch={false}
+              href={`/upload/batches/${video.uploadBatchId}`}
+            >
+              <StackIcon className="mr-2 h-4 w-4" />
+              <span>View batch</span>
+            </Link>
+          </Button>
           <Button variant="secondary" asChild>
             <a
               href={`/api/videos/${videoId}/download/video`}
