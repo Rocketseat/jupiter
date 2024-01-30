@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 
-import { verifySignatureAppRouter } from '@upstash/qstash/nextjs'
+import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
 import axios from 'axios'
 import { NextRequest, NextResponse } from 'next/server'
 import WebSocket from 'ws'
