@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { BarChart } from 'lucide-react'
+
 import {
   Card,
   CardContent,
@@ -8,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { env } from '@/env'
+
 import { ViewsCountChart } from './views-count-chart'
 
 export const revalidate = 60 * 60 * 1 // 1 hour

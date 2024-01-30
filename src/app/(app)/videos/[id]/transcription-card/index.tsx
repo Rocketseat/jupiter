@@ -1,19 +1,21 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import { Loader2 } from 'lucide-react'
+import { Fragment, useRef, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Switch } from '@/components/ui/switch'
+
 import { Segment } from './segment'
 import { TranscriptionSkeleton } from './transcription-skeleton'
-import { Button } from '@/components/ui/button'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Fragment, useRef, useState } from 'react'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
-import { Loader2 } from 'lucide-react'
 
 interface TranscriptionCardProps {
   videoId: string
@@ -39,26 +41,24 @@ export function TranscriptionCard({
 }: TranscriptionCardProps) {
   const [shouldFollowUserFocus, setShouldFollowUserFocus] = useState(true)
 
-  const { data: transcription } = useQuery(
-    ['transcription', videoId],
-    async () => {
+  const { data: transcription } = useQuery({
+    queryKey: ['transcription', videoId],
+    queryFn: async () => {
       const response = await axios.get(`/api/videos/${videoId}/transcription`)
 
       return response.data.transcription
     },
-    {
-      refetchInterval(data) {
-        const isTranscriptionAlreadyLoaded = !!data
+    refetchInterval(data) {
+      const isTranscriptionAlreadyLoaded = !!data
 
-        if (isTranscriptionAlreadyLoaded) {
-          return false
-        }
+      if (isTranscriptionAlreadyLoaded) {
+        return false
+      }
 
-        return 15 * 1000 // 15 seconds
-      },
-      refetchOnWindowFocus: false,
+      return 15 * 1000 // 15 seconds
     },
-  )
+    refetchOnWindowFocus: false,
+   })
 
   // const { mutateAsync: saveTranscriptions } = useMutation(
   //   async (data: TranscriptionSegmentsFormSchema) => {

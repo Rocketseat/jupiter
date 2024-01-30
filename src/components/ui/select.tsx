@@ -1,9 +1,8 @@
 'use client'
 
-import * as React from 'react'
 import * as SelectPrimitive from '@radix-ui/react-select'
 import { Check, ChevronDown } from 'lucide-react'
-
+import * as React from 'react'
 import { twMerge } from 'tailwind-merge'
 
 const Select = SelectPrimitive.Root
@@ -103,7 +102,10 @@ const SelectSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Separator
     ref={ref}
-    className={twMerge('-mx-1 my-1 h-px bg-slate-100 dark:bg-slate-800', className)}
+    className={twMerge(
+      '-mx-1 my-1 h-px bg-slate-100 dark:bg-slate-800',
+      className,
+    )}
     {...props}
   />
 ))

@@ -1,17 +1,11 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
-import { Video, Music2, Link2, Loader2, Trash2 } from 'lucide-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
+import { Link2, Loader2, Music2, Trash2, Video } from 'lucide-react'
+import { useState } from 'react'
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -22,7 +16,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
 
@@ -40,16 +41,17 @@ export function BatchVideoListActions({
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
-  const { isLoading: isDeletingVideo, mutateAsync: deleteVideo } = useMutation(
-    async () => {
+  const { mutateAsync: deleteVideo, isPending: isDeletingVideo } = useMutation({
+    mutationFn: async () => {
       await axios.delete(`/api/videos/${video.id}`)
     },
-    {
-      onSuccess() {
-        queryClient.invalidateQueries(['batch', batchId])
-      },
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ['batch', batchId],
+        exact: true,
+      })
     },
-  )
+  })
 
   async function handleDeleteVideo() {
     try {

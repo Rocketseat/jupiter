@@ -1,5 +1,15 @@
 'use client'
 
+import {
+  CheckCircledIcon,
+  CrossCircledIcon,
+  DotsHorizontalIcon,
+  InfoCircledIcon,
+} from '@radix-ui/react-icons'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { selectAtom } from 'jotai/utils'
+import { useCallback } from 'react'
+
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import {
@@ -12,15 +22,6 @@ import {
   addToAudioConversionQueueAtom,
   audioConversionAtom,
 } from '@/state/uploads'
-import {
-  CheckCircledIcon,
-  CrossCircledIcon,
-  DotsHorizontalIcon,
-  InfoCircledIcon,
-} from '@radix-ui/react-icons'
-import { useAtomValue, useSetAtom } from 'jotai'
-import { selectAtom } from 'jotai/utils'
-import { useCallback } from 'react'
 
 export interface AudioConversionProgressColumnProps {
   uploadId: string

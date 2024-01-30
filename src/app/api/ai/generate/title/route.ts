@@ -1,6 +1,7 @@
-import { openai } from '@/lib/openai'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import { openai } from '@/lib/openai'
 
 export const runtime = 'edge'
 

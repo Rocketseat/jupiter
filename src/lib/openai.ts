@@ -1,5 +1,6 @@
-import { env } from '@/env'
 import { Configuration, OpenAIApi } from 'openai-edge'
+
+import { env } from '@/env'
 
 const config = new Configuration({
   apiKey: env.OPENAI_API_KEY,

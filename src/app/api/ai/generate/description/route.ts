@@ -1,7 +1,8 @@
-import { openai } from '@/lib/openai'
-import { prisma } from '@/lib/prisma'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 import { NextResponse } from 'next/server'
+
+import { openai } from '@/lib/openai'
+import { prisma } from '@/lib/prisma'
 
 export async function POST(request: Request) {
   const { prompt } = await request.json()

@@ -1,8 +1,15 @@
+import { CheckIcon, PlusIcon } from '@radix-ui/react-icons'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
 import { Loader2, Tag } from 'lucide-react'
-import { Button } from './ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
-import { Separator } from './ui/separator'
+import { useState } from 'react'
+import { twMerge } from 'tailwind-merge'
+
+import useDebounceValue from '@/hooks/useDebounceValue'
+
+import { CreateNewTagDialog } from './create-new-tag-dialog'
 import { Badge } from './ui/badge'
+import { Button } from './ui/button'
 import {
   Command,
   CommandGroup,
@@ -10,15 +17,10 @@ import {
   CommandItem,
   CommandList,
 } from './ui/command'
-import { CheckIcon, PlusIcon } from '@radix-ui/react-icons'
-import { twMerge } from 'tailwind-merge'
-import { useQuery } from '@tanstack/react-query'
-import useDebounceValue from '@/hooks/useDebounceValue'
-import { useState } from 'react'
-import axios from 'axios'
 import { Dialog } from './ui/dialog'
-import { CreateNewTagDialog } from './create-new-tag-dialog'
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { ScrollArea } from './ui/scroll-area'
+import { Separator } from './ui/separator'
 
 export interface TagInputProps {
   value: string[]
@@ -43,7 +45,11 @@ export function TagInput({
 
   const searchTerm = useDebounceValue(search, 300)
 
-  const { data: tagOptions, isLoading: isLoadingTagOptions } = useQuery({
+  const {
+    data: tagOptions,
+    isLoading: isLoadingTagOptions,
+    isPending: isPendingTagOptions,
+  } = useQuery({
     queryKey: ['tags', searchTerm],
     queryFn: async () => {
       const response = await axios.get('/api/tags/search', {
@@ -90,7 +96,7 @@ export function TagInput({
                   {value.length > previewTagsAmount ? (
                     <Badge
                       variant="secondary"
-                      className="pointer-events-none rounded-sm px-1 font-normal"
+                      className="pointer-events-none text-nowrap rounded-sm px-1 font-normal"
                     >
                       {value.length} selected
                     </Badge>
@@ -133,7 +139,7 @@ export function TagInput({
                     </CommandItem>
                   )}
 
-                  {isLoadingTagOptions ? (
+                  {isLoadingTagOptions || isPendingTagOptions ? (
                     <div className="flex cursor-default select-none items-center justify-center gap-2 rounded-sm p-2 text-sm text-muted-foreground">
                       <Loader2 className="h-3 w-3 animate-spin" />
                       <span>Loading tags...</span>

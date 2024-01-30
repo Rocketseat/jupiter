@@ -1,5 +1,6 @@
-import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
+
+import { prisma } from '@/lib/prisma'
 
 export const revalidate = 60 * 15 // 15 minutes
 

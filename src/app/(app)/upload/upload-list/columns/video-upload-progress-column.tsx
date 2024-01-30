@@ -1,8 +1,5 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import { startVideoUploadAtom, videoUploadAtom } from '@/state/uploads'
 import {
   CheckCircledIcon,
   CrossCircledIcon,
@@ -11,6 +8,10 @@ import {
 import { useAtomValue, useSetAtom } from 'jotai'
 import { selectAtom } from 'jotai/utils'
 import { useCallback } from 'react'
+
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
+import { startVideoUploadAtom, videoUploadAtom } from '@/state/uploads'
 
 export interface VideoUploadProgressColumnProps {
   uploadId: string

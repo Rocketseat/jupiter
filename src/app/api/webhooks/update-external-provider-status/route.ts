@@ -1,8 +1,11 @@
+import { randomUUID } from 'node:crypto'
+
+import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { env } from '@/env'
 import { publishMessagesOnTopic } from '@/lib/kafka'
 import { prisma } from '@/lib/prisma'
-import { randomUUID } from 'node:crypto'
-import { z } from 'zod'
 
 const pandaWebhookBodySchema = z.object({
   action: z.enum(['video.changeStatus']),
@@ -11,7 +14,7 @@ const pandaWebhookBodySchema = z.object({
   video_external_id: z.string().uuid(),
 })
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const webhookId = randomUUID()
 
   const {
@@ -24,7 +27,7 @@ export async function POST(request: Request) {
     /**
      * We want to ignore videos that were not uploaded by Jupiter.
      */
-    return new Response()
+    return new NextResponse(null, { status: 204 })
   }
 
   try {
@@ -43,7 +46,7 @@ export async function POST(request: Request) {
        * videos that were not stored on jupiter or the video could already had
        * been updated.
        */
-      return new Response()
+      return new NextResponse(null, { status: 204 })
     }
 
     await prisma.$transaction([
@@ -84,10 +87,8 @@ export async function POST(request: Request) {
       ],
     })
 
-    return new Response()
-  } catch (err) {
-    console.log(err)
-
+    return new NextResponse(null, { status: 204 })
+  } catch (err: unknown) {
     await prisma.webhook.create({
       data: {
         id: webhookId,

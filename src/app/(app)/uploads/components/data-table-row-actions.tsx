@@ -5,16 +5,19 @@ import {
   Pencil2Icon,
   StackIcon,
 } from '@radix-ui/react-icons'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Row } from '@tanstack/react-table'
-
-import { Button } from '@/components/ui/button'
+import axios from 'axios'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  Link2,
+  Loader2,
+  Music2,
+  Trash2,
+  Video as VideoIcon,
+} from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -25,20 +28,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Video } from '../data/schema'
+import { Button } from '@/components/ui/button'
 import {
-  Link2,
-  Loader2,
-  Music2,
-  Trash2,
-  Video as VideoIcon,
-} from 'lucide-react'
-import Link from 'next/link'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
-import { useToast } from '@/components/ui/use-toast'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { ToastAction } from '@/components/ui/toast'
-import { useState } from 'react'
+import { useToast } from '@/components/ui/use-toast'
+
+import { Video } from '../data/schema'
 
 interface DataTableRowActionsProps {
   row: Row<Video>
@@ -49,16 +50,17 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const queryClient = useQueryClient()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
-  const { isLoading: isDeletingVideo, mutateAsync: deleteVideo } = useMutation(
-    async () => {
+  const { mutateAsync: deleteVideo, isPending: isDeletingVideo } = useMutation({
+    mutationFn: async () => {
       await axios.delete(`/api/videos/${row.original.id}`)
     },
-    {
-      onSuccess() {
-        queryClient.invalidateQueries(['videos'])
-      },
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ['videos'],
+        exact: true,
+      })
     },
-  )
+  })
 
   async function handleDeleteVideo() {
     try {

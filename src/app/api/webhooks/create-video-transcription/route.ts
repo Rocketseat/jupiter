@@ -1,13 +1,16 @@
+import { randomUUID } from 'node:crypto'
+
+import { GetObjectCommand } from '@aws-sdk/client-s3'
+import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
+import axios from 'axios'
+import FormData from 'form-data'
+import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
+import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
 import { prisma } from '@/lib/prisma'
-import { GetObjectCommand } from '@aws-sdk/client-s3'
-import { NextResponse } from 'next/server'
-import FormData from 'form-data'
-import axios from 'axios'
-import { z } from 'zod'
-import { env } from '@/env'
-import { publishMessage, validateQStashSignature } from '@/lib/qstash'
-import { randomUUID } from 'node:crypto'
+import { publishMessage } from '@/lib/qstash'
 
 const createTranscriptionBodySchema = z.object({
   videoId: z.string().uuid(),
@@ -24,13 +27,13 @@ interface OpenAITranscriptionResponse {
 
 export const maxDuration = 300
 
-export async function POST(request: Request) {
+async function handler(request: NextRequest) {
   const webhookId = randomUUID()
 
-  try {
-    const { bodyAsJSON } = await validateQStashSignature({ request })
+  const body = await request.json()
 
-    const { videoId } = createTranscriptionBodySchema.parse(bodyAsJSON)
+  try {
+    const { videoId } = createTranscriptionBodySchema.parse(body)
 
     const video = await prisma.video.findUniqueOrThrow({
       where: {
@@ -77,7 +80,7 @@ export async function POST(request: Request) {
         id: webhookId,
         type: 'CREATE_TRANSCRIPTION',
         videoId,
-        metadata: JSON.stringify(bodyAsJSON),
+        metadata: JSON.stringify(body),
       },
     })
 
@@ -89,7 +92,10 @@ export async function POST(request: Request) {
     )
 
     if (!audioFile.Body) {
-      return
+      return NextResponse.json(
+        { message: 'Audio file not found.' },
+        { status: 400 },
+      )
     }
 
     const formData = new FormData()
@@ -157,10 +163,8 @@ export async function POST(request: Request) {
       },
     })
 
-    return new Response()
-  } catch (err: any) {
-    console.error(err)
-
+    return new NextResponse(null, { status: 201 })
+  } catch (err: unknown) {
     await prisma.webhook.update({
       where: {
         id: webhookId,
@@ -172,8 +176,10 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(
-      { message: 'Error processing video.', error: err?.message || '' },
-      { status: 401 },
+      { message: 'Error processing video.', error: err },
+      { status: 400 },
     )
   }
 }
+
+export const POST = verifySignatureAppRouter(handler)

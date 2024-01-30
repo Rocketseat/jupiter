@@ -1,8 +1,8 @@
+import dayjs from 'dayjs'
 import { BarChart } from 'lucide-react'
-import { prisma } from '@/lib/prisma'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import dayjs from 'dayjs'
+import { prisma } from '@/lib/prisma'
 
 export const revalidate = 60 * 15 // 15 minutes
 

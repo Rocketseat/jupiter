@@ -1,8 +1,9 @@
-import { env } from '@/env'
 import { randomUUID } from 'crypto'
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google'
+
+import { env } from '@/env'
 
 const credentialsProvider = CredentialsProvider({
   credentials: {

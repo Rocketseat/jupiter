@@ -1,14 +1,14 @@
 'use client'
 
-import * as React from 'react'
 import {
   ColumnDef,
-  OnChangeFn,
-  PaginationState,
   flexRender,
   getCoreRowModel,
+  OnChangeFn,
+  PaginationState,
   useReactTable,
 } from '@tanstack/react-table'
+import * as React from 'react'
 
 import {
   Table,
@@ -19,9 +19,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import { DataTablePagination } from './data-table-pagination'
 import { VideoListSkeletonTable } from '../video-list-skeleton-table'
 import { DataTableFilters, DataTableFiltersProps } from './data-table-filters'
+import { DataTablePagination } from './data-table-pagination'
 
 interface DataTableProps<TData, TValue> extends DataTableFiltersProps {
   columns: ColumnDef<TData, TValue>[]

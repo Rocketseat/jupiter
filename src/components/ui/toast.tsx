@@ -1,9 +1,8 @@
-import * as React from 'react'
 import * as ToastPrimitives from '@radix-ui/react-toast'
-import { tv, type VariantProps } from 'tailwind-variants'
 import { X } from 'lucide-react'
-
+import * as React from 'react'
 import { twMerge } from 'tailwind-merge'
+import { tv, type VariantProps } from 'tailwind-variants'
 
 const ToastProvider = ToastPrimitives.Provider
 

@@ -1,9 +1,8 @@
 'use client'
 
-import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
-
+import * as React from 'react'
 import { twMerge } from 'tailwind-merge'
 
 const Dialog = DialogPrimitive.Root
@@ -106,7 +105,10 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={twMerge('text-sm leading-relaxed text-muted-foreground', className)}
+    className={twMerge(
+      'text-sm leading-relaxed text-muted-foreground',
+      className,
+    )}
     {...props}
   />
 ))

@@ -1,8 +1,9 @@
 import { Metadata } from 'next'
 
+import { env } from '@/env'
+
 import { SignInButton } from './sign-in-button'
 import { SignInForm } from './sign-in-form'
-import { env } from '@/env'
 
 export const metadata: Metadata = {
   title: 'Sign In',

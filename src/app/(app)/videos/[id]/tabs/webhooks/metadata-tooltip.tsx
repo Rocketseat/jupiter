@@ -1,10 +1,11 @@
+import { InfoCircledIcon } from '@radix-ui/react-icons'
+
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { InfoCircledIcon } from '@radix-ui/react-icons'
 
 export function MetadataTooltip() {
   return (

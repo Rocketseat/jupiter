@@ -1,9 +1,10 @@
 'use client'
 
-import { addUploadsAtom } from '@/state/uploads'
 import { UploadIcon } from '@radix-ui/react-icons'
 import { useSetAtom } from 'jotai'
 import { useDropzone } from 'react-dropzone'
+
+import { addUploadsAtom } from '@/state/uploads'
 
 export function UploadDropArea() {
   const addUploads = useSetAtom(addUploadsAtom)

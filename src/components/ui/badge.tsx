@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { tv, type VariantProps } from 'tailwind-variants'
-
 import { twMerge } from 'tailwind-merge'
+import { tv, type VariantProps } from 'tailwind-variants'
 
 const badgeVariants = tv({
   base: 'inline-flex items-center rounded-md border border-slate-200 px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 dark:border-slate-800 dark:focus:ring-slate-800',

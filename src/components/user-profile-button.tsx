@@ -1,8 +1,10 @@
 'use client'
 
-import { Avatar } from './ui/avatar'
-import { signOut, useSession } from 'next-auth/react'
+import { LogOut } from 'lucide-react'
 import Image from 'next/image'
+import { signOut, useSession } from 'next-auth/react'
+
+import { Avatar } from './ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
-import { LogOut } from 'lucide-react'
 
 export function UserProfileButton() {
   const { data: session } = useSession()

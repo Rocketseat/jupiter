@@ -1,9 +1,11 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import axios from 'axios'
 import { Link1Icon } from '@radix-ui/react-icons'
 import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import { Edit2 } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
 
 import {
   Dialog,
@@ -14,9 +16,8 @@ import {
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+
 import { Button } from './ui/button'
-import { Edit2 } from 'lucide-react'
-import Link from 'next/link'
 
 export interface TranscriptionPreviewProps {
   videoId: string
@@ -25,17 +26,19 @@ export interface TranscriptionPreviewProps {
 export function TranscriptionPreview({ videoId }: TranscriptionPreviewProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const { data: transcription, isLoading: isLoadingTranscription } = useQuery(
-    ['transcription', videoId],
-    async () => {
+  const {
+    data: transcription,
+    isLoading: isLoadingTranscription,
+    isPending: isPendingTranscription,
+  } = useQuery({
+    queryKey: ['transcription', videoId],
+    queryFn: async () => {
       const response = await axios.get(`/api/videos/${videoId}/transcription`)
 
       return response.data.transcription
     },
-    {
-      enabled: isDialogOpen,
-    },
-  )
+    enabled: isDialogOpen,
+  })
 
   const transcriptionText = useMemo(() => {
     if (!transcription) {
@@ -57,7 +60,7 @@ export function TranscriptionPreview({ videoId }: TranscriptionPreviewProps) {
         <DialogHeader>
           <DialogTitle>Transcrição</DialogTitle>
         </DialogHeader>
-        {isLoadingTranscription ? (
+        {isLoadingTranscription || isPendingTranscription ? (
           <div className="space-y-2">
             {Array.from({ length: 20 }).map((_, i) => {
               return <Skeleton key={i} className="h-3 w-full" />

@@ -11,9 +11,9 @@ const nextConfig = {
   },
 
   images: {
-    domains: [
-      'lh3.googleusercontent.com',
-      'github.com'
+    remotePatterns: [
+      { hostname: 'lh3.googleusercontent.com' },
+      { hostname: 'github.com' }
     ]
   },
 

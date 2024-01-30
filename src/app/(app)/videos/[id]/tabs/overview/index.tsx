@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { prisma } from '@/lib/prisma'
+
 import { TranscriptionCard } from '../../transcription-card'
 import { VideoForm } from './video-form'
 

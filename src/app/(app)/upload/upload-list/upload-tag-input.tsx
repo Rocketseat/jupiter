@@ -1,10 +1,12 @@
 'use client'
 
-import { useController, useFieldArray, useFormContext } from 'react-hook-form'
-import { UploadsFormSchema } from '.'
-import { TagInput } from '@/components/tag-input'
 import { useAtomValue } from 'jotai'
+import { useController, useFieldArray, useFormContext } from 'react-hook-form'
+
+import { TagInput } from '@/components/tag-input'
 import { amountOfUploadsAtom } from '@/state/uploads'
+
+import { UploadsFormSchema } from '.'
 
 interface TagInputProps {
   uploadIndex: number

@@ -1,4 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import {
   DialogContent,
@@ -10,13 +17,7 @@ import {
 } from './ui/dialog'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Loader2 } from 'lucide-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
 import { useToast } from './ui/use-toast'
-import { Badge } from './ui/badge'
 
 const newTagFormSchema = z.object({
   tag: z
@@ -52,18 +53,19 @@ export function CreateNewTagDialog({
     },
   })
 
-  const { mutateAsync: createTag } = useMutation(
-    async (tag: string) => {
+  const { mutateAsync: createTag } = useMutation({
+    mutationFn: async (tag: string) => {
       await axios.post('/api/tags', {
         tag,
       })
     },
-    {
-      onSuccess() {
-        queryClient.invalidateQueries(['tags'])
-      },
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ['tags'],
+        exact: true,
+      })
     },
-  )
+  })
 
   async function handleCreateTag({ tag }: NewTagFormSchema) {
     try {

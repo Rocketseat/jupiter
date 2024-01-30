@@ -1,15 +1,17 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import axios from 'axios'
+import { useRouter } from 'next/navigation'
+import { FormProvider, useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+import { ToastAction } from '@/components/ui/toast'
+import { useToast } from '@/components/ui/use-toast'
+
 import { Header } from './header'
 import { UploadDropArea } from './upload-drop-area'
 import { UploadTable } from './upload-table'
-import { FormProvider, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import axios from 'axios'
-import { useToast } from '@/components/ui/use-toast'
-import { ToastAction } from '@/components/ui/toast'
-import { useRouter } from 'next/navigation'
 
 const uploadsFormSchema = z.object({
   files: z

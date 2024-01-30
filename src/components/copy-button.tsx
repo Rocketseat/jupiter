@@ -1,8 +1,9 @@
 'use client'
 
 import { ComponentProps, useRef, useState } from 'react'
-import { Button } from './ui/button'
 import { twMerge } from 'tailwind-merge'
+
+import { Button } from './ui/button'
 
 export interface CopyButtonProps extends ComponentProps<typeof Button> {
   textToCopy: string

@@ -1,5 +1,6 @@
-import { env } from '@/env'
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg'
+
+import { env } from '@/env'
 
 export const ffmpeg = createFFmpeg({
   log: env.NODE_ENV === 'development',

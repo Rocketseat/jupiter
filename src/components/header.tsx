@@ -1,13 +1,13 @@
+import { PlusCircledIcon } from '@radix-ui/react-icons'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import rocketseatIcon from '@/assets/rocketseat-icon.svg'
-import { PlusCircledIcon } from '@radix-ui/react-icons'
 
-import { Button } from './ui/button'
 import { NavLink } from './nav-link'
-import { ThemeSwitcher } from './theme-switcher'
 import { Search } from './search'
+import { ThemeSwitcher } from './theme-switcher'
+import { Button } from './ui/button'
 import { UserProfileButton } from './user-profile-button'
 
 export function Header() {
