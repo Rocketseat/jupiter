@@ -1,6 +1,7 @@
-import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)

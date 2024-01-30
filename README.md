@@ -3,7 +3,7 @@ Jupiter is a video upload hub that automates the generation of titles, descripti
 ### To-do
 
 - Whisper JAX
-- New FFMPeg
+- New FFMPeg (@ffmpeg/core)
 - Datadog / Sentry
 - DeadLetter queue (manual retry)
   - store number of retries and if its the last maybe notice somewhere and display a button for manual retry

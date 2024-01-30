@@ -1,18 +1,20 @@
 'use client'
 
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { VideoDescriptionInput } from './video-description-input'
-import { VideoTagInput } from './video-tag-input'
-import { Button } from '@/components/ui/button'
-import { FormProvider, useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
+import { CheckCircledIcon } from '@radix-ui/react-icons'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
+import { Loader2 } from 'lucide-react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/use-toast'
-import { CheckCircledIcon } from '@radix-ui/react-icons'
+
+import { VideoDescriptionInput } from './video-description-input'
+import { VideoTagInput } from './video-tag-input'
 
 interface VideoFormProps {
   video: any
@@ -45,11 +47,11 @@ export function VideoForm({ video }: VideoFormProps) {
     },
   })
 
-  const { mutateAsync: updateVideo } = useMutation(
-    async (data: EditVideoFormSchema) => {
+  const { mutateAsync: updateVideo } = useMutation({
+    mutationFn: async (data: EditVideoFormSchema) => {
       await axios.put(`/api/videos/${video.id}`, data)
     },
-  )
+  })
 
   async function handleSaveVideo(data: EditVideoFormSchema) {
     try {

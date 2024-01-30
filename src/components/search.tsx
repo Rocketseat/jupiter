@@ -1,6 +1,16 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { Loader2, Video } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+
+import useDebounceValue from '@/hooks/useDebounceValue'
+
+import { Button } from './ui/button'
 import {
   CommandDialog,
   CommandGroup,
@@ -8,15 +18,6 @@ import {
   CommandItem,
   CommandList,
 } from './ui/command'
-
-import { Loader2, Video } from 'lucide-react'
-import { Button } from './ui/button'
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { useRouter } from 'next/navigation'
-import useDebounceValue from '@/hooks/useDebounceValue'
 
 dayjs.extend(relativeTime)
 
@@ -27,7 +28,11 @@ export function Search() {
 
   const searchTerm = useDebounceValue(search, 300)
 
-  const { data: videos, isLoading: isLoadingVideos } = useQuery({
+  const {
+    data: videos,
+    isLoading: isLoadingVideos,
+    isPending: isPendingVideos,
+  } = useQuery({
     queryKey: ['search', searchTerm],
     queryFn: async () => {
       const response = await axios.get('/api/videos/search', {
@@ -78,7 +83,7 @@ export function Search() {
         />
         <CommandList className="h-auto">
           <CommandGroup heading="Recent uploads">
-            {isLoadingVideos ? (
+            {isPendingVideos || isLoadingVideos ? (
               <div className="flex cursor-default select-none items-center justify-center gap-2 rounded-sm px-2 py-1.5 text-sm text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" />
                 <span>Loading videos...</span>

@@ -1,5 +1,6 @@
-import { env } from '@/env'
 import { Kafka } from '@upstash/kafka'
+
+import { env } from '@/env'
 
 export const kafka = new Kafka({
   url: env.KAFKA_BROKER_URL,

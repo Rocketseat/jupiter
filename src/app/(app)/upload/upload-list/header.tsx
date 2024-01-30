@@ -1,13 +1,19 @@
 'use client'
 
+import { MagicWandIcon, TextIcon } from '@radix-ui/react-icons'
+import axios from 'axios'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { ChevronDownIcon, Loader2 } from 'lucide-react'
+import { useFormContext } from 'react-hook-form'
+
 import {
-  AlertDialogHeader,
-  AlertDialogFooter,
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
@@ -27,11 +33,6 @@ import {
   isThereAnyPendingUploadAtom,
   uploadsAtom,
 } from '@/state/uploads'
-import { MagicWandIcon, TextIcon } from '@radix-ui/react-icons'
-import axios from 'axios'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
-import { ChevronDownIcon, Loader2 } from 'lucide-react'
-import { useFormContext } from 'react-hook-form'
 
 interface HeaderProps {
   onSubmit: () => void

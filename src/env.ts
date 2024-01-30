@@ -32,6 +32,10 @@ export const env = createEnv({
     QSTASH_TOKEN: z.string().refine(requiredOnEnv('production')),
     QSTASH_CURRENT_SIGNING_KEY: z.string().refine(requiredOnEnv('production')),
     QSTASH_NEXT_SIGNING_KEY: z.string().refine(requiredOnEnv('production')),
+    QSTASH_VALIDATE_SIGNATURE: z
+      .string()
+      .transform((value) => value === 'true')
+      .default('true'),
     KAFKA_BROKER_URL: z.string().refine(requiredOnEnv('production')),
     KAFKA_USERNAME: z.string().refine(requiredOnEnv('production')),
     KAFKA_PASSWORD: z.string().refine(requiredOnEnv('production')),

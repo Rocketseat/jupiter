@@ -1,9 +1,10 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import { AtSign, Loader2 } from 'lucide-react'
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
+
+import { Button } from '@/components/ui/button'
 
 export function SignInButton() {
   const [loading, setLoading] = useState(false)

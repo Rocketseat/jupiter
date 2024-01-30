@@ -1,9 +1,11 @@
 import { Metadata } from 'next'
-import { VideoList } from './video-list'
+import { Suspense } from 'react'
+
+import { CardSkeleton } from '@/components/skeleton/card-skeleton'
 import { Storage } from '@/components/summary/storage'
 import { TotalCount } from '@/components/summary/total-count'
-import { Suspense } from 'react'
-import { CardSkeleton } from '@/components/skeleton/card-skeleton'
+
+import { VideoList } from './video-list'
 
 export const metadata: Metadata = {
   title: 'Uploads',

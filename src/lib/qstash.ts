@@ -1,5 +1,8 @@
+import { Client, PublishJsonRequest } from '@upstash/qstash'
+import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
+import { NextRequest, NextResponse } from 'next/server'
+
 import { env } from '@/env'
-import { Receiver, Client, PublishJsonRequest } from '@upstash/qstash/nodejs'
 
 const qstash = new Client({
   token: env.QSTASH_TOKEN,
@@ -32,47 +35,14 @@ export async function publishMessage<T = any>({
   })
 }
 
-export async function validateQStashSignature({
-  request,
-  runInDev = false,
-}: {
-  request: Request
-  runInDev?: boolean
-}) {
-  const requestBodyAsText = await request.text()
-
-  if (env.NODE_ENV === 'development' && runInDev === false) {
-    return {
-      bodyAsJSON: JSON.parse(requestBodyAsText),
+export async function validateQStashSignature(
+  handler: (request: NextRequest) => Promise<NextResponse>,
+) {
+  return async (request: NextRequest) => {
+    if (env.QSTASH_VALIDATE_SIGNATURE) {
+      return await verifySignatureAppRouter(handler)(request)
     }
-  }
 
-  const signature = request.headers.get('upstash-signature')
-
-  const receiver = new Receiver({
-    currentSigningKey: env.QSTASH_CURRENT_SIGNING_KEY,
-    nextSigningKey: env.QSTASH_NEXT_SIGNING_KEY,
-  })
-
-  if (!signature) {
-    throw new Error('QStash signature not found.')
-  }
-
-  const isValid = await receiver
-    .verify({
-      signature,
-      body: requestBodyAsText,
-    })
-    .catch((err) => {
-      console.error(err)
-      return false
-    })
-
-  if (!isValid) {
-    throw new Error('QStash signature is invalid.')
-  }
-
-  return {
-    bodyAsJSON: JSON.parse(requestBodyAsText),
+    return await handler(request)
   }
 }

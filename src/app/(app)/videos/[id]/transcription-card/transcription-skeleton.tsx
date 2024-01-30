@@ -1,6 +1,7 @@
+import { Loader2 } from 'lucide-react'
+
 import { CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Loader2 } from 'lucide-react'
 
 export function TranscriptionSkeleton() {
   return (

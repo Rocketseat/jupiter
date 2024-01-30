@@ -1,11 +1,13 @@
-import { prisma } from '@/lib/prisma'
-import { NextResponse } from 'next/server'
-import axios from 'axios'
-import { z } from 'zod'
-import { env } from '@/env'
-import { validateQStashSignature } from '@/lib/qstash'
-import WebSocket from 'ws'
 import { randomUUID } from 'node:crypto'
+
+import axios from 'axios'
+import { NextRequest, NextResponse } from 'next/server'
+import WebSocket from 'ws'
+import { z } from 'zod'
+
+import { env } from '@/env'
+import { prisma } from '@/lib/prisma'
+import { validateQStashSignature } from '@/lib/qstash'
 
 type PandaMessage = {
   action: 'progress' | 'success'
@@ -18,13 +20,13 @@ const createTranscriptionBodySchema = z.object({
 
 export const maxDuration = 300
 
-export async function POST(request: Request) {
+async function handler(request: NextRequest) {
   const webhookId = randomUUID()
 
-  try {
-    const { bodyAsJSON } = await validateQStashSignature({ request })
+  const body = await request.json()
 
-    const { videoId } = createTranscriptionBodySchema.parse(bodyAsJSON)
+  try {
+    const { videoId } = createTranscriptionBodySchema.parse(body)
 
     const video = await prisma.video.findUniqueOrThrow({
       where: {
@@ -55,7 +57,7 @@ export async function POST(request: Request) {
         id: webhookId,
         type: 'UPLOAD_TO_EXTERNAL_PROVIDER',
         videoId,
-        metadata: JSON.stringify(bodyAsJSON),
+        metadata: JSON.stringify(body),
       },
     })
 
@@ -108,10 +110,8 @@ export async function POST(request: Request) {
       },
     })
 
-    return new Response()
-  } catch (err: any) {
-    console.error(err)
-
+    return new NextResponse(null, { status: 204 })
+  } catch (err: unknown) {
     await prisma.webhook.update({
       where: {
         id: webhookId,
@@ -123,8 +123,10 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(
-      { message: 'Error uploading video.', error: err?.message || '' },
-      { status: 401 },
+      { message: 'Error uploading video.', error: err },
+      { status: 400 },
     )
   }
 }
+
+export const POST = validateQStashSignature(handler)

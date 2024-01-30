@@ -1,13 +1,15 @@
+import { randomUUID } from 'node:crypto'
+
+import { PutObjectCommand } from '@aws-sdk/client-s3'
+import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
+import axios from 'axios'
+import { NextRequest, NextResponse } from 'next/server'
+import { compile, Cue } from 'node-webvtt'
+import { z } from 'zod'
+
+import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
 import { prisma } from '@/lib/prisma'
-import { NextResponse } from 'next/server'
-import { z } from 'zod'
-import { validateQStashSignature } from '@/lib/qstash'
-import { Cue, compile } from 'node-webvtt'
-import { randomUUID } from 'node:crypto'
-import { env } from '@/env'
-import { PutObjectCommand } from '@aws-sdk/client-s3'
-import axios from 'axios'
 
 const createSubtitlesFromTranscription = z.object({
   videoId: z.string().uuid(),
@@ -15,14 +17,13 @@ const createSubtitlesFromTranscription = z.object({
 
 export const maxDuration = 300
 
-export async function POST(request: Request) {
+async function handler(request: NextRequest) {
   const webhookId = randomUUID()
+  const body = await request.json()
+
+  const { videoId } = createSubtitlesFromTranscription.parse(body)
 
   try {
-    const { bodyAsJSON } = await validateQStashSignature({ request })
-
-    const { videoId } = createSubtitlesFromTranscription.parse(bodyAsJSON)
-
     const video = await prisma.video.findUniqueOrThrow({
       where: {
         id: videoId,
@@ -148,10 +149,8 @@ export async function POST(request: Request) {
       }),
     ])
 
-    return new Response()
-  } catch (err: any) {
-    console.error(err)
-
+    return new NextResponse(null, { status: 201 })
+  } catch (err: unknown) {
     await prisma.webhook.update({
       where: {
         id: webhookId,
@@ -163,8 +162,10 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(
-      { message: 'Error creating subtitles.', error: err?.message || '' },
-      { status: 401 },
+      { message: 'Error creating subtitles.', error: err },
+      { status: 400 },
     )
   }
 }
+
+export const POST = verifySignatureAppRouter(handler)

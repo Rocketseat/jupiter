@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+
 import { UploadList } from './upload-list'
 
 export const metadata: Metadata = {

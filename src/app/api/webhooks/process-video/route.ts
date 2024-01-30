@@ -1,11 +1,14 @@
+import { randomUUID } from 'node:crypto'
+
+import { CopyObjectCommand } from '@aws-sdk/client-s3'
+import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
+import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
 import { prisma } from '@/lib/prisma'
-import { CopyObjectCommand } from '@aws-sdk/client-s3'
-import { NextResponse } from 'next/server'
-import { z } from 'zod'
-import { publishMessage, validateQStashSignature } from '@/lib/qstash'
-import { randomUUID } from 'node:crypto'
+import { publishMessage } from '@/lib/qstash'
 
 const processVideoBodySchema = z.object({
   videoId: z.string().uuid(),
@@ -13,13 +16,13 @@ const processVideoBodySchema = z.object({
 
 export const maxDuration = 60
 
-export async function POST(request: Request) {
+async function handler(request: NextRequest) {
   const webhookId = randomUUID()
 
-  try {
-    const { bodyAsJSON } = await validateQStashSignature({ request })
+  const body = await request.json()
 
-    const { videoId } = processVideoBodySchema.parse(bodyAsJSON)
+  try {
+    const { videoId } = processVideoBodySchema.parse(body)
 
     const video = await prisma.video.findUniqueOrThrow({
       where: {
@@ -38,7 +41,7 @@ export async function POST(request: Request) {
         id: webhookId,
         type: 'PROCESS_VIDEO',
         videoId,
-        metadata: JSON.stringify(bodyAsJSON),
+        metadata: JSON.stringify(body),
       },
     })
 
@@ -92,10 +95,8 @@ export async function POST(request: Request) {
       },
     })
 
-    return new Response()
-  } catch (err: any) {
-    console.error(err)
-
+    return new NextResponse(null, { status: 204 })
+  } catch (err: unknown) {
     await prisma.webhook.update({
       where: {
         id: webhookId,
@@ -107,8 +108,10 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(
-      { message: 'Error processing video.', error: err?.message || '' },
-      { status: 401 },
+      { message: 'Error processing video.', error: err },
+      { status: 400 },
     )
   }
 }
+
+export const POST = verifySignatureAppRouter(handler)

@@ -1,6 +1,17 @@
 'use client'
 
 import {
+  CheckCircledIcon,
+  CrossCircledIcon,
+  DotsHorizontalIcon,
+} from '@radix-ui/react-icons'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { Loader2 } from 'lucide-react'
+
+import {
   Table,
   TableBody,
   TableCell,
@@ -8,20 +19,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  CheckCircledIcon,
-  CrossCircledIcon,
-  DotsHorizontalIcon,
-} from '@radix-ui/react-icons'
-import { Loader2 } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { MetadataTooltip } from './metadata-tooltip'
-import { WebhooksSkeletonTable } from './webhooks-skeleton-table'
 import { Textarea } from '@/components/ui/textarea'
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
+
+import { MetadataTooltip } from './metadata-tooltip'
+import { WebhooksSkeletonTable } from './webhooks-skeleton-table'
 
 dayjs.extend(relativeTime)
 

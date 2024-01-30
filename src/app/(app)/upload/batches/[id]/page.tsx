@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+
 import { BatchVideoList } from './batch-video-list'
 
 interface BatchPageProps {

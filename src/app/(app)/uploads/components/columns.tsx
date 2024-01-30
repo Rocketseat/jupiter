@@ -1,17 +1,18 @@
 'use client'
 
+import { CopyIcon, SymbolIcon } from '@radix-ui/react-icons'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import Link from 'next/link'
+
+import { CopyButton } from '@/components/copy-button'
+import { TranscriptionPreview } from '@/components/transcription-preview'
+import { formatBytes } from '@/utils/format-bytes'
+import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 
 import { Video } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
-import { CopyIcon, SymbolIcon } from '@radix-ui/react-icons'
-import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
-import { TranscriptionPreview } from '@/components/transcription-preview'
-import { CopyButton } from '@/components/copy-button'
-import { formatBytes } from '@/utils/format-bytes'
-import Link from 'next/link'
 
 dayjs.extend(relativeTime)
 

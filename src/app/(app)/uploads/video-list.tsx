@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { DataTable } from './components/data-table'
-import axios from 'axios'
-import { columns } from './components/columns'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { PaginationState } from '@tanstack/react-table'
+import axios from 'axios'
+import { useState } from 'react'
+
 import useDebounceValue from '@/hooks/useDebounceValue'
+
+import { columns } from './components/columns'
+import { DataTable } from './components/data-table'
 
 export function VideoList() {
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
@@ -52,7 +54,7 @@ export function VideoList() {
       return { videos, pageCount }
     },
     refetchOnWindowFocus: true,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   })
 
   return (

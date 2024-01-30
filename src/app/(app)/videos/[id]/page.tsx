@@ -1,12 +1,13 @@
-import { Button } from '@/components/ui/button'
-
 import { VideoIcon } from '@radix-ui/react-icons'
 import { Music2 } from 'lucide-react'
 import { Metadata } from 'next'
+
+import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { prisma } from '@/lib/prisma'
+
 import { Overview } from './tabs/overview'
 import { Webhooks } from './tabs/webhooks'
-import { prisma } from '@/lib/prisma'
 
 interface VideoPageProps {
   params: { id: string }

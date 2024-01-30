@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 import { Skeleton } from '../ui/skeleton'
 
 export function CardSkeleton() {

@@ -1,5 +1,6 @@
-import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+
+import { prisma } from '@/lib/prisma'
 
 const createTagBodySchema = z.object({
   tag: z.string(),

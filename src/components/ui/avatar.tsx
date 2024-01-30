@@ -1,8 +1,7 @@
 'use client'
 
-import * as React from 'react'
 import * as AvatarPrimitive from '@radix-ui/react-avatar'
-
+import * as React from 'react'
 import { twMerge } from 'tailwind-merge'
 
 const Avatar = React.forwardRef<

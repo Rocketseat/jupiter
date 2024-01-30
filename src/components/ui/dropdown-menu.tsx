@@ -1,9 +1,8 @@
 'use client'
 
-import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight, Circle } from 'lucide-react'
-
+import * as React from 'react'
 import { twMerge } from 'tailwind-merge'
 
 const DropdownMenu = DropdownMenuPrimitive.Root
@@ -162,7 +161,10 @@ const DropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
-    className={twMerge('-mx-1 my-1 h-px bg-slate-100 dark:bg-slate-800', className)}
+    className={twMerge(
+      '-mx-1 my-1 h-px bg-slate-100 dark:bg-slate-800',
+      className,
+    )}
     {...props}
   />
 ))
@@ -174,7 +176,10 @@ const DropdownMenuShortcut = ({
 }: React.HTMLAttributes<HTMLSpanElement>) => {
   return (
     <span
-      className={twMerge('ml-auto text-xs tracking-widest opacity-60', className)}
+      className={twMerge(
+        'ml-auto text-xs tracking-widest opacity-60',
+        className,
+      )}
       {...props}
     />
   )

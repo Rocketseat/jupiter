@@ -1,12 +1,14 @@
 'use client'
 
+import { MagicWandIcon } from '@radix-ui/react-icons'
 import { useCompletion } from 'ai/react'
+import { Loader2 } from 'lucide-react'
+import { useEffect } from 'react'
+import { useFormContext } from 'react-hook-form'
+
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { MagicWandIcon } from '@radix-ui/react-icons'
-import { useEffect } from 'react'
-import { Loader2 } from 'lucide-react'
-import { useFormContext } from 'react-hook-form'
+
 import { EditVideoFormSchema } from './video-form'
 
 export interface VideoDescriptionInputProps {

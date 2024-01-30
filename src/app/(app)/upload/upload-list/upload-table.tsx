@@ -1,6 +1,12 @@
 'use client'
 
+import { useAtomValue, useSetAtom } from 'jotai'
+import { AudioWaveform, Loader2, TrashIcon, Videotape } from 'lucide-react'
+import { SyntheticEvent, useEffect } from 'react'
+import { useFormContext } from 'react-hook-form'
+
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -9,16 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { formatBytes } from '@/utils/format-bytes'
-import { Loader2, TrashIcon } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { SyntheticEvent, useEffect } from 'react'
-import { useFormContext } from 'react-hook-form'
-import { UploadsFormSchema } from '.'
-import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
-import { UploadTagInput } from './upload-tag-input'
-import { useAtomValue, useSetAtom } from 'jotai'
-
 import {
   areUploadsEmptyAtom,
   deleteUploadAtom,
@@ -27,19 +23,15 @@ import {
   updateUploadDurationAtom,
   uploadsAtom,
 } from '@/state/uploads'
-import { VideoUploadProgressColumn } from './columns/video-upload-progress-column'
+import { formatBytes } from '@/utils/format-bytes'
+import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
+
+import { UploadsFormSchema } from '.'
 import { AudioConversionProgressColumn } from './columns/audio-conversion-progress-column'
 import { AudioUploadProgressColumn } from './columns/audio-upload-progress-column'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { VideoUploadProgressColumn } from './columns/video-upload-progress-column'
 import { UploadLanguageInput } from './upload-language-input'
+import { UploadTagInput } from './upload-tag-input'
 
 export function UploadTable() {
   const {
@@ -81,11 +73,26 @@ export function UploadTable() {
         <TableHeader>
           <TableRow>
             <TableHead style={{ width: 148 }}></TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead style={{ width: 180 }}>Metadata</TableHead>
-            <TableHead style={{ width: 200 }}>Video upload</TableHead>
-            <TableHead style={{ width: 200 }}>Audio conversion</TableHead>
-            <TableHead style={{ width: 200 }}>Audio upload</TableHead>
+            <TableHead>Information</TableHead>
+            <TableHead style={{ width: 240 }}>Metadata</TableHead>
+            <TableHead style={{ width: 160 }}>
+              <div className="flex items-center gap-2">
+                <Videotape className="size-4" />
+                Upload
+              </div>
+            </TableHead>
+            <TableHead style={{ width: 160 }}>
+              <div className="flex items-center gap-2">
+                <AudioWaveform className="size-4" />
+                Conversion
+              </div>
+            </TableHead>
+            <TableHead style={{ width: 160 }}>
+              <div className="flex items-center gap-2">
+                <AudioWaveform className="size-4" />
+                Upload
+              </div>
+            </TableHead>
             <TableHead style={{ width: 140 }}></TableHead>
           </TableRow>
         </TableHeader>
