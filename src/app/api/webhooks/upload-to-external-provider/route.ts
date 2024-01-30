@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 
+import { verifySignatureAppRouter } from '@upstash/qstash/nextjs'
 import axios from 'axios'
 import { NextRequest, NextResponse } from 'next/server'
 import WebSocket from 'ws'
@@ -7,7 +8,6 @@ import { z } from 'zod'
 
 import { env } from '@/env'
 import { prisma } from '@/lib/prisma'
-import { validateQStashSignature } from '@/lib/qstash'
 
 type PandaMessage = {
   action: 'progress' | 'success'
@@ -129,4 +129,4 @@ async function handler(request: NextRequest) {
   }
 }
 
-export const POST = validateQStashSignature(handler)
+export const POST = verifySignatureAppRouter(handler)
