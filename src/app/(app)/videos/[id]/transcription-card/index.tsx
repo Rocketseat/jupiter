@@ -58,7 +58,7 @@ export function TranscriptionCard({
       return 15 * 1000 // 15 seconds
     },
     refetchOnWindowFocus: false,
-   })
+  })
 
   // const { mutateAsync: saveTranscriptions } = useMutation(
   //   async (data: TranscriptionSegmentsFormSchema) => {
