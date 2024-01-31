@@ -35,9 +35,10 @@ export function Search() {
   } = useQuery({
     queryKey: ['search', searchTerm],
     queryFn: async () => {
-      const response = await axios.get('/api/videos/search', {
+      const response = await axios.get('/api/videos', {
         params: {
-          q: searchTerm,
+          titleFilter: searchTerm,
+          pageSize: 5,
         },
       })
 
