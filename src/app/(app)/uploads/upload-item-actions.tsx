@@ -1,20 +1,8 @@
 'use client'
 
-import {
-  DotsHorizontalIcon,
-  Pencil2Icon,
-  StackIcon,
-} from '@radix-ui/react-icons'
+import { DotsHorizontalIcon, Pencil2Icon } from '@radix-ui/react-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Row } from '@tanstack/react-table'
-import axios from 'axios'
-import {
-  Link2,
-  Loader2,
-  Music2,
-  Trash2,
-  Video as VideoIcon,
-} from 'lucide-react'
+import { Loader2, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -38,21 +26,21 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/eden'
 
-import { Video } from '../data/schema'
-
-interface DataTableRowActionsProps {
-  row: Row<Video>
+interface UploadItemActionsProps {
+  videoId: string
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+export function UploadItemActions({ videoId }: UploadItemActionsProps) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const { mutateAsync: deleteVideo, isPending: isDeletingVideo } = useMutation({
     mutationFn: async () => {
-      await axios.delete(`/api/videos/${row.original.id}`)
+      await api.videos[videoId].delete()
     },
     onSuccess() {
       queryClient.invalidateQueries({
@@ -100,54 +88,17 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem asChild>
-            <Link href={`/videos/${row.original.id}`} prefetch={false}>
+            <Link href={`/videos/${videoId}`} prefetch={false}>
               <Pencil2Icon className="mr-2 h-4 w-4" />
-              <span>Review</span>
+              <span>Edit</span>
             </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            disabled={!row.original.externalProviderId}
-            onClick={() =>
-              navigator.clipboard.writeText(
-                `https://b-vz-762f4670-e04.tv.pandarow.original.com.br/${row.original.externalProviderId}/playlist.m3u8`,
-              )
-            }
-          >
-            <Link2 className="mr-2 h-4 w-4" />
-            <span>Copy HLS</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled={!row.original.uploadBatchId} asChild>
-            <Link
-              href={`/upload/batches/${row.original.uploadBatchId}`}
-              prefetch={false}
-            >
-              <StackIcon className="mr-2 h-4 w-4" />
-              <span>View batch</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled={!row.original.storageKey} asChild>
-            <a
-              href={`/api/videos/${row.original.id}/download/video`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <VideoIcon className="mr-2 h-4 w-4" />
-              <span>Download MP4</span>
-            </a>
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled={!row.original.audioStorageKey} asChild>
-            <a
-              href={`/api/videos/${row.original.id}/download/audio`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Music2 className="mr-2 h-4 w-4" />
-              <span>Download MP3</span>
-            </a>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <AlertDialogTrigger asChild>
-            <DropdownMenuItem disabled={isDeletingVideo}>
+            <DropdownMenuItem
+              className="text-red-500 data-[highlighted]:text-red-500 dark:text-red-400 dark:data-[highlighted]:text-red-400"
+              disabled={isDeletingVideo}
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete
             </DropdownMenuItem>

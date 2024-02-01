@@ -45,6 +45,7 @@ export function SignInForm() {
       <div className="space-y-2">
         <Label htmlFor="email">E-mail</Label>
         <Input id="email" type="email" {...register('email')} />
+
         {errors.email && (
           <p className="text-sm font-medium text-red-500 dark:text-red-400">
             {errors.email.message}
@@ -55,6 +56,7 @@ export function SignInForm() {
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
         <Input id="password" type="password" {...register('password')} />
+
         {errors.password && (
           <p className="text-sm font-medium text-red-500 dark:text-red-400">
             {errors.password.message}
