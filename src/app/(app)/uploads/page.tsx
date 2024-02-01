@@ -96,13 +96,16 @@ export default async function UploadsPage({
             {videos && videos.length > 0 ? (
               videos.map((video) => {
                 return (
-                  <TableRow key={video.id}>
+                  <TableRow
+                    key={video.id}
+                    className="has-[a:focus-visible]:bg-accent"
+                  >
                     <TableCell>
                       <div className="flex flex-col">
                         <Link
                           href={`/videos/${video.id}`}
                           prefetch={false}
-                          className="text-primary hover:underline"
+                          className="font-medium text-primary outline-none hover:underline"
                         >
                           {video.title}
                         </Link>
@@ -112,10 +115,12 @@ export default async function UploadsPage({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
                       {formatSecondsToMinutes(video.duration)}
                     </TableCell>
-                    <TableCell>{formatBytes(video.sizeInBytes)}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {formatBytes(video.sizeInBytes)}
+                    </TableCell>
                     <TableCell>
                       {video.transcription ? (
                         <TranscriptionPreview videoId={video.id} />

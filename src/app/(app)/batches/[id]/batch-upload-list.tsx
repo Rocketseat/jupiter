@@ -90,17 +90,19 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
             <TableBody>
               {batch && batch.videos.length ? (
                 batch.videos.map((video) => (
-                  <TableRow key={video.id}>
-                    <TableCell className="text-right">
+                  <TableRow
+                    key={video.id}
+                    className="has-[a:focus-visible]:bg-accent"
+                  >
+                    <TableCell className="text-right font-medium">
                       {video.uploadOrder}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-medium"></span>
                         <Link
                           href={`/videos/${video.id}`}
                           prefetch={false}
-                          className="text-primary hover:underline"
+                          className="font-medium text-primary outline-none hover:underline"
                         >
                           {video.title}
                         </Link>
@@ -109,10 +111,12 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
                       {formatSecondsToMinutes(video.duration)}
                     </TableCell>
-                    <TableCell>{formatBytes(video.sizeInBytes)}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {formatBytes(video.sizeInBytes)}
+                    </TableCell>
                     <TableCell>
                       {video.transcription ? (
                         <TranscriptionPreview videoId={video.id} />
