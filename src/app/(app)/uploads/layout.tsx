@@ -25,7 +25,9 @@ export default async function Layout({ children }: { children: ReactNode }) {
       </div>
 
       <div className="space-y-4">
-        <UploadsFilters />
+        <Suspense fallback={null}>
+          <UploadsFilters />
+        </Suspense>
 
         {children}
       </div>

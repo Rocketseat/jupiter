@@ -5,6 +5,7 @@ import { Cable, CopyIcon, ReceiptText } from 'lucide-react'
 import { Metadata } from 'next'
 import { unstable_noStore } from 'next/cache'
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { z } from 'zod'
 
 import { CopyButton } from '@/components/copy-button'
@@ -173,11 +174,13 @@ export default async function UploadsPage({
         </Table>
       </div>
 
-      <UploadsPagination
-        pageSize={query.pageSize}
-        pageIndex={query.pageIndex}
-        pageCount={pageCount}
-      />
+      <Suspense fallback={null}>
+        <UploadsPagination
+          pageSize={query.pageSize}
+          pageIndex={query.pageIndex}
+          pageCount={pageCount}
+        />
+      </Suspense>
     </>
   )
 }
