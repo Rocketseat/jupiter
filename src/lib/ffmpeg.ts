@@ -1,32 +1,38 @@
-import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg'
+import { FFmpeg } from '@ffmpeg/ffmpeg'
+import { ProgressEventCallback } from '@ffmpeg/ffmpeg/dist/esm/types'
+import { fetchFile, toBlobURL } from '@ffmpeg/util'
 
-import { env } from '@/env'
-
-export const ffmpeg = createFFmpeg({
-  log: env.NODE_ENV === 'development',
-  corePath: new URL('/ffmpeg-dist/ffmpeg-core.js', env.NEXT_PUBLIC_VERCEL_URL)
-    .href,
-})
+export const ffmpeg = new FFmpeg()
 
 export async function convertVideoToMP3(
   inputFile: File,
   onProgress: (progress: number) => void,
 ): Promise<File> {
-  if (!ffmpeg.isLoaded()) {
-    await ffmpeg.load()
+  if (!ffmpeg.loaded) {
+    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd'
+
+    await ffmpeg.load({
+      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await toBlobURL(
+        `${baseURL}/ffmpeg-core.wasm`,
+        'application/wasm',
+      ),
+    })
   }
 
-  ffmpeg.FS('writeFile', inputFile.name, await fetchFile(inputFile))
+  ffmpeg.writeFile(inputFile.name, await fetchFile(inputFile))
 
-  ffmpeg.setProgress(({ ratio }) => {
-    const progress = Math.round(ratio * 100)
+  const onFFMpegProgress: ProgressEventCallback = ({ progress }) => {
+    const progressPercentage = Math.round(progress * 100)
 
-    onProgress(progress)
-  })
+    onProgress(progressPercentage)
+  }
+
+  ffmpeg.on('progress', onFFMpegProgress)
 
   const outputId = crypto.randomUUID()
 
-  await ffmpeg.run(
+  await ffmpeg.exec([
     '-i',
     inputFile.name,
     '-vn',
@@ -35,15 +41,17 @@ export async function convertVideoToMP3(
     '-acodec',
     'libmp3lame',
     `${outputId}.mp3`,
-  )
+  ])
 
-  const data = ffmpeg.FS('readFile', `${outputId}.mp3`)
+  const data = (await ffmpeg.readFile(`${outputId}.mp3`)) as Uint8Array
 
   const audioFileBlob = new Blob([data.buffer], { type: 'audio/mpeg' })
 
   const audioFile = new File([audioFileBlob], `${outputId}.mp3`, {
     type: 'audio/mpeg',
   })
+
+  ffmpeg.off('progress', onFFMpegProgress)
 
   return audioFile
 }
