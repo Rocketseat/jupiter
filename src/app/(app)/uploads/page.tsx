@@ -4,6 +4,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { Cable, CopyIcon, ReceiptText } from 'lucide-react'
 import { Metadata } from 'next'
 import { unstable_noStore } from 'next/cache'
+import { headers } from 'next/headers'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { z } from 'zod'
@@ -19,7 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { UploadItemActions } from '@/components/upload-item-actions'
-import { server } from '@/lib/eden-server'
+import { api } from '@/lib/eden'
 import { formatBytes } from '@/utils/format-bytes'
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 
@@ -52,8 +53,11 @@ export default async function UploadsPage({
 
   const query = uploadsPageSearchParams.parse(searchParams)
 
-  const { data, error } = await server.videos.get({
+  const { data, error } = await api.videos.get({
     $query: query,
+    $fetch: {
+      headers: Object.fromEntries(headers().entries()),
+    },
   })
 
   if (error) {
