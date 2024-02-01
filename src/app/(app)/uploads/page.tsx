@@ -98,7 +98,7 @@ export default async function UploadsPage({
                 return (
                   <TableRow
                     key={video.id}
-                    className="has-[a:focus-visible]:bg-accent"
+                    className="has-[a:focus-visible]:bg-muted"
                   >
                     <TableCell>
                       <div className="flex flex-col">

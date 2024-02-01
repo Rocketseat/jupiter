@@ -47,18 +47,6 @@ function CustomTooltip({ active, payload, label }: TooltipProps<any, any>) {
   return null
 }
 
-function CustomCursor({ x, y, width, height }: ComponentProps<'svg'>) {
-  return (
-    <rect
-      className="fill-transparent"
-      x={x}
-      y={y}
-      width={width}
-      height={height}
-    />
-  )
-}
-
 export function ViewsCountChart({ data }: ViewsCountChartProps) {
   const clearedData = useMemo(() => {
     return data.filter((item) => item.plays !== 0)
@@ -78,6 +66,8 @@ export function ViewsCountChart({ data }: ViewsCountChartProps) {
 
         <CartesianGrid className="!stroke-muted" vertical={false} />
 
+        <Tooltip cursor={{ strokeOpacity: 0.3 }} content={<CustomTooltip />} />
+
         <Line
           type="monotone"
           stroke={lime[500]}
@@ -95,8 +85,6 @@ export function ViewsCountChart({ data }: ViewsCountChartProps) {
             className: 'stroke-0 fill-sky-500',
           }}
         />
-
-        <Tooltip cursor={<CustomCursor />} content={<CustomTooltip />} />
       </LineChart>
     </ResponsiveContainer>
   )
