@@ -1,3 +1,5 @@
+'use server'
+
 import { edenTreaty } from '@elysiajs/eden'
 import type { App } from '@server/app'
 import { headers } from 'next/headers'
