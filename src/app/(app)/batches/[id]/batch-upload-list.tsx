@@ -2,7 +2,6 @@
 
 import { SymbolIcon } from '@radix-ui/react-icons'
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { CopyIcon, Loader2 } from 'lucide-react'
@@ -18,19 +17,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { UploadItemActions } from '@/components/upload-item-actions'
+import { api } from '@/lib/eden'
 import { formatBytes } from '@/utils/format-bytes'
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 
-import { BatchVideoListActions } from './batch-video-list-actions'
-import { BatchVideoSkeletonTable } from './batch-video-skeleton-table'
+import { BatchUploadSkeletonTable } from './batch-upload-skeleton-table'
 
 dayjs.extend(relativeTime)
 
-export interface BatchVideoListProps {
+export interface BatchUploadListProps {
   batchId: string
 }
 
-export function BatchVideoList({ batchId }: BatchVideoListProps) {
+export function BatchUploadList({ batchId }: BatchUploadListProps) {
   const {
     data: batch,
     isLoading: isLoadingBatch,
@@ -38,9 +38,13 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
   } = useQuery({
     queryKey: ['batch', batchId],
     queryFn: async () => {
-      const response = await axios.get(`/api/batches/${batchId}`)
+      const { data, error } = await api.batches[batchId].get()
 
-      return response.data.batch
+      if (error) {
+        throw error
+      }
+
+      return data.batch
     },
     refetchInterval: 15 * 1000,
     refetchIntervalInBackground: false,
@@ -71,11 +75,11 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
           </TableHeader>
 
           {isLoadingBatch ? (
-            <BatchVideoSkeletonTable />
+            <BatchUploadSkeletonTable />
           ) : (
             <TableBody>
-              {batch.videos.length ? (
-                batch.videos.map((video: any) => (
+              {batch && batch.videos.length ? (
+                batch.videos.map((video) => (
                   <TableRow key={video.id}>
                     <TableCell className="text-center">
                       {video.uploadOrder}
@@ -136,7 +140,7 @@ export function BatchVideoList({ batchId }: BatchVideoListProps) {
                       )}
                     </TableCell>
                     <TableCell>
-                      <BatchVideoListActions batchId={batchId} video={video} />
+                      <UploadItemActions videoId={video.id} />
                     </TableCell>
                   </TableRow>
                 ))

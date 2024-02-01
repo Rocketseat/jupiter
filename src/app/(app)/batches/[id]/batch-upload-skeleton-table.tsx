@@ -1,13 +1,13 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { TableBody, TableCell, TableRow } from '@/components/ui/table'
 
-export interface BatchVideoSkeletonTableProps {
+export interface BatchUploadSkeletonTableProps {
   rows?: number
 }
 
-export function BatchVideoSkeletonTable({
+export function BatchUploadSkeletonTable({
   rows = 8,
-}: BatchVideoSkeletonTableProps) {
+}: BatchUploadSkeletonTableProps) {
   return (
     <TableBody>
       {Array.from({ length: rows }).map((_, row) => {

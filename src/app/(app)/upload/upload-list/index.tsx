@@ -48,7 +48,7 @@ export function UploadList() {
       const response = await axios.post('/api/batches', data)
       const { batchId } = response.data
 
-      router.push(`/upload/batches/${batchId}`)
+      router.push(`/batches/${batchId}`)
     } catch {
       toast({
         title: 'Uh oh! Something went wrong.',

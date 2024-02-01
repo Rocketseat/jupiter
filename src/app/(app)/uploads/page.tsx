@@ -18,11 +18,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { UploadItemActions } from '@/components/upload-item-actions'
 import { api } from '@/lib/eden'
 import { formatBytes } from '@/utils/format-bytes'
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 
-import { UploadItemActions } from './upload-item-actions'
 import { UploadsPagination } from './uploads-pagination'
 
 dayjs.extend(relativeTime)
