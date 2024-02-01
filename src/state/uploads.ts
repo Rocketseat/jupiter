@@ -377,10 +377,6 @@ export const convertUploadVideoToAudioAtom = atom(
 
       set(startAudioUploadAtom, uploadId)
     } catch (err) {
-      if (ffmpeg.isLoaded()) {
-        ffmpeg.exit()
-      }
-
       set(audioConversionAtom, (draft) => {
         const audioConversion = draft.get(uploadId)
 

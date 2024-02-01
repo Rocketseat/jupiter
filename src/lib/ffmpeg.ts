@@ -2,12 +2,14 @@ import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { ProgressEventCallback } from '@ffmpeg/ffmpeg/dist/esm/types'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
 
-export const ffmpeg = new FFmpeg()
+export let ffmpeg: FFmpeg | null = null
 
 export async function convertVideoToMP3(
   inputFile: File,
   onProgress: (progress: number) => void,
 ): Promise<File> {
+  ffmpeg = new FFmpeg()
+
   if (!ffmpeg.loaded) {
     const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd'
 
