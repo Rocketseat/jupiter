@@ -102,7 +102,7 @@ export default async function UploadsPage({
                         <Link
                           href={`/videos/${video.id}`}
                           prefetch={false}
-                          className="text-violet-500 hover:underline dark:text-violet-300"
+                          className="text-primary hover:underline"
                         >
                           {video.title}
                         </Link>

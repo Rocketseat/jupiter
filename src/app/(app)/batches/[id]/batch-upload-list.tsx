@@ -4,7 +4,7 @@ import { SymbolIcon } from '@radix-ui/react-icons'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { CopyIcon, Loader2 } from 'lucide-react'
+import { Cable, CopyIcon, Loader2, ReceiptText } from 'lucide-react'
 import Link from 'next/link'
 
 import { CopyButton } from '@/components/copy-button'
@@ -57,7 +57,7 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead style={{ width: 40 }}></TableHead>
+              <TableHead style={{ width: 48 }}></TableHead>
               <TableHead style={{ width: 400 }}>
                 <div className="flex items-center gap-2">
                   <span>Video</span>
@@ -68,8 +68,18 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
               </TableHead>
               <TableHead style={{ width: 140 }}>Duration</TableHead>
               <TableHead style={{ width: 140 }}>Size</TableHead>
-              <TableHead style={{ width: 200 }}>Transcription</TableHead>
-              <TableHead style={{ width: 240 }}>External ID (Panda)</TableHead>
+              <TableHead style={{ width: 200 }}>
+                <div className="flex items-center gap-2">
+                  <ReceiptText className="size-4" />
+                  Transcription
+                </div>
+              </TableHead>
+              <TableHead style={{ width: 200 }}>
+                <div className="flex items-center gap-2">
+                  <Cable className="size-4" />
+                  External ID
+                </div>
+              </TableHead>
               <TableHead style={{ width: 60 }}></TableHead>
             </TableRow>
           </TableHeader>
@@ -81,7 +91,7 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
               {batch && batch.videos.length ? (
                 batch.videos.map((video) => (
                   <TableRow key={video.id}>
-                    <TableCell className="text-center">
+                    <TableCell className="text-right">
                       {video.uploadOrder}
                     </TableCell>
                     <TableCell>
@@ -90,7 +100,7 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
                         <Link
                           href={`/videos/${video.id}`}
                           prefetch={false}
-                          className="text-violet-500 hover:underline dark:text-violet-300"
+                          className="text-primary hover:underline"
                         >
                           {video.title}
                         </Link>

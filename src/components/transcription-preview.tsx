@@ -55,7 +55,7 @@ export function TranscriptionPreview({ videoId }: TranscriptionPreviewProps) {
   return (
     <Dialog onOpenChange={setIsDialogOpen} open={isDialogOpen}>
       <DialogTrigger asChild>
-        <button className="flex items-center font-medium text-violet-500 hover:text-violet-600">
+        <button className="flex items-center font-medium text-primary hover:underline">
           <Link1Icon className="mr-2 h-4 w-4" />
           <span>View transcription</span>
         </button>

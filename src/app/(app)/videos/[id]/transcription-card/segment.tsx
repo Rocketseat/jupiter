@@ -23,7 +23,7 @@ export function Segment({
       onFocus={onFocus}
       onBlur={onBlur}
       onInput={(e) => onValueChange(e.currentTarget.textContent ?? '')}
-      className="group rounded p-1 outline-none hover:bg-accent focus:bg-violet-500 focus:text-white"
+      className="group rounded p-1 outline-none hover:bg-accent focus:bg-primary focus:text-primary-foreground"
     >
       <Badge
         variant="outline"

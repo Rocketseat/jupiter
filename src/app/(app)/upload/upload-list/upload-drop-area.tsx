@@ -22,7 +22,7 @@ export function UploadDropArea() {
     <>
       <label
         htmlFor="files"
-        className="flex h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed bg-slate-50 p-4 text-sm text-slate-600 hover:bg-slate-100 data-[drag-active=true]:border-violet-300 data-[drag-active=true]:bg-violet-50 dark:bg-slate-900 dark:text-slate-400"
+        className="flex h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed bg-slate-50 p-4 text-sm text-slate-600 hover:bg-slate-100 data-[drag-active=true]:border-primary data-[drag-active=true]:bg-primary dark:bg-slate-900 dark:text-slate-400"
         data-drag-active={isDragActive}
         {...getRootProps()}
       >
