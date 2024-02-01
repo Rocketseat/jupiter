@@ -1,57 +1,16 @@
 import type { NextAuthConfig } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google'
+import { GoogleProfile } from 'next-auth/providers/google'
 
 import { env } from '@/env'
 
-const credentialsProvider = CredentialsProvider({
-  credentials: {
-    email: {
-      label: 'E-mail',
-      type: 'email',
-      placeholder: 'use admin@rocketseat.team',
-      value: 'admin@rocketseat.team',
-    },
-    password: {
-      label: 'Password',
-      type: 'password',
-      value: 'admin',
-      placeholder: 'use 123456',
-    },
-  },
-  async authorize(credentials) {
-    if (
-      credentials?.email === 'admin@rocketseat.team' &&
-      credentials.password === '123456'
-    ) {
-      return {
-        id: crypto.randomUUID(),
-        email: credentials.email,
-        name: 'Rocketseat',
-        image: 'https://github.com/rocketseat.png',
-      }
-    }
-
-    throw new Error('Unauthorized.')
-  },
-})
+import { credentialsProvider } from './credentials-provider'
+import { googleProvider } from './google-provider'
+import { prismaAdapter } from './prisma-auth-adapter'
 
 export const authConfig = {
-  providers: [
-    env.VERCEL_ENV === 'preview'
-      ? credentialsProvider
-      : GoogleProvider({
-          clientId: env.GOOGLE_CLIENT_ID,
-          clientSecret: env.GOOGLE_CLIENT_SECRET,
-          authorization: {
-            params: {
-              prompt: 'consent',
-              access_type: 'offline',
-              response_type: 'code',
-            },
-          },
-        }),
-  ],
+  adapter: prismaAdapter,
+  providers:
+    env.VERCEL_ENV === 'preview' ? [credentialsProvider] : [googleProvider],
   pages: {
     signIn: '/auth/sign-in',
     error: '/auth/error',
@@ -61,6 +20,8 @@ export const authConfig = {
       if (account?.provider === 'google') {
         const googleProfile = profile as GoogleProfile
         const emailDomain = googleProfile.email.match(/@([^@]+)$/)
+
+        console.log(emailDomain)
 
         if (!emailDomain) {
           return false

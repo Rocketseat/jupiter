@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/core": "^0.25.0",
     "@aws-sdk/client-s3": "3.502.0",
     "@aws-sdk/s3-request-presigner": "3.502.0",
     "@elysiajs/eden": "^0.8.1",

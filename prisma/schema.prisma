@@ -10,6 +10,55 @@ datasource db {
   directUrl = env("DIRECT_DATABASE_URL")
 }
 
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refreshToken      String?
+  accessToken       String?
+  expiresAt         Int?
+  tokenType         String?
+  scope             String?
+  idToken           String?
+  sessionState      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(uuid())
+  companyId     String
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+
+  company  Company   @relation(fields: [companyId], references: [id])
+  accounts Account[]
+  sessions Session[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
 model Company {
   id     String @id @default(uuid())
   name   String
@@ -18,6 +67,7 @@ model Company {
   videos  Video[]
   tags    Tag[]
   batches UploadBatch[]
+  members User[]
 }
 
 model Video {
