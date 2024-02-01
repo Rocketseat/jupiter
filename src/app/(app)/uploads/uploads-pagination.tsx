@@ -42,8 +42,8 @@ export function UploadsPagination({
     [searchParams],
   )
 
-  function navigateToPage(page: number) {
-    router.push(`/uploads?${createQueryString('pageSize', String(page))}`)
+  function navigateToPage(pageIndex: number) {
+    router.push(`/uploads?${createQueryString('pageIndex', String(pageIndex))}`)
   }
 
   function setPageSize(pageSize: string) {
