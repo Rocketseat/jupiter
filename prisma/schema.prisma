@@ -10,9 +10,20 @@ datasource db {
   directUrl = env("DIRECT_DATABASE_URL")
 }
 
+model Company {
+  id     String @id @default(uuid())
+  name   String
+  domain String @unique
+
+  videos  Video[]
+  tags    Tag[]
+  batches UploadBatch[]
+}
+
 model Video {
   id                  String    @id @default(uuid())
   uploadBatchId       String?
+  companyId           String
   language            String    @default("pt")
   uploadOrder         Int
   duration            Int
@@ -31,6 +42,7 @@ model Video {
   uploadBatch   UploadBatch?   @relation(fields: [uploadBatchId], references: [id], onDelete: SetNull)
   transcription Transcription?
   webhooks      Webhook[]
+  company       Company        @relation(fields: [companyId], references: [id])
 }
 
 enum WebhookType {
@@ -81,15 +93,19 @@ model TranscriptionSegment {
 
 model UploadBatch {
   id        String   @id @default(uuid())
+  companyId String
   createdAt DateTime @default(now())
 
-  videos Video[]
+  videos  Video[]
+  company Company @relation(fields: [companyId], references: [id])
 }
 
 model Tag {
   id        String   @id @default(uuid())
+  companyId String
   slug      String   @unique
   createdAt DateTime @default(now())
 
-  videos Video[]
+  videos  Video[]
+  company Company @relation(fields: [companyId], references: [id])
 }
