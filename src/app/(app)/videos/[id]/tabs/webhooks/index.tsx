@@ -6,7 +6,6 @@ import {
   DotsHorizontalIcon,
 } from '@radix-ui/react-icons'
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Loader2 } from 'lucide-react'
@@ -20,6 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
+import { api } from '@/lib/eden'
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 
 import { MetadataTooltip } from './metadata-tooltip'
@@ -39,9 +39,13 @@ export function Webhooks({ videoId }: WebhooksProps) {
   } = useQuery({
     queryKey: ['webhooks', videoId],
     queryFn: async () => {
-      const response = await axios.get(`/api/videos/${videoId}/webhooks`)
+      const { data, error } = await api.videos[videoId].webhooks.get()
 
-      return response.data.webhooks
+      if (error) {
+        throw error
+      }
+
+      return data.webhooks
     },
     refetchInterval: 15 * 1000,
     refetchIntervalInBackground: false,
@@ -78,8 +82,8 @@ export function Webhooks({ videoId }: WebhooksProps) {
             <WebhooksSkeletonTable />
           ) : (
             <TableBody>
-              {webhooks.length ? (
-                webhooks.map((webhook: any) => (
+              {webhooks && webhooks.length ? (
+                webhooks.map((webhook) => (
                   <TableRow key={webhook.id}>
                     <TableCell>
                       <div className="flex flex-col">
@@ -134,7 +138,7 @@ export function Webhooks({ videoId }: WebhooksProps) {
                       <Textarea
                         readOnly
                         className="min-h-[56px] font-mono"
-                        value={webhook.metadata}
+                        value={webhook.metadata ?? ''}
                       />
                     </TableCell>
                   </TableRow>

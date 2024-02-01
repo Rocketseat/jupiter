@@ -8,6 +8,7 @@ import { z } from 'zod'
 
 import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/eden'
 
 import { Header } from './header'
 import { UploadDropArea } from './upload-drop-area'
@@ -43,12 +44,17 @@ export function UploadList() {
     formState: { isSubmitting },
   } = uploadsForm
 
-  async function handleCreateUploadBatch(data: UploadsFormSchema) {
+  async function handleCreateUploadBatch({ files }: UploadsFormSchema) {
     try {
-      const response = await axios.post('/api/batches', data)
-      const { batchId } = response.data
+      const { data, error } = await api.batches.post({
+        files,
+      })
 
-      router.push(`/batches/${batchId}`)
+      if (error) {
+        throw error
+      }
+
+      router.push(`/batches/${data.batchId}`)
     } catch {
       toast({
         title: 'Uh oh! Something went wrong.',

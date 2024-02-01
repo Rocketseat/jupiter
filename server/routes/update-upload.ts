@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 
 export const updateUpload = new Elysia().put(
   '/videos/:videoId',
-  async ({ params, body, set }) => {
+  async ({ params, body }) => {
     const { videoId } = params
     const { title, description, tags, commitUrl } = body
 

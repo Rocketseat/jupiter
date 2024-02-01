@@ -13,6 +13,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Switch } from '@/components/ui/switch'
+import { api } from '@/lib/eden'
 
 import { Segment } from './segment'
 import { TranscriptionSkeleton } from './transcription-skeleton'
@@ -44,9 +45,13 @@ export function TranscriptionCard({
   const { data: transcription } = useQuery({
     queryKey: ['transcription', videoId],
     queryFn: async () => {
-      const response = await axios.get(`/api/videos/${videoId}/transcription`)
+      const { data, error } = await api.videos[videoId].transcription.get()
 
-      return response.data.transcription
+      if (error) {
+        throw error
+      }
+
+      return data.transcription
     },
     refetchInterval(data) {
       const isTranscriptionAlreadyLoaded = !!data
@@ -59,12 +64,6 @@ export function TranscriptionCard({
     },
     refetchOnWindowFocus: false,
   })
-
-  // const { mutateAsync: saveTranscriptions } = useMutation(
-  //   async (data: TranscriptionSegmentsFormSchema) => {
-  //     await axios.put(`/api/transcriptions`, data)
-  //   },
-  // )
 
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -110,7 +109,7 @@ export function TranscriptionCard({
         <ScrollArea className="h-full w-full">
           {transcription ? (
             <CardContent className="p-4 leading-relaxed">
-              {transcription.segments.map((segment: any, index: number) => {
+              {transcription.segments.map((segment, index: number) => {
                 return (
                   <Fragment key={segment.id}>
                     <input
@@ -131,12 +130,12 @@ export function TranscriptionCard({
                              * cause new rerenders on every input.
                              */
                             value={segment.text}
-                            start={segment.start}
+                            start={Number(segment.start)}
                             onValueChange={field.onChange}
                             onBlur={field.onBlur}
                             onFocus={() =>
                               handleSegmentFocused({
-                                start: segment.start,
+                                start: Number(segment.start),
                               })
                             }
                           />
@@ -168,7 +167,6 @@ export function TranscriptionCard({
             onClick={handleSubmit(handleSaveTranscriptionSegments)}
             variant="secondary"
             className="w-20"
-            // disabled={!transcription || isSubmitting}
             disabled
           >
             {isSubmitting ? (

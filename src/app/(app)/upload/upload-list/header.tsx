@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
+import { api } from '@/lib/eden'
 import {
   amountOfUploadsAtom,
   areUploadsEmptyAtom,
@@ -59,15 +60,17 @@ export function Header({ onSubmit }: HeaderProps) {
       Array.from(uploads.values()).map(async (upload, index) => {
         const fileName = upload.file.name
 
-        const response = await axios.get('/api/ai/generate/title', {
-          params: {
+        const { data, error } = await api.ai.generate.title.post({
+          $query: {
             slug: fileName,
           },
         })
 
-        const { title } = response.data
+        if (error) {
+          throw error
+        }
 
-        setValue(`files.${index}.title`, title, {
+        setValue(`files.${index}.title`, data.title, {
           shouldValidate: true,
         })
       }),

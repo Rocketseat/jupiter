@@ -5,6 +5,7 @@ import { selectAtom } from 'jotai/utils'
 import { atomWithImmer } from 'jotai-immer'
 import { z } from 'zod'
 
+import { api } from '@/lib/eden'
 import { convertVideoToMP3, ffmpeg } from '@/lib/ffmpeg'
 
 enableMapSet()
@@ -225,10 +226,13 @@ export const startVideoUploadAtom = atom(
     const abortController = new AbortController()
 
     try {
-      const response = await axios.post('/api/uploads', { videoId: uploadId })
-      const uploadURL = z.string().url().parse(response.data.url)
+      const { data, error } = await api.uploads.post({ videoId: uploadId })
 
-      await axios.put(uploadURL, upload.file, {
+      if (error) {
+        throw error
+      }
+
+      await axios.put(data.url, upload.file, {
         signal: abortController.signal,
         headers: {
           'Content-Type': upload.file.type,
@@ -282,13 +286,15 @@ export const startAudioUploadAtom = atom(
         throw new Error(`Audio file not found for upload ${uploadId}.`)
       }
 
-      const response = await axios.post('/api/uploads/audio', {
+      const { data, error } = await api.uploads.audio.post({
         videoId: uploadId,
       })
 
-      const uploadURL = z.string().url().parse(response.data.url)
+      if (error) {
+        throw error
+      }
 
-      await axios.put(uploadURL, upload.audioFile, {
+      await axios.put(data.url, upload.audioFile, {
         signal: abortController.signal,
         headers: {
           'Content-Type': upload.audioFile.type,
