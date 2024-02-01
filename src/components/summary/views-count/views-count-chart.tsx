@@ -1,16 +1,17 @@
 'use client'
 
-import { ComponentProps } from 'react'
+import { ComponentProps, useMemo } from 'react'
 import {
-  Bar,
-  BarChart,
   CartesianGrid,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   TooltipProps,
   XAxis,
   YAxis,
 } from 'recharts'
+import { lime, sky } from 'tailwindcss/colors'
 
 interface ViewsCountDataPerMonth {
   date: string
@@ -49,7 +50,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps<any, any>) {
 function CustomCursor({ x, y, width, height }: ComponentProps<'svg'>) {
   return (
     <rect
-      className="fill-primary/10"
+      className="fill-transparent"
       x={x}
       y={y}
       width={width}
@@ -59,32 +60,44 @@ function CustomCursor({ x, y, width, height }: ComponentProps<'svg'>) {
 }
 
 export function ViewsCountChart({ data }: ViewsCountChartProps) {
+  const clearedData = useMemo(() => {
+    return data.filter((item) => item.plays !== 0)
+  }, [data])
+
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={data} style={{ fontSize: 12 }}>
+      <LineChart data={clearedData} style={{ fontSize: 12 }}>
         <XAxis
           dataKey="date"
           stroke="#888888"
           tickLine={false}
           axisLine={false}
         />
+
         <YAxis stroke="#888888" tickLine={false} axisLine={false} />
 
         <CartesianGrid className="!stroke-muted" vertical={false} />
 
-        <Bar
-          className="fill-teal-400 stroke-teal-500 dark:fill-emerald-950"
+        <Line
+          type="monotone"
+          stroke={lime[500]}
           dataKey="plays"
-          radius={[6, 6, 0, 0]}
+          dot={{
+            className: 'stroke-0 fill-lime-500',
+          }}
         />
-        <Bar
-          className="fill-violet-400 stroke-violet-500 dark:fill-violet-950"
+
+        <Line
+          type="monotone"
+          stroke={sky[500]}
           dataKey="unique"
-          radius={[6, 6, 0, 0]}
+          dot={{
+            className: 'stroke-0 fill-sky-500',
+          }}
         />
 
         <Tooltip cursor={<CustomCursor />} content={<CustomTooltip />} />
-      </BarChart>
+      </LineChart>
     </ResponsiveContainer>
   )
 }

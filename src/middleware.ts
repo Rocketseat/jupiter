@@ -1,13 +1,9 @@
-import { withAuth } from 'next-auth/middleware'
+import NextAuth from 'next-auth'
 
-export default withAuth({
-  pages: {
-    signIn: '/auth/sign-in',
-    error: '/auth/error',
-  },
-})
+import { authConfig } from '@/auth/auth.config'
+
+export default NextAuth(authConfig).auth
 
 export const config = {
-  matcher: ['/((?!api/webhooks|_next/static|_next/image|favicon.ico).*)'],
-  // matcher: ['/none'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 }

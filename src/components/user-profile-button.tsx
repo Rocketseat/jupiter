@@ -1,8 +1,7 @@
-'use client'
-
 import { LogOut } from 'lucide-react'
 import Image from 'next/image'
-import { signOut, useSession } from 'next-auth/react'
+
+import { auth, signOut } from '@/auth'
 
 import { Avatar } from './ui/avatar'
 import {
@@ -14,8 +13,14 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 
-export function UserProfileButton() {
-  const { data: session } = useSession()
+export async function UserProfileButton() {
+  const session = await auth()
+
+  async function handleSignOut() {
+    'use server'
+
+    await signOut()
+  }
 
   return (
     <DropdownMenu>
@@ -37,13 +42,14 @@ export function UserProfileButton() {
       <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="flex items-center gap-2"
-          onClick={() => signOut()}
-        >
-          <LogOut className="h-4 w-4" />
-          Sign out
-        </DropdownMenuItem>
+        <form action={handleSignOut}>
+          <DropdownMenuItem className="flex items-center gap-2" asChild>
+            <button type="submit" className="w-full">
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </button>
+          </DropdownMenuItem>
+        </form>
       </DropdownMenuContent>
     </DropdownMenu>
   )
