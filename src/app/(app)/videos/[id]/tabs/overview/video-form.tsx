@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
 import { useMutation } from '@tanstack/react-query'
-import axios from 'axios'
 import { Loader2 } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -12,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/eden'
 
 import { VideoDescriptionInput } from './video-description-input'
 import { VideoTagInput } from './video-tag-input'
@@ -49,7 +49,7 @@ export function VideoForm({ video }: VideoFormProps) {
 
   const { mutateAsync: updateVideo } = useMutation({
     mutationFn: async (data: EditVideoFormSchema) => {
-      await axios.put(`/api/videos/${video.id}`, data)
+      await api.videos[video.id].put(data)
     },
   })
 

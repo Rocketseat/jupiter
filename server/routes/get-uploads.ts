@@ -21,13 +21,11 @@ export const getUploads = new Elysia().get(
       where.tags = {
         some: {
           slug: {
-            in: tagsFilter,
+            in: Array.isArray(tagsFilter) ? tagsFilter : [tagsFilter],
           },
         },
       }
     }
-
-    console.log(where)
 
     const [videos, count] = await Promise.all([
       prisma.video.findMany({
@@ -57,7 +55,7 @@ export const getUploads = new Elysia().get(
   {
     query: t.Object({
       titleFilter: t.Optional(t.String()),
-      tagsFilter: t.Optional(t.Array(t.String())),
+      tagsFilter: t.Optional(t.Union([t.Array(t.String()), t.String()])),
       pageIndex: t.Numeric({ default: 0 }),
       pageSize: t.Numeric({ default: 10 }),
     }),

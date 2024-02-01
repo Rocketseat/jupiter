@@ -2,7 +2,7 @@ import { Elysia, t } from 'elysia'
 
 import { openai } from '@/lib/openai'
 
-export const generateAITitle = new Elysia().get(
+export const generateAITitle = new Elysia().post(
   '/ai/generate/title',
   async ({ query }) => {
     const { slug } = query

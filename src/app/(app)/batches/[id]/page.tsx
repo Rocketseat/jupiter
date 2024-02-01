@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 
-import { BatchVideoList } from './batch-video-list'
+import { BatchUploadList } from './batch-upload-list'
 
 interface BatchPageProps {
   params: { id: string }
@@ -29,7 +29,7 @@ export default async function BatchPage({ params }: BatchPageProps) {
         </div>
       </div>
 
-      <BatchVideoList batchId={params.id} />
+      <BatchUploadList batchId={params.id} />
     </>
   )
 }

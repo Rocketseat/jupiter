@@ -1,7 +1,6 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Loader2, Video } from 'lucide-react'
@@ -9,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import useDebounceValue from '@/hooks/useDebounceValue'
+import { api } from '@/lib/eden'
 
 import { Button } from './ui/button'
 import {
@@ -35,14 +35,19 @@ export function Search() {
   } = useQuery({
     queryKey: ['search', searchTerm],
     queryFn: async () => {
-      const response = await axios.get('/api/videos', {
-        params: {
+      const { data, error } = await api.videos.get({
+        $query: {
           titleFilter: searchTerm,
           pageSize: 5,
+          pageIndex: 0,
         },
       })
 
-      return response.data.videos
+      if (error) {
+        throw error
+      }
+
+      return data.videos
     },
     enabled: open,
   })
@@ -89,12 +94,13 @@ export function Search() {
                 <Loader2 className="h-3 w-3 animate-spin" />
                 <span>Loading videos...</span>
               </div>
-            ) : videos.length === 0 ? (
+            ) : videos && videos.length === 0 ? (
               <div className="flex h-full cursor-default select-none items-center justify-center gap-2 rounded-sm px-2 py-1.5 text-sm text-muted-foreground">
                 No results found.
               </div>
             ) : (
-              videos.map((video: any) => {
+              videos &&
+              videos.map((video) => {
                 return (
                   <CommandItem
                     onSelect={() => handleItemSelected(video.id)}

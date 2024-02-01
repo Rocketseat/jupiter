@@ -28,6 +28,7 @@ export default function SignInPage() {
               className="fill-primary"
             />
           </svg>
+
           <div className="space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
               Join Jupiter

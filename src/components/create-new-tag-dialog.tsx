@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+
+import { api } from '@/lib/eden'
 
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
@@ -55,9 +56,7 @@ export function CreateNewTagDialog({
 
   const { mutateAsync: createTag } = useMutation({
     mutationFn: async (tag: string) => {
-      await axios.post('/api/tags', {
-        tag,
-      })
+      await api.tags.post({ tag })
     },
     onSuccess() {
       queryClient.invalidateQueries({

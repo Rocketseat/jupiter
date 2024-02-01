@@ -2,7 +2,6 @@
 
 import { Link1Icon } from '@radix-ui/react-icons'
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
 import { Edit2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
@@ -16,6 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { api } from '@/lib/eden'
 
 import { Button } from './ui/button'
 
@@ -33,9 +33,13 @@ export function TranscriptionPreview({ videoId }: TranscriptionPreviewProps) {
   } = useQuery({
     queryKey: ['transcription', videoId],
     queryFn: async () => {
-      const response = await axios.get(`/api/videos/${videoId}/transcription`)
+      const { data, error } = await api.videos[videoId].transcription.get()
 
-      return response.data.transcription
+      if (error) {
+        throw error
+      }
+
+      return data.transcription
     },
     enabled: isDialogOpen,
   })
@@ -45,7 +49,7 @@ export function TranscriptionPreview({ videoId }: TranscriptionPreviewProps) {
       return ''
     }
 
-    return transcription.segments.map((segment: any) => segment.text).join('')
+    return transcription.segments.map((segment) => segment.text).join('')
   }, [transcription])
 
   return (
@@ -76,7 +80,7 @@ export function TranscriptionPreview({ videoId }: TranscriptionPreviewProps) {
               autoFocus
             />
             <Button variant="secondary" asChild>
-              <Link href={`/videos/${transcription.videoId}`}>
+              <Link href={`/videos/${transcription?.videoId}`}>
                 <Edit2 className="mr-2 h-3 w-3" />
                 Review
               </Link>

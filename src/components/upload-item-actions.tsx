@@ -1,9 +1,9 @@
 'use client'
 
-import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+import { DotsHorizontalIcon, Pencil2Icon } from '@radix-ui/react-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
-import { Link2, Loader2, Music2, Trash2, Video } from 'lucide-react'
+import { Loader2, Trash2 } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 
 import {
@@ -26,28 +26,25 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/eden'
 
-type BatchVideoListActionsProps = {
-  batchId: string
-  video: any
+interface UploadItemActionsProps {
+  videoId: string
 }
 
-export function BatchVideoListActions({
-  video,
-  batchId,
-}: BatchVideoListActionsProps) {
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-
+export function UploadItemActions({ videoId }: UploadItemActionsProps) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
   const { mutateAsync: deleteVideo, isPending: isDeletingVideo } = useMutation({
     mutationFn: async () => {
-      await axios.delete(`/api/videos/${video.id}`)
+      await api.videos[videoId].delete()
     },
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ['batch', batchId],
+        queryKey: ['videos'],
         exact: true,
       })
     },
@@ -90,42 +87,18 @@ export function BatchVideoListActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem
-            disabled={!video.externalProviderId}
-            onClick={() =>
-              navigator.clipboard.writeText(
-                `https://b-vz-762f4670-e04.tv.pandavideo.com.br/${video.externalProviderId}/playlist.m3u8`,
-              )
-            }
-          >
-            <Link2 className="mr-2 h-4 w-4" />
-            <span>Copy HLS</span>
-          </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <a
-              href={`/api/videos/${video.id}/download/video`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Video className="mr-2 h-4 w-4" />
-              <span>Download MP4</span>
-            </a>
+            <Link href={`/videos/${videoId}`} prefetch={false}>
+              <Pencil2Icon className="mr-2 h-4 w-4" />
+              <span>Edit</span>
+            </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <a
-              href={`/api/videos/${video.id}/download/audio`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Music2 className="mr-2 h-4 w-4" />
-              <span>Download MP3</span>
-            </a>
-          </DropdownMenuItem>
-
           <DropdownMenuSeparator />
-
           <AlertDialogTrigger asChild>
-            <DropdownMenuItem disabled={isDeletingVideo}>
+            <DropdownMenuItem
+              className="text-red-500 data-[highlighted]:text-red-500 dark:text-red-400 dark:data-[highlighted]:text-red-400"
+              disabled={isDeletingVideo}
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete
             </DropdownMenuItem>

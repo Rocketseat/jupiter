@@ -1,11 +1,11 @@
 import { CheckIcon, PlusIcon } from '@radix-ui/react-icons'
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
 import { Loader2, Tag } from 'lucide-react'
 import { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 import useDebounceValue from '@/hooks/useDebounceValue'
+import { api } from '@/lib/eden'
 
 import { CreateNewTagDialog } from './create-new-tag-dialog'
 import { Badge } from './ui/badge'
@@ -52,14 +52,19 @@ export function TagInput({
   } = useQuery({
     queryKey: ['tags', searchTerm],
     queryFn: async () => {
-      const response = await axios.get('/api/tags/search', {
-        params: {
+      const { data, error } = await api.tags.search.get({
+        $query: {
           q: searchTerm,
           pageSize: 20,
+          pageIndex: 0,
         },
       })
 
-      return response.data.tags
+      if (error) {
+        throw error
+      }
+
+      return data.tags
     },
     enabled: open,
   })
@@ -144,12 +149,13 @@ export function TagInput({
                       <Loader2 className="h-3 w-3 animate-spin" />
                       <span>Loading tags...</span>
                     </div>
-                  ) : tagOptions.length === 0 ? (
+                  ) : tagOptions && tagOptions.length === 0 ? (
                     <div className="flex cursor-default select-none items-center justify-center gap-2 rounded-sm p-2 text-sm text-muted-foreground">
                       No tags found.
                     </div>
                   ) : (
-                    tagOptions.map((option: any) => {
+                    tagOptions &&
+                    tagOptions.map((option) => {
                       const isSelected = value.includes(option.slug)
 
                       return (
