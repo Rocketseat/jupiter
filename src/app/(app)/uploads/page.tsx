@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { UploadItemActions } from '@/components/upload-item-actions'
-import { api } from '@/lib/eden'
+import { server } from '@/lib/eden-server'
 import { formatBytes } from '@/utils/format-bytes'
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 
@@ -52,7 +52,7 @@ export default async function UploadsPage({
 
   const query = uploadsPageSearchParams.parse(searchParams)
 
-  const { data, error } = await api.videos.get({
+  const { data, error } = await server.videos.get({
     $query: query,
   })
 
