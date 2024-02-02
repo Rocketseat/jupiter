@@ -1,30 +1,30 @@
 import dayjs from 'dayjs'
+import { gte, sum } from 'drizzle-orm'
 import { HardDrive } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { prisma } from '@/lib/prisma'
+import { db } from '@/drizzle/client'
+import { video } from '@/drizzle/schema'
 import { formatBytes } from '@/utils/format-bytes'
 
 export const revalidate = 60 * 15 // 15 minutes
 
 export async function Storage() {
-  const [total, lastMonth] = await Promise.all([
-    prisma.video.aggregate({
-      _sum: {
-        sizeInBytes: true,
-      },
-    }),
-    prisma.video.aggregate({
-      _sum: {
-        sizeInBytes: true,
-      },
-      where: {
-        createdAt: {
-          gte: dayjs().subtract(30, 'days').toDate(),
-        },
-      },
-    }),
-  ])
+  const [[{ sizeInBytesOverall }], [{ sizeInBytesLastMonth }]] =
+    await Promise.all([
+      db
+        .select({ sizeInBytesOverall: sum(video.sizeInBytes).mapWith(Number) })
+        .from(video),
+
+      db
+        .select({
+          sizeInBytesLastMonth: sum(video.sizeInBytes).mapWith(Number),
+        })
+        .from(video)
+        .where(
+          gte(video.createdAt, dayjs().subtract(30, 'days').toISOString()),
+        ),
+    ])
 
   return (
     <Card>
@@ -34,10 +34,10 @@ export async function Storage() {
       </CardHeader>
       <CardContent className="space-y-1">
         <span className="text-2xl font-bold">
-          {formatBytes(total._sum.sizeInBytes ?? 0)}
+          {formatBytes(sizeInBytesOverall ?? 0)}
         </span>
         <p className="text-xs text-muted-foreground">
-          + {formatBytes(lastMonth._sum.sizeInBytes ?? 0)} in last 30 days
+          + {formatBytes(sizeInBytesLastMonth ?? 0)} in last 30 days
         </p>
       </CardContent>
     </Card>

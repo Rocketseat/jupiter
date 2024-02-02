@@ -1,25 +1,28 @@
 import { OpenAIStream, StreamingTextResponse } from 'ai'
+import { eq, sql } from 'drizzle-orm'
 import { Elysia, t } from 'elysia'
 
+import { db } from '@/drizzle/client'
+import { transcription, transcriptionSegment } from '@/drizzle/schema'
 import { openai } from '@/lib/openai'
-import { prisma } from '@/lib/prisma'
 
 export const generateAIDescription = new Elysia().post(
   '/ai/generate/description',
   async ({ set, query }) => {
     const { videoId } = query
 
-    const [transcription] = await prisma.$queryRaw<
-      [{ text: string }]
-    >/* sql */ `
-      SELECT 
-        STRING_AGG("public"."TranscriptionSegment"."text", '') as "text"
-      FROM "public"."TranscriptionSegment"
-      JOIN "public"."Transcription" ON "public"."Transcription"."id" = "public"."TranscriptionSegment"."transcriptionId"
-      WHERE "public"."Transcription"."videoId" = ${videoId}
-    `
+    const [{ text }] = await db
+      .select({
+        text: sql<string>`STRING_AGG(${transcriptionSegment.text}, '')`,
+      })
+      .from(transcriptionSegment)
+      .innerJoin(
+        transcription,
+        eq(transcription.id, transcriptionSegment.transcriptionId),
+      )
+      .where(eq(transcription.videoId, videoId))
 
-    if (!transcription.text) {
+    if (!text) {
       set.status = 400
 
       return { message: 'Transcription not found.' }
@@ -46,7 +49,7 @@ export const generateAIDescription = new Elysia().post(
         },
         {
           role: 'user',
-          content: `Gere um resumo da transcrição abaixo. Retorne o resumo no mesmo idioma da transcrição. \n\n ${transcription.text}`,
+          content: `Gere um resumo da transcrição abaixo. Retorne o resumo no mesmo idioma da transcrição. \n\n ${text}`,
         },
       ],
       temperature: 0,

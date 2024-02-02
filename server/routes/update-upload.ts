@@ -1,7 +1,9 @@
+import { and, eq, inArray } from 'drizzle-orm'
 import { Elysia, t } from 'elysia'
 
+import { db } from '@/drizzle/client'
+import { tag, tagToVideo, video } from '@/drizzle/schema'
 import { publishMessagesOnTopic } from '@/lib/kafka'
-import { prisma } from '@/lib/prisma'
 
 export const updateUpload = new Elysia().put(
   '/videos/:videoId',
@@ -9,23 +11,74 @@ export const updateUpload = new Elysia().put(
     const { videoId } = params
     const { title, description, tags, commitUrl } = body
 
-    const { duration, externalProviderId } = await prisma.video.update({
-      where: {
-        id: videoId,
-      },
-      data: {
-        title,
-        description,
-        commitUrl,
-        tags: {
-          connect: tags.map((tag) => {
-            return {
-              slug: tag,
-            }
-          }),
-        },
-      },
+    const currentVideoTags = await db
+      .select({ id: tag.id, slug: tag.slug })
+      .from(tag)
+      .innerJoin(tagToVideo, eq(tagToVideo.a, tag.id))
+      .innerJoin(video, eq(tagToVideo.b, video.id))
+      .where(eq(video.id, videoId))
+
+    const currentVideoTagsSlugs = currentVideoTags.map((item) => item.slug)
+
+    const tagsToRemoveIds = currentVideoTags
+      .filter((item) => !tags.includes(item.slug))
+      .map((item) => item.id)
+
+    const tagsSlugsToAdd = tags.filter((slug) => {
+      return !currentVideoTagsSlugs.includes(slug)
     })
+
+    const { duration, externalProviderId } = await db.transaction(
+      async (tx) => {
+        const [{ duration, externalProviderId }] = await tx
+          .update(video)
+          .set({
+            title,
+            description,
+            commitUrl,
+          })
+          .where(eq(video.id, videoId))
+          .returning({
+            duration: video.duration,
+            externalProviderId: video.externalProviderId,
+          })
+
+        if (tagsToRemoveIds.length > 0) {
+          await tx
+            .delete(tagToVideo)
+            .where(
+              and(
+                eq(tagToVideo.b, videoId),
+                inArray(tagToVideo.a, tagsToRemoveIds),
+              ),
+            )
+        }
+
+        if (tagsSlugsToAdd.length > 0) {
+          const tagsToAdd = await tx.query.tag.findMany({
+            columns: {
+              id: true,
+            },
+            where(fields, { inArray }) {
+              return inArray(fields.slug, tagsSlugsToAdd)
+            },
+          })
+
+          const tagsToAddIds = tagsToAdd.map((item) => item.id)
+
+          await tx.insert(tagToVideo).values(
+            tagsToAddIds.map((tagId) => {
+              return {
+                a: tagId,
+                b: videoId,
+              }
+            }),
+          )
+        }
+
+        return { duration, externalProviderId }
+      },
+    )
 
     await publishMessagesOnTopic({
       topic: 'jupiter.video-updated',

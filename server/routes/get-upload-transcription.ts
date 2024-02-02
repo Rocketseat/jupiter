@@ -1,20 +1,20 @@
 import { Elysia, t } from 'elysia'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/drizzle/client'
 
 export const getUploadTranscription = new Elysia().get(
   '/videos/:videoId/transcription',
   async ({ params, set }) => {
     const { videoId } = params
 
-    const transcription = await prisma.transcription.findUnique({
-      where: {
-        videoId,
+    const transcription = await db.query.transcription.findFirst({
+      where(fields, { eq }) {
+        return eq(fields.videoId, videoId)
       },
-      include: {
+      with: {
         segments: {
-          orderBy: {
-            start: 'asc',
+          orderBy(fields, { asc }) {
+            return asc(fields.start)
           },
         },
       },

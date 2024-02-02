@@ -1,33 +1,36 @@
+import { count, ilike } from 'drizzle-orm'
 import { Elysia, t } from 'elysia'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/drizzle/client'
+import { tag } from '@/drizzle/schema'
 
 export const getTags = new Elysia().get(
   '/tags/search',
   async ({ query }) => {
     const { q: search, pageIndex, pageSize } = query
 
-    const slugSearch = search.length ? { contains: search } : undefined
+    const [tags, [{ amount }]] = await Promise.all([
+      db.query.tag.findMany({
+        where(fields, { ilike }) {
+          if (search) {
+            return ilike(fields.slug, `%${search}%`)
+          }
 
-    const [tags, count] = await Promise.all([
-      prisma.tag.findMany({
-        where: {
-          slug: slugSearch,
+          return undefined
         },
-        skip: pageIndex * pageSize,
-        take: pageSize,
-        orderBy: {
-          createdAt: 'desc',
+        offset: pageIndex * pageSize,
+        limit: pageSize,
+        orderBy(fields, { desc }) {
+          return desc(fields.createdAt)
         },
       }),
-      prisma.tag.count({
-        where: {
-          slug: slugSearch,
-        },
-      }),
+      db
+        .select({ amount: count() })
+        .from(tag)
+        .where(search ? ilike(tag.slug, `%${search}%`) : undefined),
     ])
 
-    const pageCount = Math.ceil(count / pageSize) ?? 0
+    const pageCount = Math.ceil(amount / pageSize) ?? 0
 
     return { tags, pageCount }
   },

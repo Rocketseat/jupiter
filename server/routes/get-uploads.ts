@@ -1,54 +1,69 @@
-import { Prisma } from '@prisma/client'
+import {
+  and,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  ilike,
+  inArray,
+} from 'drizzle-orm'
 import { Elysia, t } from 'elysia'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/drizzle/client'
+import { tag, tagToVideo, transcription, video } from '@/drizzle/schema'
 
 export const getUploads = new Elysia().get(
   '/videos',
   async ({ query }) => {
     const { pageIndex, pageSize, titleFilter, tagsFilter } = query
 
-    const where: Prisma.VideoWhereInput = {}
+    const videoColumns = getTableColumns(video)
 
-    if (titleFilter) {
-      where.title = {
-        contains: titleFilter,
-        mode: 'insensitive',
-      }
-    }
+    const [videos, [{ amount }]] = await Promise.all([
+      db
+        .select({
+          ...videoColumns,
+          transcription: transcription.id,
+        })
+        .from(video)
+        .leftJoin(tagToVideo, eq(tagToVideo.b, video.id))
+        .leftJoin(tag, eq(tag.id, tagToVideo.a))
+        .leftJoin(transcription, eq(transcription.videoId, video.id))
+        .where(
+          and(
+            tagsFilter
+              ? inArray(
+                  tag.slug,
+                  Array.isArray(tagsFilter) ? tagsFilter : [tagsFilter],
+                )
+              : undefined,
+            titleFilter ? ilike(video.title, `%${titleFilter}%`) : undefined,
+          ),
+        )
+        .orderBy(desc(video.createdAt))
+        .offset(pageIndex * pageSize)
+        .limit(pageSize)
+        .groupBy(video.id, transcription.id),
 
-    if (tagsFilter && tagsFilter.length > 0) {
-      where.tags = {
-        some: {
-          slug: {
-            in: Array.isArray(tagsFilter) ? tagsFilter : [tagsFilter],
-          },
-        },
-      }
-    }
-
-    const [videos, count] = await Promise.all([
-      prisma.video.findMany({
-        include: {
-          transcription: {
-            select: {
-              id: true,
-            },
-          },
-        },
-        where,
-        orderBy: {
-          createdAt: 'desc',
-        },
-        skip: pageIndex * pageSize,
-        take: pageSize,
-      }),
-      prisma.video.count({
-        where,
-      }),
+      db
+        .select({ amount: count() })
+        .from(video)
+        .leftJoin(tagToVideo, eq(tagToVideo.b, video.id))
+        .leftJoin(tag, eq(tag.id, tagToVideo.a))
+        .where(
+          and(
+            tagsFilter
+              ? inArray(
+                  tag.slug,
+                  Array.isArray(tagsFilter) ? tagsFilter : [tagsFilter],
+                )
+              : undefined,
+            titleFilter ? ilike(video.title, `%${titleFilter}%`) : undefined,
+          ),
+        ),
     ])
 
-    const pageCount = Math.ceil(count / pageSize)
+    const pageCount = Math.ceil(amount / pageSize)
 
     return { videos, pageCount }
   },

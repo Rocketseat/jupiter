@@ -2,24 +2,28 @@ import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { Elysia, t } from 'elysia'
 
+import { db } from '@/drizzle/client'
 import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
-import { prisma } from '@/lib/prisma'
 
 export const downloadUploadMedia = new Elysia().get(
   '/videos/:videoId/download/:media',
   async ({ params, set }) => {
     const { videoId, media } = params
 
-    const video = await prisma.video.findUniqueOrThrow({
-      where: {
-        id: videoId,
+    const videoToDownload = await db.query.video.findFirst({
+      where(fields, { eq }) {
+        return eq(fields.id, videoId)
       },
     })
 
+    if (!videoToDownload) {
+      throw new Error('Video not found.')
+    }
+
     const columnKey = media === 'video' ? 'storageKey' : 'audioStorageKey'
 
-    const downloadKey = video[columnKey]
+    const downloadKey = videoToDownload[columnKey]
 
     if (downloadKey === null) {
       set.status = 400

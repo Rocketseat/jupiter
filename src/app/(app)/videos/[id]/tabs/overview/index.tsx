@@ -1,3 +1,6 @@
+import { unstable_noStore } from 'next/cache'
+import { headers } from 'next/headers'
+
 import {
   Card,
   CardContent,
@@ -5,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { prisma } from '@/lib/prisma'
+import { api } from '@/lib/eden'
 
 import { TranscriptionCard } from '../../transcription-card'
 import { VideoForm } from './video-form'
@@ -15,18 +18,19 @@ export interface OverviewProps {
 }
 
 export async function Overview({ videoId }: OverviewProps) {
-  const video = await prisma.video.findFirstOrThrow({
-    where: {
-      id: videoId,
-    },
-    include: {
-      tags: {
-        select: {
-          slug: true,
-        },
-      },
+  unstable_noStore()
+
+  const { data, error } = await api.videos[videoId].get({
+    $fetch: {
+      headers: Object.fromEntries(headers().entries()),
     },
   })
+
+  if (error) {
+    throw error
+  }
+
+  const { video } = data
 
   return (
     <div className="grid flex-1 grid-cols-[1fr_minmax(320px,480px)] gap-4">

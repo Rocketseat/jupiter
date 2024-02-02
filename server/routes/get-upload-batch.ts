@@ -1,31 +1,35 @@
 import { Elysia, t } from 'elysia'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/drizzle/client'
 
 export const getUploadBatch = new Elysia().get(
   '/batches/:batchId',
   async ({ params }) => {
     const { batchId } = params
 
-    const batch = await prisma.uploadBatch.findUniqueOrThrow({
-      where: {
-        id: batchId,
+    const batch = await db.query.uploadBatch.findFirst({
+      where(fields, { eq }) {
+        return eq(fields.id, batchId)
       },
-      include: {
+      with: {
         videos: {
-          include: {
+          with: {
             transcription: {
-              select: {
+              columns: {
                 id: true,
               },
             },
           },
-          orderBy: {
-            uploadOrder: 'asc',
+          orderBy(fields, { asc }) {
+            return asc(fields.uploadOrder)
           },
         },
       },
     })
+
+    if (!batch) {
+      throw new Error('Batch not found.')
+    }
 
     return { batch }
   },

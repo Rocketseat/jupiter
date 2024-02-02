@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Webhook" ALTER COLUMN "status" SET DEFAULT 'RUNNING';

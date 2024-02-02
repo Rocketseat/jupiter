@@ -1,16 +1,16 @@
 import { Elysia, t } from 'elysia'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/drizzle/client'
+import { tag } from '@/drizzle/schema'
 
 export const createTag = new Elysia().post(
   '/tags',
   async ({ body }) => {
-    const { tag } = body
+    const { tag: slug } = body
 
-    await prisma.tag.create({
-      data: {
-        slug: tag,
-      },
+    await db.insert(tag).values({
+      slug,
+      companyId: 'ae6780ef-b2c2-4041-bada-c48e27ac6157',
     })
 
     return new Response(null, { status: 201 })

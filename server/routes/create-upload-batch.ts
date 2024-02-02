@@ -1,9 +1,8 @@
-import { randomUUID } from 'node:crypto'
-
 import { Elysia, t } from 'elysia'
 
+import { db } from '@/drizzle/client'
+import { tagToVideo, uploadBatch, video } from '@/drizzle/schema'
 import { publishMessagesOnTopic } from '@/lib/kafka'
-import { prisma } from '@/lib/prisma'
 import { publishMessage } from '@/lib/qstash'
 
 export const createUploadBatch = new Elysia().post(
@@ -11,35 +10,62 @@ export const createUploadBatch = new Elysia().post(
   async ({ body, set }) => {
     const { files: videos } = body
 
-    const batchId = randomUUID()
+    const { batchId } = await db.transaction(async (tx) => {
+      const [{ id: batchId }] = await tx
+        .insert(uploadBatch)
+        .values({
+          companyId: 'ae6780ef-b2c2-4041-bada-c48e27ac6157',
+        })
+        .returning({
+          id: uploadBatch.id,
+        })
 
-    await prisma.$transaction(async (tx) => {
-      await tx.uploadBatch.create({
-        data: { id: batchId },
-      })
-
-      await Promise.all(
-        videos.map((video, index) => {
-          return tx.video.create({
-            data: {
-              id: video.id,
-              language: video.language,
-              uploadBatchId: batchId,
-              uploadOrder: index + 1,
-              title: video.title,
-              sizeInBytes: video.sizeInBytes,
-              duration: video.duration,
-              tags: {
-                connect: video.tags.map((tag) => {
-                  return {
-                    slug: tag,
-                  }
-                }),
-              },
-            },
-          })
+      await tx.insert(video).values(
+        videos.map((videoItem, index) => {
+          return {
+            id: videoItem.id,
+            language: videoItem.language,
+            uploadBatchId: batchId,
+            uploadOrder: index + 1,
+            title: videoItem.title,
+            sizeInBytes: videoItem.sizeInBytes,
+            duration: videoItem.duration,
+            companyId: 'ae6780ef-b2c2-4041-bada-c48e27ac6157',
+          }
         }),
       )
+
+      const tagsOnVideos = await tx.query.tag.findMany({
+        where(fields, { inArray }) {
+          return inArray(
+            fields.slug,
+            videos.flatMap((videoItem) => videoItem.tags),
+          )
+        },
+      })
+
+      const tagSlugToId = tagsOnVideos.reduce((map, item) => {
+        return map.set(item.slug, item.id)
+      }, new Map<string, string>())
+
+      const tagToVideos = videos.flatMap((videoItem) => {
+        return videoItem.tags.map((videoTag) => {
+          const tagId = tagSlugToId.get(videoTag)
+
+          if (!tagId) {
+            throw new Error(`Tag with slug "${videoTag}" was not found.`)
+          }
+
+          return {
+            a: tagId,
+            b: videoItem.id,
+          }
+        })
+      })
+
+      await tx.insert(tagToVideo).values(tagToVideos)
+
+      return { batchId }
     })
 
     await Promise.all(

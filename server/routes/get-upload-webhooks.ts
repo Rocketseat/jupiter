@@ -1,18 +1,18 @@
 import { Elysia, t } from 'elysia'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/drizzle/client'
 
 export const getUploadWebhooks = new Elysia().get(
   '/videos/:videoId/webhooks',
   async ({ params }) => {
     const { videoId } = params
 
-    const webhooks = await prisma.webhook.findMany({
-      where: {
-        videoId,
+    const webhooks = await db.query.webhook.findMany({
+      where(fields, { eq }) {
+        return eq(fields.videoId, videoId)
       },
-      orderBy: {
-        createdAt: 'desc',
+      orderBy(fields, { desc }) {
+        return desc(fields.createdAt)
       },
     })
 

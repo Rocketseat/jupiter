@@ -1,11 +1,13 @@
 import { DeleteObjectsCommand, ObjectIdentifier } from '@aws-sdk/client-s3'
 import axios from 'axios'
+import { eq } from 'drizzle-orm'
 import { Elysia, t } from 'elysia'
 
+import { db } from '@/drizzle/client'
+import { video } from '@/drizzle/schema'
 import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
 import { publishMessagesOnTopic } from '@/lib/kafka'
-import { prisma } from '@/lib/prisma'
 import { publishMessage } from '@/lib/qstash'
 
 export const deleteUpload = new Elysia().delete(
@@ -13,30 +15,34 @@ export const deleteUpload = new Elysia().delete(
   async ({ params }) => {
     const { videoId } = params
 
-    const video = await prisma.video.findUniqueOrThrow({
-      where: {
-        id: videoId,
+    const videoToDelete = await db.query.video.findFirst({
+      where(fields, { eq }) {
+        return eq(fields.id, videoId)
       },
     })
+
+    if (!videoToDelete) {
+      throw new Error('Video not found.')
+    }
 
     const objectsToDelete: ObjectIdentifier[] = []
     const deletionPromises: Promise<unknown>[] = []
 
-    if (video.storageKey) {
+    if (videoToDelete.storageKey) {
       objectsToDelete.push({
-        Key: video.storageKey,
+        Key: videoToDelete.storageKey,
       })
     }
 
-    if (video.audioStorageKey) {
+    if (videoToDelete.audioStorageKey) {
       objectsToDelete.push({
-        Key: video.audioStorageKey,
+        Key: videoToDelete.audioStorageKey,
       })
     }
 
-    if (video.subtitlesStorageKey) {
+    if (videoToDelete.subtitlesStorageKey) {
       objectsToDelete.push({
-        Key: video.subtitlesStorageKey,
+        Key: videoToDelete.subtitlesStorageKey,
       })
     }
 
@@ -54,7 +60,7 @@ export const deleteUpload = new Elysia().delete(
       )
     }
 
-    if (video.externalProviderId) {
+    if (videoToDelete.externalProviderId) {
       deletionPromises.push(
         axios.delete('https://api-v2.pandavideo.com.br/videos', {
           data: [{ video_id: videoId }],
@@ -65,13 +71,7 @@ export const deleteUpload = new Elysia().delete(
       )
     }
 
-    deletionPromises.push(
-      prisma.video.delete({
-        where: {
-          id: videoId,
-        },
-      }),
-    )
+    deletionPromises.push(db.delete(video).where(eq(video.id, videoId)))
 
     await Promise.all(deletionPromises)
 

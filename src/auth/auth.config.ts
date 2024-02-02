@@ -5,10 +5,8 @@ import { env } from '@/env'
 
 import { credentialsProvider } from './credentials-provider'
 import { googleProvider } from './google-provider'
-import { prismaAdapter } from './prisma-auth-adapter'
 
 export const authConfig = {
-  adapter: prismaAdapter,
   providers:
     env.VERCEL_ENV === 'preview' ? [credentialsProvider] : [googleProvider],
   pages: {
