@@ -1,11 +1,11 @@
-const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
+import FilterWarningsPlugin from 'webpack-filter-warnings-plugin'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   logging: {
     fetches: {
       fullUrl: true,
-    }
+    },
   },
 
   typescript: {
@@ -19,16 +19,15 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { hostname: 'lh3.googleusercontent.com' },
-      { hostname: 'github.com' }
-    ]
+      { hostname: 'github.com' },
+    ],
   },
 
   /**
-   * 
+   *
    * @param {import('webpack').Configuration} config
    */
   webpack: (config) => {
-
     /**
      * Suppress warning about not found modules
      */
@@ -36,7 +35,7 @@ const nextConfig = {
       'aws-crt': false,
       encoding: false,
       '@aws-sdk/signature-v4-crt': false,
-      'bufferutil': false,
+      bufferutil: false,
       'utf-8-validate': false,
     }
 
@@ -51,23 +50,6 @@ const nextConfig = {
 
     return config
   },
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'require-corp',
-          },
-          {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin',
-          },
-        ],
-      },
-    ]
-  },
 }
 
-module.exports = nextConfig
+export default nextConfig
