@@ -3,13 +3,15 @@ import { randomUUID } from 'node:crypto'
 import { PutObjectCommand } from '@aws-sdk/client-s3'
 import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
 import axios from 'axios'
+import { eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { compile, Cue } from 'node-webvtt'
 import { z } from 'zod'
 
+import { db } from '@/drizzle/client'
+import { video, webhook } from '@/drizzle/schema'
 import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
-import { prisma } from '@/lib/prisma'
 
 const createSubtitlesFromTranscription = z.object({
   videoId: z.string().uuid(),
@@ -24,16 +26,16 @@ async function handler(request: NextRequest) {
   const { videoId } = createSubtitlesFromTranscription.parse(body)
 
   try {
-    const video = await prisma.video.findUniqueOrThrow({
-      where: {
-        id: videoId,
+    const sourceVideo = await db.query.video.findFirst({
+      where(fields, { eq }) {
+        return eq(fields.id, videoId)
       },
-      include: {
+      with: {
         transcription: {
-          include: {
+          with: {
             segments: {
-              orderBy: {
-                start: 'asc',
+              orderBy(fields, { asc }) {
+                return asc(fields.start)
               },
             },
           },
@@ -41,7 +43,16 @@ async function handler(request: NextRequest) {
       },
     })
 
-    if (video.subtitlesStorageKey) {
+    if (!sourceVideo) {
+      return NextResponse.json(
+        { message: 'Video not found.' },
+        {
+          status: 400,
+        },
+      )
+    }
+
+    if (sourceVideo.subtitlesStorageKey) {
       return NextResponse.json(
         { message: 'Video subtitles has already been generated.' },
         {
@@ -50,7 +61,7 @@ async function handler(request: NextRequest) {
       )
     }
 
-    if (!video.externalProviderId) {
+    if (!sourceVideo.externalProviderId) {
       return NextResponse.json(
         { message: 'Video was not uploaded to external provider yet.' },
         {
@@ -59,7 +70,7 @@ async function handler(request: NextRequest) {
       )
     }
 
-    if (!video.transcription) {
+    if (!sourceVideo.transcription) {
       return NextResponse.json(
         { message: 'Video transcription was not generated.' },
         {
@@ -68,22 +79,20 @@ async function handler(request: NextRequest) {
       )
     }
 
-    await prisma.webhook.create({
-      data: {
-        id: webhookId,
-        type: 'CREATE_SUBTITLES_FROM_TRANSCRIPTION',
-        videoId,
-        metadata: JSON.stringify({ videoId }),
-      },
+    await db.insert(webhook).values({
+      id: webhookId,
+      type: 'CREATE_SUBTITLES_FROM_TRANSCRIPTION',
+      videoId,
+      metadata: JSON.stringify({ videoId }),
     })
 
-    const subtitlesStorageKey = `batch-${video.uploadBatchId}/${videoId}.vtt`
+    const subtitlesStorageKey = `batch-${sourceVideo.uploadBatchId}/${videoId}.vtt`
 
-    const segments: Cue[] = video.transcription.segments
+    const segments: Cue[] = sourceVideo.transcription.segments
       .map((segment) => {
         return {
-          start: segment.start.toNumber(),
-          end: segment.end.toNumber(),
+          start: Number(segment.start),
+          end: Number(segment.end),
           text: segment.text,
           identifier: '',
           styles: '',
@@ -129,37 +138,30 @@ async function handler(request: NextRequest) {
       ),
     ])
 
-    await prisma.$transaction([
-      prisma.video.update({
-        where: {
-          id: videoId,
-        },
-        data: {
-          subtitlesStorageKey,
-        },
-      }),
-      prisma.webhook.update({
-        where: {
-          id: webhookId,
-        },
-        data: {
+    await db.transaction(async (tx) => {
+      await tx
+        .update(video)
+        .set({ subtitlesStorageKey })
+        .where(eq(video.id, videoId))
+
+      await tx
+        .update(webhook)
+        .set({
           status: 'SUCCESS',
           finishedAt: new Date(),
-        },
-      }),
-    ])
+        })
+        .where(eq(webhook.id, webhookId))
+    })
 
     return new NextResponse(null, { status: 201 })
   } catch (err: unknown) {
-    await prisma.webhook.update({
-      where: {
-        id: webhookId,
-      },
-      data: {
+    await db
+      .update(webhook)
+      .set({
         status: 'ERROR',
         finishedAt: new Date(),
-      },
-    })
+      })
+      .where(eq(webhook.id, webhookId))
 
     return NextResponse.json(
       { message: 'Error creating subtitles.', error: err },

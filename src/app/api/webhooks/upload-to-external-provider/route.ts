@@ -2,12 +2,14 @@ import { randomUUID } from 'node:crypto'
 
 import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
 import axios from 'axios'
+import { eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import WebSocket from 'ws'
 import { z } from 'zod'
 
+import { db } from '@/drizzle/client'
+import { webhook } from '@/drizzle/schema'
 import { env } from '@/env'
-import { prisma } from '@/lib/prisma'
 
 type PandaMessage = {
   action: 'progress' | 'success'
@@ -28,13 +30,22 @@ async function handler(request: NextRequest) {
   try {
     const { videoId } = createTranscriptionBodySchema.parse(body)
 
-    const video = await prisma.video.findUniqueOrThrow({
-      where: {
-        id: videoId,
+    const sourceVideo = await db.query.video.findFirst({
+      where(fields, { eq }) {
+        return eq(fields.id, videoId)
       },
     })
 
-    if (!video.processedAt) {
+    if (!sourceVideo) {
+      return NextResponse.json(
+        { message: 'Video not found.' },
+        {
+          status: 400,
+        },
+      )
+    }
+
+    if (!sourceVideo.processedAt) {
       return NextResponse.json(
         { message: "Video hasn't processed yet." },
         {
@@ -43,7 +54,7 @@ async function handler(request: NextRequest) {
       )
     }
 
-    if (video.externalProviderId) {
+    if (sourceVideo.externalProviderId) {
       return NextResponse.json(
         { message: 'Video has already been uploaded to external provider.' },
         {
@@ -52,23 +63,21 @@ async function handler(request: NextRequest) {
       )
     }
 
-    await prisma.webhook.create({
-      data: {
-        id: webhookId,
-        type: 'UPLOAD_TO_EXTERNAL_PROVIDER',
-        videoId,
-        metadata: JSON.stringify(body),
-      },
+    await db.insert(webhook).values({
+      id: webhookId,
+      type: 'UPLOAD_TO_EXTERNAL_PROVIDER',
+      videoId,
+      metadata: JSON.stringify({ videoId }),
     })
 
-    const videoDownloadURL = `https://pub-${env.CLOUDFLARE_UPLOAD_BUCKET_ID}.r2.dev/${video.id}.mp4`
+    const videoDownloadURL = `https://pub-${env.CLOUDFLARE_UPLOAD_BUCKET_ID}.r2.dev/${sourceVideo.id}.mp4`
 
     const response = await axios.post(
       'https://import.pandavideo.com:9443/videos',
       {
         folder_id: env.PANDAVIDEO_UPLOAD_FOLDER,
-        video_id: video.id,
-        title: video.id,
+        video_id: sourceVideo.id,
+        title: sourceVideo.id,
         url: videoDownloadURL,
       },
       {
@@ -87,7 +96,7 @@ async function handler(request: NextRequest) {
         try {
           const message: PandaMessage = JSON.parse(data.toString())
 
-          if (message.action === 'success' && message.payload?.complete) {
+          if (message.action === 'success' && 'complete' in message.payload) {
             resolve(true)
           }
         } catch (err) {
@@ -100,27 +109,23 @@ async function handler(request: NextRequest) {
       })
     })
 
-    await prisma.webhook.update({
-      where: {
-        id: webhookId,
-      },
-      data: {
+    await db
+      .update(webhook)
+      .set({
         status: 'SUCCESS',
         finishedAt: new Date(),
-      },
-    })
+      })
+      .where(eq(webhook.id, webhookId))
 
     return new NextResponse(null, { status: 204 })
   } catch (err: unknown) {
-    await prisma.webhook.update({
-      where: {
-        id: webhookId,
-      },
-      data: {
+    await db
+      .update(webhook)
+      .set({
         status: 'ERROR',
         finishedAt: new Date(),
-      },
-    })
+      })
+      .where(eq(webhook.id, webhookId))
 
     return NextResponse.json(
       { message: 'Error uploading video.', error: err },

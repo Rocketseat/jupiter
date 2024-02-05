@@ -1,11 +1,13 @@
 import { randomUUID } from 'node:crypto'
 
+import { eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
+import { db } from '@/drizzle/client'
+import { video, webhook } from '@/drizzle/schema'
 import { env } from '@/env'
 import { publishMessagesOnTopic } from '@/lib/kafka'
-import { prisma } from '@/lib/prisma'
 
 const pandaWebhookBodySchema = z.object({
   action: z.enum(['video.changeStatus']),
@@ -31,16 +33,20 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const video = await prisma.video.findUnique({
-      where: {
-        id: videoId,
+    const sourceVideo = await db.query.video.findFirst({
+      where(fields, { eq }) {
+        return eq(fields.id, videoId)
       },
-      include: {
-        tags: true,
+      with: {
+        tagToVideos: {
+          with: {
+            tag: true,
+          },
+        },
       },
     })
 
-    if (!video || video.externalProviderId) {
+    if (!sourceVideo || sourceVideo.externalProviderId) {
       /**
        * Here we return a success response as the webhook can be called with
        * videos that were not stored on jupiter or the video could already had
@@ -49,57 +55,52 @@ export async function POST(request: NextRequest) {
       return new NextResponse(null, { status: 204 })
     }
 
-    await prisma.$transaction([
-      prisma.video.update({
-        where: {
-          id: videoId,
-        },
-        data: {
-          externalProviderId: videoExternalId,
-        },
-      }),
-      prisma.webhook.create({
-        data: {
-          id: webhookId,
-          type: 'UPDATE_EXTERNAL_PROVIDER_STATUS',
-          videoId,
-          status: 'SUCCESS',
-          finishedAt: new Date(),
-          metadata: JSON.stringify({
-            videoExternalId,
-          }),
-        },
-      }),
-    ])
+    await db.transaction(async (tx) => {
+      await tx
+        .update(video)
+        .set({ externalProviderId: videoExternalId })
+        .where(eq(video.id, videoId))
+
+      db.insert(webhook).values({
+        id: webhookId,
+        type: 'UPDATE_EXTERNAL_PROVIDER_STATUS',
+        videoId,
+        status: 'SUCCESS',
+        finishedAt: new Date(),
+        metadata: JSON.stringify({
+          videoExternalId,
+        }),
+      })
+    })
 
     await publishMessagesOnTopic({
       topic: 'jupiter.video-updated',
       messages: [
         {
           id: videoId,
-          duration: video.duration,
-          title: video.title,
-          commitUrl: video.commitUrl,
-          description: video.description,
+          duration: sourceVideo.duration,
+          title: sourceVideo.title,
+          commitUrl: sourceVideo.commitUrl,
+          description: sourceVideo.description,
           externalProviderId: videoExternalId,
-          tags: video.tags.map((tag) => tag.slug),
+          tags: sourceVideo.tagToVideos.map(
+            (tagToVideo) => tagToVideo.tag.slug,
+          ),
         },
       ],
     })
 
     return new NextResponse(null, { status: 204 })
   } catch (err: unknown) {
-    await prisma.webhook.create({
-      data: {
-        id: webhookId,
-        type: 'UPDATE_EXTERNAL_PROVIDER_STATUS',
-        videoId,
-        status: 'ERROR',
-        finishedAt: new Date(),
-        metadata: JSON.stringify({
-          videoExternalId,
-        }),
-      },
+    await db.insert(webhook).values({
+      id: webhookId,
+      type: 'UPDATE_EXTERNAL_PROVIDER_STATUS',
+      videoId,
+      status: 'ERROR',
+      finishedAt: new Date(),
+      metadata: JSON.stringify({
+        videoExternalId,
+      }),
     })
   }
 }

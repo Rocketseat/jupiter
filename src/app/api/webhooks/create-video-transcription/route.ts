@@ -3,13 +3,15 @@ import { randomUUID } from 'node:crypto'
 import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
 import axios from 'axios'
+import { eq } from 'drizzle-orm'
 import FormData from 'form-data'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
+import { db } from '@/drizzle/client'
+import { transcription, transcriptionSegment, webhook } from '@/drizzle/schema'
 import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
-import { prisma } from '@/lib/prisma'
 import { publishMessage } from '@/lib/qstash'
 
 const createTranscriptionBodySchema = z.object({
@@ -35,20 +37,29 @@ async function handler(request: NextRequest) {
   try {
     const { videoId } = createTranscriptionBodySchema.parse(body)
 
-    const video = await prisma.video.findUniqueOrThrow({
-      where: {
-        id: videoId,
+    const sourceVideo = await db.query.video.findFirst({
+      where(fields, { eq }) {
+        return eq(fields.id, videoId)
       },
-      include: {
+      with: {
         transcription: {
-          select: {
+          columns: {
             id: true,
           },
         },
       },
     })
 
-    if (!video.processedAt) {
+    if (!sourceVideo) {
+      return NextResponse.json(
+        { message: 'Video not found.' },
+        {
+          status: 400,
+        },
+      )
+    }
+
+    if (!sourceVideo.processedAt) {
       return NextResponse.json(
         { message: "Video hasn't processed yet." },
         {
@@ -57,7 +68,7 @@ async function handler(request: NextRequest) {
       )
     }
 
-    if (!video.audioStorageKey) {
+    if (!sourceVideo.audioStorageKey) {
       return NextResponse.json(
         { message: 'No audio media found.' },
         {
@@ -66,7 +77,7 @@ async function handler(request: NextRequest) {
       )
     }
 
-    if (video.transcription) {
+    if (sourceVideo.transcription) {
       return NextResponse.json(
         { message: 'Video transcription has already been generated.' },
         {
@@ -75,19 +86,17 @@ async function handler(request: NextRequest) {
       )
     }
 
-    await prisma.webhook.create({
-      data: {
-        id: webhookId,
-        type: 'CREATE_TRANSCRIPTION',
-        videoId,
-        metadata: JSON.stringify(body),
-      },
+    await db.insert(webhook).values({
+      id: webhookId,
+      type: 'CREATE_TRANSCRIPTION',
+      videoId,
+      metadata: JSON.stringify({ videoId }),
     })
 
     const audioFile = await r2.send(
       new GetObjectCommand({
         Bucket: env.CLOUDFLARE_STORAGE_BUCKET_NAME,
-        Key: video.audioStorageKey,
+        Key: sourceVideo.audioStorageKey,
       }),
     )
 
@@ -103,13 +112,13 @@ async function handler(request: NextRequest) {
     formData.append('file', audioFile.Body, {
       contentType: audioFile.ContentType,
       knownLength: audioFile.ContentLength,
-      filename: video.audioStorageKey,
+      filename: sourceVideo.audioStorageKey,
     })
 
     formData.append('model', 'whisper-1')
     formData.append('response_format', 'verbose_json')
     formData.append('temperature', '0')
-    formData.append('language', video.language)
+    formData.append('language', sourceVideo.language)
 
     const response = await axios.post<OpenAITranscriptionResponse>(
       'https://api.openai.com/v1/audio/transcriptions',
@@ -122,39 +131,41 @@ async function handler(request: NextRequest) {
       },
     )
 
-    await prisma.$transaction([
-      prisma.transcription.create({
-        data: {
+    await db.transaction(async (tx) => {
+      const [{ transcriptionId }] = await tx
+        .insert(transcription)
+        .values({
           videoId,
-          segments: {
-            createMany: {
-              data: response.data.segments.map((segment) => {
-                return {
-                  text: segment.text,
-                  start: segment.start,
-                  end: segment.end,
-                }
-              }),
-            },
-          },
-        },
-      }),
-      prisma.webhook.update({
-        where: {
-          id: webhookId,
-        },
-        data: {
+        })
+        .returning({
+          transcriptionId: transcription.id,
+        })
+
+      await tx.insert(transcriptionSegment).values(
+        response.data.segments.map((segment) => {
+          return {
+            transcriptionId,
+            text: segment.text,
+            start: segment.start.toString(),
+            end: segment.end.toString(),
+          }
+        }),
+      )
+
+      await tx
+        .update(webhook)
+        .set({
           status: 'SUCCESS',
           finishedAt: new Date(),
-        },
-      }),
-    ])
+        })
+        .where(eq(webhook.id, webhookId))
+    })
 
     await publishMessage({
       topic: 'jupiter.transcription-created',
       body: {
         videoId,
-        title: video.title,
+        title: sourceVideo.title,
         transcription: response.data.text,
         segments: response.data.segments,
       },
@@ -165,15 +176,13 @@ async function handler(request: NextRequest) {
 
     return new NextResponse(null, { status: 201 })
   } catch (err: unknown) {
-    await prisma.webhook.update({
-      where: {
-        id: webhookId,
-      },
-      data: {
+    await db
+      .update(webhook)
+      .set({
         status: 'ERROR',
         finishedAt: new Date(),
-      },
-    })
+      })
+      .where(eq(webhook.id, webhookId))
 
     return NextResponse.json(
       { message: 'Error processing video.', error: err },
