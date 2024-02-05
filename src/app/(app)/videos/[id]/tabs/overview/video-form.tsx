@@ -16,8 +16,11 @@ import { api } from '@/lib/eden'
 import { VideoDescriptionInput } from './video-description-input'
 import { VideoTagInput } from './video-tag-input'
 
+const videoGetFn = api.videos[':videoId'].get
+type GetVideoReturn = typeof videoGetFn
+
 interface VideoFormProps {
-  video: any
+  video: NonNullable<Awaited<ReturnType<GetVideoReturn>>['data']>['video']
 }
 
 const editVideoFormSchema = z.object({
@@ -42,7 +45,7 @@ export function VideoForm({ video }: VideoFormProps) {
     defaultValues: {
       title: video.title,
       description: video.description,
-      tags: video.tags.map((tag: any) => tag.slug),
+      tags: video.tags.map((tag) => tag.slug),
       commitUrl: video.commitUrl,
     },
   })
@@ -79,7 +82,7 @@ export function VideoForm({ video }: VideoFormProps) {
             Title{' '}
             <span className="text-muted-foreground">(synced with Skylab)</span>
           </Label>
-          <Input id="title" {...register('title')} />
+          <Input id="title" {...register('title')} defaultValue={video.title} />
           {errors.title && (
             <p className="text-sm font-medium text-red-500 dark:text-red-400">
               {errors.title.message}
@@ -97,7 +100,10 @@ export function VideoForm({ video }: VideoFormProps) {
             Description{' '}
             <span className="text-muted-foreground">(synced with Skylab)</span>
           </Label>
-          <VideoDescriptionInput videoId={video.id} />
+          <VideoDescriptionInput
+            videoId={video.id}
+            defaultValue={video.description ?? ''}
+          />
         </div>
 
         <div className="space-y-2">
@@ -116,7 +122,11 @@ export function VideoForm({ video }: VideoFormProps) {
             Commit reference{' '}
             <span className="text-muted-foreground">(synced with Skylab)</span>
           </Label>
-          <Input id="commit" {...register('commitUrl')} />
+          <Input
+            id="commit"
+            {...register('commitUrl')}
+            defaultValue={video.commitUrl ?? ''}
+          />
           {errors.commitUrl && (
             <p className="text-sm font-medium text-red-500 dark:text-red-400">
               {errors.commitUrl.message}

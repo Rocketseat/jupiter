@@ -18,8 +18,6 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export const dynamic = 'force-dynamic'
-
 export default async function VideoPage({ params }: VideoPageProps) {
   const videoId = params.id
 
@@ -59,6 +57,7 @@ export default async function VideoPage({ params }: VideoPageProps) {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
         </TabsList>
+
         <TabsContent value="overview">
           <Overview videoId={videoId} />
         </TabsContent>

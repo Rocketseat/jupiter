@@ -3,7 +3,7 @@
 import { MagicWandIcon } from '@radix-ui/react-icons'
 import { useCompletion } from 'ai/react'
 import { Loader2 } from 'lucide-react'
-import { useEffect } from 'react'
+import { ComponentProps, TextareaHTMLAttributes, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
@@ -11,11 +11,15 @@ import { Textarea } from '@/components/ui/textarea'
 
 import { EditVideoFormSchema } from './video-form'
 
-export interface VideoDescriptionInputProps {
+export interface VideoDescriptionInputProps
+  extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   videoId: string
 }
 
-export function VideoDescriptionInput({ videoId }: VideoDescriptionInputProps) {
+export function VideoDescriptionInput({
+  videoId,
+  ...props
+}: VideoDescriptionInputProps) {
   const { setValue, register } = useFormContext<EditVideoFormSchema>()
 
   const { completion, complete, isLoading } = useCompletion({
@@ -35,6 +39,7 @@ export function VideoDescriptionInput({ videoId }: VideoDescriptionInputProps) {
         disabled={isLoading}
         className="min-h-[132px] leading-relaxed"
         {...register('description')}
+        {...props}
       />
       <div>
         <Button
