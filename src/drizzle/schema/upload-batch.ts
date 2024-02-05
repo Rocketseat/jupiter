@@ -5,9 +5,7 @@ import { company, video } from '.'
 
 export const uploadBatch = pgTable('UploadBatch', {
   id: uuid('id').primaryKey().defaultRandom(),
-  createdAt: timestamp('createdAt', { precision: 3, mode: 'string' })
-    .defaultNow()
-    .notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
   companyId: uuid('companyId')
     .notNull()
     .references(() => company.id, {

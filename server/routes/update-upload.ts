@@ -5,11 +5,25 @@ import { db } from '@/drizzle/client'
 import { tag, tagToVideo, video } from '@/drizzle/schema'
 import { publishMessagesOnTopic } from '@/lib/kafka'
 
-export const updateUpload = new Elysia().put(
+import { authentication } from './authentication'
+import { UnauthorizedError } from './errors/unauthorized-error'
+
+export const updateUpload = new Elysia().use(authentication).put(
   '/videos/:videoId',
-  async ({ params, body }) => {
+  async ({ params, body, getCurrentUser }) => {
+    const { companyId } = await getCurrentUser()
     const { videoId } = params
     const { title, description, tags, commitUrl } = body
+
+    const videoFromUser = await db.query.video.findFirst({
+      where(fields, { eq, and }) {
+        return and(eq(fields.id, videoId), eq(fields.companyId, companyId))
+      },
+    })
+
+    if (!videoFromUser) {
+      throw new UnauthorizedError()
+    }
 
     const currentVideoTags = await db
       .select({ id: tag.id, slug: tag.slug })

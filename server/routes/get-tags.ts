@@ -4,19 +4,21 @@ import { Elysia, t } from 'elysia'
 import { db } from '@/drizzle/client'
 import { tag } from '@/drizzle/schema'
 
-export const getTags = new Elysia().get(
+import { authentication } from './authentication'
+
+export const getTags = new Elysia().use(authentication).get(
   '/tags/search',
-  async ({ query }) => {
+  async ({ query, getCurrentUser }) => {
+    const { companyId } = await getCurrentUser()
     const { q: search, pageIndex, pageSize } = query
 
     const [tags, [{ amount }]] = await Promise.all([
       db.query.tag.findMany({
-        where(fields, { ilike }) {
-          if (search) {
-            return ilike(fields.slug, `%${search}%`)
-          }
-
-          return undefined
+        where(fields, { ilike, eq, and }) {
+          return and(
+            eq(fields.companyId, companyId),
+            search ? ilike(fields.slug, `%${search}%`) : undefined,
+          )
         },
         offset: pageIndex * pageSize,
         limit: pageSize,

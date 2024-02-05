@@ -12,9 +12,12 @@ import { Elysia, t } from 'elysia'
 import { db } from '@/drizzle/client'
 import { tag, tagToVideo, transcription, video } from '@/drizzle/schema'
 
-export const getUploads = new Elysia().get(
+import { authentication } from './authentication'
+
+export const getUploads = new Elysia().use(authentication).get(
   '/videos',
-  async ({ query }) => {
+  async ({ query, getCurrentUser }) => {
+    const { companyId } = await getCurrentUser()
     const { pageIndex, pageSize, titleFilter, tagsFilter } = query
 
     const videoColumns = getTableColumns(video)
@@ -31,6 +34,7 @@ export const getUploads = new Elysia().get(
         .leftJoin(transcription, eq(transcription.videoId, video.id))
         .where(
           and(
+            eq(video.companyId, companyId),
             tagsFilter
               ? inArray(
                   tag.slug,

@@ -3,14 +3,17 @@ import { Elysia, t } from 'elysia'
 import { db } from '@/drizzle/client'
 import { tag } from '@/drizzle/schema'
 
-export const createTag = new Elysia().post(
+import { authentication } from './authentication'
+
+export const createTag = new Elysia().use(authentication).post(
   '/tags',
-  async ({ body }) => {
+  async ({ body, getCurrentUser }) => {
+    const { companyId } = await getCurrentUser()
     const { tag: slug } = body
 
     await db.insert(tag).values({
       slug,
-      companyId: 'ae6780ef-b2c2-4041-bada-c48e27ac6157',
+      companyId,
     })
 
     return new Response(null, { status: 201 })

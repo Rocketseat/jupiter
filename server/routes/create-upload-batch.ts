@@ -5,16 +5,19 @@ import { tagToVideo, uploadBatch, video } from '@/drizzle/schema'
 import { publishMessagesOnTopic } from '@/lib/kafka'
 import { publishMessage } from '@/lib/qstash'
 
-export const createUploadBatch = new Elysia().post(
+import { authentication } from './authentication'
+
+export const createUploadBatch = new Elysia().use(authentication).post(
   '/batches',
-  async ({ body, set }) => {
+  async ({ body, set, getCurrentUser }) => {
+    const { companyId } = await getCurrentUser()
     const { files: videos } = body
 
     const { batchId } = await db.transaction(async (tx) => {
       const [{ id: batchId }] = await tx
         .insert(uploadBatch)
         .values({
-          companyId: 'ae6780ef-b2c2-4041-bada-c48e27ac6157',
+          companyId,
         })
         .returning({
           id: uploadBatch.id,
@@ -30,7 +33,7 @@ export const createUploadBatch = new Elysia().post(
             title: videoItem.title,
             sizeInBytes: videoItem.sizeInBytes,
             duration: videoItem.duration,
-            companyId: 'ae6780ef-b2c2-4041-bada-c48e27ac6157',
+            companyId,
           }
         }),
       )

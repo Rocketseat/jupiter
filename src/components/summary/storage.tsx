@@ -21,9 +21,7 @@ export async function Storage() {
           sizeInBytesLastMonth: sum(video.sizeInBytes).mapWith(Number),
         })
         .from(video)
-        .where(
-          gte(video.createdAt, dayjs().subtract(30, 'days').toISOString()),
-        ),
+        .where(gte(video.createdAt, dayjs().subtract(30, 'days').toDate())),
     ])
 
   return (

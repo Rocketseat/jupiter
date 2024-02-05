@@ -24,10 +24,8 @@ export const webhook = pgTable('Webhook', {
     .references(() => video.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   type: webhookType('type').notNull(),
   status: webhookStatus('status').default('RUNNING').notNull(),
-  createdAt: timestamp('createdAt', { precision: 3, mode: 'string' })
-    .defaultNow()
-    .notNull(),
-  finishedAt: timestamp('finishedAt', { precision: 3, mode: 'string' }),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  finishedAt: timestamp('finishedAt'),
   metadata: text('metadata'),
 })
 

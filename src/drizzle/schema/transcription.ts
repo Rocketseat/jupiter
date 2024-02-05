@@ -10,10 +10,10 @@ export const transcription = pgTable(
     videoId: uuid('videoId')
       .notNull()
       .references(() => video.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
-    createdAt: timestamp('createdAt', { precision: 3, mode: 'string' })
+    createdAt: timestamp('createdAt')
       .defaultNow()
       .notNull(),
-    reviewedAt: timestamp('reviewedAt', { precision: 3, mode: 'string' }),
+    reviewedAt: timestamp('reviewedAt'),
   },
   (table) => {
     return {

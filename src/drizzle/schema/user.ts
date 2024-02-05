@@ -21,7 +21,7 @@ export const user = pgTable(
       }),
     name: text('name'),
     email: text('email').notNull(),
-    emailVerified: timestamp('emailVerified', { precision: 3, mode: 'string' }),
+    emailVerified: timestamp('emailVerified'),
     image: text('image'),
   },
   (table) => {

@@ -14,9 +14,7 @@ export const tag = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     slug: text('slug').notNull(),
-    createdAt: timestamp('createdAt', { precision: 3, mode: 'string' })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp('createdAt').defaultNow().notNull(),
     companyId: uuid('companyId')
       .notNull()
       .references(() => company.id, {

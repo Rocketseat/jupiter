@@ -1,8 +1,6 @@
-import { eq, getTableColumns } from 'drizzle-orm'
 import { Elysia, t } from 'elysia'
 
 import { db } from '@/drizzle/client'
-import { tag, tagToVideo, video } from '@/drizzle/schema'
 
 export const getUpload = new Elysia().get(
   '/videos/:videoId',

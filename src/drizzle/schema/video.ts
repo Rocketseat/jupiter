@@ -30,16 +30,14 @@ export const video = pgTable(
       }),
     externalProviderId: text('externalProviderId'),
     audioStorageKey: text('audioStorageKey'),
-    processedAt: timestamp('processedAt', { precision: 3, mode: 'string' }),
+    processedAt: timestamp('processedAt'),
     sizeInBytes: integer('sizeInBytes').notNull(),
     uploadOrder: integer('uploadOrder').notNull(),
     commitUrl: text('commitUrl'),
     subtitlesStorageKey: text('subtitlesStorageKey'),
     language: text('language').default('pt').notNull(),
 
-    createdAt: timestamp('createdAt', { precision: 3, mode: 'string' })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp('createdAt').defaultNow().notNull(),
   },
   (table) => {
     return {
