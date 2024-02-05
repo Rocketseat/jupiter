@@ -8,7 +8,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 
-import { company, tagToVideo, transcription, uploadBatch } from '.'
+import { company, tagToVideo, transcription, uploadBatch, user } from '.'
 
 export const video = pgTable(
   'Video',
@@ -28,6 +28,10 @@ export const video = pgTable(
         onDelete: 'restrict',
         onUpdate: 'cascade',
       }),
+    authorId: uuid('authorId').references(() => user.id, {
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }),
     externalProviderId: text('externalProviderId'),
     audioStorageKey: text('audioStorageKey'),
     processedAt: timestamp('processedAt'),
@@ -36,7 +40,6 @@ export const video = pgTable(
     commitUrl: text('commitUrl'),
     subtitlesStorageKey: text('subtitlesStorageKey'),
     language: text('language').default('pt').notNull(),
-
     createdAt: timestamp('createdAt').defaultNow().notNull(),
   },
   (table) => {
@@ -56,6 +59,10 @@ export const videoRelations = relations(video, ({ one, many }) => ({
   company: one(company, {
     fields: [video.companyId],
     references: [company.id],
+  }),
+  author: one(user, {
+    fields: [video.authorId],
+    references: [user.id],
   }),
   transcription: one(transcription, {
     fields: [video.id],

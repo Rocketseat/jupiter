@@ -36,6 +36,20 @@
       "when": 1707135552158,
       "tag": "0004_pale_lifeguard",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1707142164432,
+      "tag": "0005_slimy_lady_vermin",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1707143517200,
+      "tag": "0006_goofy_toro",
+      "breakpoints": true
     }
   ]
 }

@@ -10,7 +10,7 @@ import {
 import { Elysia, t } from 'elysia'
 
 import { db } from '@/drizzle/client'
-import { tag, tagToVideo, transcription, video } from '@/drizzle/schema'
+import { tag, tagToVideo, transcription, user, video } from '@/drizzle/schema'
 
 import { authentication } from './authentication'
 
@@ -27,10 +27,15 @@ export const getUploads = new Elysia().use(authentication).get(
         .select({
           ...videoColumns,
           transcription: transcription.id,
+          author: {
+            name: user.name,
+            image: user.image,
+          },
         })
         .from(video)
         .leftJoin(tagToVideo, eq(tagToVideo.b, video.id))
         .leftJoin(tag, eq(tag.id, tagToVideo.a))
+        .leftJoin(user, eq(video.authorId, user.id))
         .leftJoin(transcription, eq(transcription.videoId, video.id))
         .where(
           and(
@@ -47,7 +52,7 @@ export const getUploads = new Elysia().use(authentication).get(
         .orderBy(desc(video.createdAt))
         .offset(pageIndex * pageSize)
         .limit(pageSize)
-        .groupBy(video.id, transcription.id),
+        .groupBy(video.id, transcription.id, user.name, user.image),
 
       db
         .select({ amount: count() })

@@ -28,6 +28,7 @@ export const authConfig = {
     session({ session, ...params }) {
       if ('token' in params && session.user) {
         session.user.companyId = params.token.companyId
+        session.user.id = params.token.sub
       }
 
       return session

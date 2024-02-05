@@ -19,6 +19,12 @@ export const getUploadBatch = new Elysia().get(
                 id: true,
               },
             },
+            author: {
+              columns: {
+                name: true,
+                image: true,
+              },
+            },
           },
           orderBy(fields, { asc }) {
             return asc(fields.uploadOrder)

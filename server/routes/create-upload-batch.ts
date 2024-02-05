@@ -10,7 +10,7 @@ import { authentication } from './authentication'
 export const createUploadBatch = new Elysia().use(authentication).post(
   '/batches',
   async ({ body, set, getCurrentUser }) => {
-    const { companyId } = await getCurrentUser()
+    const { companyId, id: userId } = await getCurrentUser()
     const { files: videos } = body
 
     const { batchId } = await db.transaction(async (tx) => {
@@ -18,6 +18,7 @@ export const createUploadBatch = new Elysia().use(authentication).post(
         .insert(uploadBatch)
         .values({
           companyId,
+          authorId: userId,
         })
         .returning({
           id: uploadBatch.id,
@@ -34,6 +35,7 @@ export const createUploadBatch = new Elysia().use(authentication).post(
             sizeInBytes: videoItem.sizeInBytes,
             duration: videoItem.duration,
             companyId,
+            authorId: userId,
           }
         }),
       )

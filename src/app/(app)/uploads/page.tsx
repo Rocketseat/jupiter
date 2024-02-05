@@ -5,6 +5,7 @@ import { Cable, CopyIcon, ReceiptText } from 'lucide-react'
 import { Metadata } from 'next'
 import { unstable_noStore } from 'next/cache'
 import { headers } from 'next/headers'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { z } from 'zod'
@@ -19,6 +20,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { UploadItemActions } from '@/components/upload-item-actions'
 import { api } from '@/lib/eden'
 import { formatBytes } from '@/utils/format-bytes'
@@ -87,7 +93,7 @@ export default async function UploadsPage({
                   External ID
                 </div>
               </TableHead>
-              <TableHead style={{ width: 150 }}>Uploaded at</TableHead>
+              <TableHead style={{ width: 200 }} />
               <TableHead style={{ width: 64 }} />
             </TableRow>
           </TableHeader>
@@ -159,12 +165,32 @@ export default async function UploadsPage({
                       )}
                     </TableCell>
                     <TableCell>
-                      <time
-                        title={video.createdAt.toLocaleString()}
-                        className="text-muted-foreground"
-                      >
-                        {dayjs(video.createdAt).fromNow()}
-                      </time>
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                        <time title={video.createdAt.toLocaleString()}>
+                          {dayjs(video.createdAt).fromNow()}
+                        </time>
+                        {video.author?.image && (
+                          <Tooltip>
+                            <div className="flex items-center gap-2">
+                              <span>by</span>
+                              <TooltipTrigger asChild>
+                                <Image
+                                  src={video.author?.image}
+                                  className="size-5 rounded-full"
+                                  width={20}
+                                  height={20}
+                                  alt=""
+                                />
+                              </TooltipTrigger>
+                              {video.author?.name && (
+                                <TooltipContent>
+                                  {video.author?.name}
+                                </TooltipContent>
+                              )}
+                            </div>
+                          </Tooltip>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <UploadItemActions videoId={video.id} />

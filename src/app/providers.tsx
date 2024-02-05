@@ -5,6 +5,8 @@ import { Provider as JotaiProvider } from 'jotai'
 import { ThemeProvider } from 'next-themes'
 import { ReactNode, useState } from 'react'
 
+import { TooltipProvider } from '@/components/ui/tooltip'
+
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
 
@@ -16,7 +18,9 @@ export default function Providers({ children }: { children: ReactNode }) {
       disableTransitionOnChange
     >
       <QueryClientProvider client={queryClient}>
-        <JotaiProvider>{children}</JotaiProvider>
+        <JotaiProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </JotaiProvider>
       </QueryClientProvider>
     </ThemeProvider>
   )

@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Cable, CopyIcon, Loader2, ReceiptText } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { CopyButton } from '@/components/copy-button'
@@ -17,6 +18,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { UploadItemActions } from '@/components/upload-item-actions'
 import { api } from '@/lib/eden'
 import { formatBytes } from '@/utils/format-bytes'
@@ -57,7 +63,7 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead style={{ width: 48 }}></TableHead>
+              <TableHead style={{ width: 54 }}></TableHead>
               <TableHead style={{ width: 400 }}>
                 <div className="flex items-center gap-2">
                   <span>Video</span>
@@ -66,7 +72,7 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
                   )}
                 </div>
               </TableHead>
-              <TableHead style={{ width: 140 }}>Duration</TableHead>
+              <TableHead style={{ width: 120 }}>Duration</TableHead>
               <TableHead style={{ width: 140 }}>Size</TableHead>
               <TableHead style={{ width: 200 }}>
                 <div className="flex items-center gap-2">
@@ -80,6 +86,7 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
                   External ID
                 </div>
               </TableHead>
+              <TableHead style={{ width: 200 }}></TableHead>
               <TableHead style={{ width: 60 }}></TableHead>
             </TableRow>
           </TableHeader>
@@ -152,6 +159,34 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
                           </span>
                         </div>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                        <time title={video.createdAt.toLocaleString()}>
+                          {dayjs(video.createdAt).fromNow()}
+                        </time>
+                        {video.author?.image && (
+                          <Tooltip>
+                            <div className="flex items-center gap-2">
+                              <span>by</span>
+                              <TooltipTrigger asChild>
+                                <Image
+                                  src={video.author?.image}
+                                  className="size-5 rounded-full"
+                                  width={20}
+                                  height={20}
+                                  alt=""
+                                />
+                              </TooltipTrigger>
+                              {video.author?.name && (
+                                <TooltipContent>
+                                  {video.author?.name}
+                                </TooltipContent>
+                              )}
+                            </div>
+                          </Tooltip>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <UploadItemActions videoId={video.id} />
