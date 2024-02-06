@@ -83,14 +83,8 @@ export default async function UploadsPage({
               <TableHead style={{ width: 140 }}>Size</TableHead>
               <TableHead style={{ width: 200 }}>
                 <div className="flex items-center gap-2">
-                  <ReceiptText className="size-4" />
-                  Transcription
-                </div>
-              </TableHead>
-              <TableHead style={{ width: 200 }}>
-                <div className="flex items-center gap-2">
                   <Cable className="size-4" />
-                  External ID
+                  External
                 </div>
               </TableHead>
               <TableHead style={{ width: 200 }} />
@@ -126,19 +120,6 @@ export default async function UploadsPage({
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       {formatBytes(video.sizeInBytes)}
-                    </TableCell>
-                    <TableCell>
-                      {video.transcription ? (
-                        <TranscriptionPreview videoId={video.id} />
-                      ) : (
-                        <div className="flex items-center font-medium">
-                          <SymbolIcon className="mr-2 h-3 w-3 animate-spin" />
-
-                          <span className="text-muted-foreground">
-                            Processing
-                          </span>
-                        </div>
-                      )}
                     </TableCell>
                     <TableCell>
                       {video.externalProviderId ? (

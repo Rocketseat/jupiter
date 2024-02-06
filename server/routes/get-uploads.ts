@@ -26,7 +26,6 @@ export const getUploads = new Elysia().use(authentication).get(
       db
         .select({
           ...videoColumns,
-          transcription: transcription.id,
           author: {
             name: user.name,
             image: user.image,
@@ -36,7 +35,6 @@ export const getUploads = new Elysia().use(authentication).get(
         .leftJoin(tagToVideo, eq(tagToVideo.b, video.id))
         .leftJoin(tag, eq(tag.id, tagToVideo.a))
         .leftJoin(user, eq(video.authorId, user.id))
-        .leftJoin(transcription, eq(transcription.videoId, video.id))
         .where(
           and(
             eq(video.companyId, companyId),
@@ -52,7 +50,7 @@ export const getUploads = new Elysia().use(authentication).get(
         .orderBy(desc(video.createdAt))
         .offset(pageIndex * pageSize)
         .limit(pageSize)
-        .groupBy(video.id, transcription.id, user.name, user.image),
+        .groupBy(video.id, user.name, user.image),
 
       db
         .select({ amount: count() })

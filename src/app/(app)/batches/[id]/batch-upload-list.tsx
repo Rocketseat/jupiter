@@ -161,7 +161,7 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
                       )}
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1 text-muted-foreground">
+                      <div className="flex items-center gap-1 whitespace-nowrap text-muted-foreground">
                         <time title={video.createdAt.toLocaleString()}>
                           {dayjs(video.createdAt).fromNow()}
                         </time>

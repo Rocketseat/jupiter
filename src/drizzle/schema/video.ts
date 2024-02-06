@@ -10,6 +10,15 @@ import {
 
 import { company, tagToVideo, transcription, uploadBatch, user } from '.'
 
+export type BunnyStatus =
+  | 'created'
+  | 'uploaded'
+  | 'processing'
+  | 'transcoding'
+  | 'finished'
+  | 'error'
+  | 'failed'
+
 export const video = pgTable(
   'Video',
   {
@@ -33,6 +42,7 @@ export const video = pgTable(
       onUpdate: 'cascade',
     }),
     externalProviderId: text('externalProviderId'),
+    externalStatus: text('externalStatus').$type<BunnyStatus>(),
     audioStorageKey: text('audioStorageKey'),
     processedAt: timestamp('processedAt'),
     sizeInBytes: integer('sizeInBytes').notNull(),

@@ -2,19 +2,14 @@ import { randomUUID } from 'node:crypto'
 
 import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
 import axios from 'axios'
+import { BunnyCdnStream } from 'bunnycdn-stream'
 import { eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
-import WebSocket from 'ws'
 import { z } from 'zod'
 
 import { db } from '@/drizzle/client'
-import { webhook } from '@/drizzle/schema'
+import { video, webhook } from '@/drizzle/schema'
 import { env } from '@/env'
-
-type PandaMessage = {
-  action: 'progress' | 'success'
-  payload: any
-}
 
 const createTranscriptionBodySchema = z.object({
   videoId: z.string().uuid(),
@@ -34,6 +29,13 @@ async function handler(request: NextRequest) {
       where(fields, { eq }) {
         return eq(fields.id, videoId)
       },
+      with: {
+        company: {
+          columns: {
+            externalId: true,
+          },
+        },
+      },
     })
 
     if (!sourceVideo) {
@@ -45,9 +47,18 @@ async function handler(request: NextRequest) {
       )
     }
 
-    if (!sourceVideo.processedAt) {
+    if (!sourceVideo.processedAt || !sourceVideo.storageKey) {
       return NextResponse.json(
         { message: "Video hasn't processed yet." },
+        {
+          status: 400,
+        },
+      )
+    }
+
+    if (!sourceVideo.company.externalId) {
+      return NextResponse.json(
+        { message: 'Company has no external ID created.' },
         {
           status: 400,
         },
@@ -70,52 +81,36 @@ async function handler(request: NextRequest) {
       metadata: JSON.stringify({ videoId }),
     })
 
-    const videoDownloadURL = `https://pub-${env.CLOUDFLARE_UPLOAD_BUCKET_ID}.r2.dev/${sourceVideo.id}.mp4`
-
-    const response = await axios.post(
-      'https://import.pandavideo.com:9443/videos',
-      {
-        folder_id: env.PANDAVIDEO_UPLOAD_FOLDER,
-        video_id: sourceVideo.id,
-        title: sourceVideo.id,
-        url: videoDownloadURL,
-      },
-      {
-        headers: {
-          Authorization: env.PANDAVIDEO_API_KEY,
-        },
-      },
-    )
-
-    const { websocket_url: websocketURL } = response.data
-
-    await new Promise((resolve, reject) => {
-      const socket = new WebSocket(websocketURL)
-
-      socket.on('message', (data) => {
-        try {
-          const message: PandaMessage = JSON.parse(data.toString())
-
-          if (message.action === 'success' && 'complete' in message.payload) {
-            resolve(true)
-          }
-        } catch (err) {
-          return reject(err)
-        }
-      })
-
-      socket.on('close', () => {
-        resolve(true)
-      })
+    const bunny = new BunnyCdnStream({
+      apiKey: env.BUNNY_API_KEY,
+      videoLibrary: sourceVideo.company.externalId,
     })
 
-    await db
-      .update(webhook)
-      .set({
-        status: 'SUCCESS',
-        finishedAt: new Date(),
-      })
-      .where(eq(webhook.id, webhookId))
+    const videoDownloadURL = `https://pub-${env.CLOUDFLARE_UPLOAD_BUCKET_ID}.r2.dev/${videoId}.mp4`
+
+    const { data } = await axios.get(videoDownloadURL, {
+      responseType: 'stream',
+    })
+
+    const { guid: externalProviderId } = await bunny.createAndUploadVideo(
+      data,
+      { title: 'My new video' },
+    )
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(video)
+        .set({ externalProviderId })
+        .where(eq(video.id, videoId))
+
+      await tx
+        .update(webhook)
+        .set({
+          status: 'SUCCESS',
+          finishedAt: new Date(),
+        })
+        .where(eq(webhook.id, webhookId))
+    })
 
     return new NextResponse(null, { status: 204 })
   } catch (err: unknown) {
@@ -134,4 +129,6 @@ async function handler(request: NextRequest) {
   }
 }
 
-export const POST = verifySignatureAppRouter(handler)
+export const POST = env.QSTASH_VALIDATE_SIGNATURE
+  ? handler
+  : verifySignatureAppRouter(handler)

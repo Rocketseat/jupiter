@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { PutObjectCommand } from '@aws-sdk/client-s3'
 import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
 import axios from 'axios'
+import { BunnyCdnStream } from 'bunnycdn-stream'
 import { eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { compile, Cue } from 'node-webvtt'
@@ -18,6 +19,14 @@ const createSubtitlesFromTranscription = z.object({
 })
 
 export const maxDuration = 300
+
+function b64EncodeUnicode(str: string) {
+  return btoa(
+    encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
+      return String.fromCharCode(parseInt(p1, 16))
+    }),
+  )
+}
 
 async function handler(request: NextRequest) {
   const webhookId = randomUUID()
@@ -38,6 +47,11 @@ async function handler(request: NextRequest) {
                 return asc(fields.start)
               },
             },
+          },
+        },
+        company: {
+          columns: {
+            externalId: true,
           },
         },
       },
@@ -79,6 +93,15 @@ async function handler(request: NextRequest) {
       )
     }
 
+    if (!sourceVideo.company.externalId) {
+      return NextResponse.json(
+        { message: 'Company has no external ID created.' },
+        {
+          status: 400,
+        },
+      )
+    }
+
     await db.insert(webhook).values({
       id: webhookId,
       type: 'CREATE_SUBTITLES_FROM_TRANSCRIPTION',
@@ -112,10 +135,13 @@ async function handler(request: NextRequest) {
       errors: [],
     })
 
-    const base64vtt = Buffer.from(vtt).toString('base64')
+    const bunny = new BunnyCdnStream({
+      apiKey: env.BUNNY_API_KEY,
+      videoLibrary: sourceVideo.company.externalId,
+    })
 
     await Promise.all([
-      await r2.send(
+      r2.send(
         new PutObjectCommand({
           Bucket: env.CLOUDFLARE_STORAGE_BUCKET_NAME,
           Key: subtitlesStorageKey,
@@ -123,19 +149,11 @@ async function handler(request: NextRequest) {
           ContentType: 'text/vtt',
         }),
       ),
-      await axios.post(
-        `https://api-v2.pandavideo.com.br/subtitles/${videoId}`,
-        {
-          label: 'Português',
-          srclang: 'pt-br',
-          file: `data:text/vtt;name=${videoId}.vtt;base64,${base64vtt}`,
-        },
-        {
-          headers: {
-            Authorization: env.PANDAVIDEO_API_KEY,
-          },
-        },
-      ),
+      bunny.addCaptions(sourceVideo.externalProviderId, {
+        srclang: sourceVideo.language,
+        label: sourceVideo.language,
+        captionsFile: b64EncodeUnicode(vtt),
+      }),
     ])
 
     await db.transaction(async (tx) => {
@@ -170,4 +188,6 @@ async function handler(request: NextRequest) {
   }
 }
 
-export const POST = verifySignatureAppRouter(handler)
+export const POST = env.QSTASH_VALIDATE_SIGNATURE
+  ? handler
+  : verifySignatureAppRouter(handler)

@@ -137,7 +137,7 @@ export function Webhooks({ videoId }: WebhooksProps) {
                     <TableCell>
                       <Textarea
                         readOnly
-                        className="min-h-[56px] font-mono"
+                        className="min-h-[56px] font-mono text-xs"
                         value={webhook.metadata ?? ''}
                       />
                     </TableCell>

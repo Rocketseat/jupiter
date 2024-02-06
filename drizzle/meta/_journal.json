@@ -50,6 +50,13 @@
       "when": 1707143517200,
       "tag": "0006_goofy_toro",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1707225672212,
+      "tag": "0007_clumsy_maria_hill",
+      "breakpoints": true
     }
   ]
 }

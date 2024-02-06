@@ -44,6 +44,7 @@
     "@upstash/qstash": "2.3.0",
     "ai": "2.1.17",
     "axios": "1.4.0",
+    "bunnycdn-stream": "^2.2.2",
     "cmdk": "0.2.0",
     "dayjs": "1.11.10",
     "drizzle-orm": "^0.29.3",

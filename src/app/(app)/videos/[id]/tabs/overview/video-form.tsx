@@ -7,9 +7,11 @@ import { Loader2 } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/eden'
 
@@ -107,14 +109,20 @@ export function VideoForm({ video }: VideoFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="externalProviderId">External ID (Panda)</Label>
-          <Input
-            data-empty={!video.externalProviderId}
-            value={video.externalProviderId ?? '(not generated yet)'}
-            id="externalProviderId"
-            className="data-[empty=true]:italic data-[empty=true]:text-muted-foreground"
-            readOnly
-          />
+          <Label htmlFor="externalProviderId">External Status/ID</Label>
+          <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-slate-400 has-[input:focus-visible]:ring-offset-2 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:has-[input:focus-visible]:ring-slate-800">
+            <Badge variant="secondary">
+              {video.externalStatus || 'waiting'}
+            </Badge>
+            <Separator orientation="vertical" className="h-4" />
+            <input
+              data-empty={!video.externalProviderId}
+              value={video.externalProviderId ?? '(not generated yet)'}
+              id="externalProviderId"
+              className="h-10 flex-1 py-2 text-sm outline-none"
+              readOnly
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -137,7 +145,7 @@ export function VideoForm({ video }: VideoFormProps) {
         <div className="flex items-center gap-4">
           <Button className="w-24" type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               'Save'
             )}

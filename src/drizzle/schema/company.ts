@@ -9,6 +9,7 @@ export const company = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     name: text('name').notNull(),
     domain: text('domain').notNull(),
+    externalId: text('externalId'),
   },
   (table) => {
     return {

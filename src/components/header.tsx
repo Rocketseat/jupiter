@@ -30,7 +30,7 @@ export function Header() {
         <div className="ml-auto flex items-center space-x-4">
           <Search />
           <Button asChild>
-            <Link href="/upload" prefetch={false}>
+            <Link href="/upload">
               <PlusCircledIcon className="mr-2 h-4 w-4" />
               Upload
             </Link>

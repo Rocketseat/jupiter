@@ -5,70 +5,106 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { db } from '@/drizzle/client'
-import { video, webhook } from '@/drizzle/schema'
-import { env } from '@/env'
+import { BunnyStatus, video, webhook } from '@/drizzle/schema'
 import { publishMessagesOnTopic } from '@/lib/kafka'
 
-const pandaWebhookBodySchema = z.object({
-  action: z.enum(['video.changeStatus']),
-  folder_id: z.string().optional().nullable(),
-  video_id: z.string().uuid(),
-  video_external_id: z.string().uuid(),
+const bunnyWebhookSchema = z.object({
+  VideoLibraryId: z.coerce.string(),
+  VideoGuid: z.string().uuid(),
+  Status: z
+    .union([
+      z.literal(0),
+      z.literal(1),
+      z.literal(2),
+      z.literal(3),
+      z.literal(4),
+      z.literal(5),
+      z.literal(6),
+    ])
+    .transform((statusNumber) => {
+      const statusNumberToString: BunnyStatus[] = [
+        'created',
+        'uploaded',
+        'processing',
+        'transcoding',
+        'finished',
+        'error',
+        'failed',
+      ] as const
+
+      return statusNumberToString[statusNumber]
+    }),
 })
 
 export async function POST(request: NextRequest) {
   const webhookId = randomUUID()
 
   const {
-    video_id: videoId,
-    video_external_id: videoExternalId,
-    folder_id: folderId,
-  } = pandaWebhookBodySchema.parse(await request.json())
+    Status: externalStatus,
+    VideoGuid: externalProviderId,
+    VideoLibraryId: videoLibraryId,
+  } = bunnyWebhookSchema.parse(await request.json())
 
-  if (!folderId || folderId !== env.PANDAVIDEO_UPLOAD_FOLDER) {
+  const sourceVideo = await db.query.video.findFirst({
+    where(fields, { eq }) {
+      return eq(fields.externalProviderId, externalProviderId)
+    },
+    with: {
+      tagToVideos: {
+        with: {
+          tag: true,
+        },
+      },
+      company: {
+        columns: {
+          externalId: true,
+        },
+      },
+    },
+  })
+
+  if (!sourceVideo) {
     /**
-     * We want to ignore videos that were not uploaded by Jupiter.
+     * Here we return a success response as the webhook can be called with
+     * videos that were not stored on jupiter or the video could already had
+     * been updated.
+     */
+    return new NextResponse(null, { status: 204 })
+  }
+
+  if (sourceVideo.company.externalId !== videoLibraryId) {
+    /**
+     * Here we return a success response even the video ID not belonging to
+     * the right company as we don't want this webhook to retry.
+     */
+    return new NextResponse(null, { status: 204 })
+  }
+
+  if (sourceVideo.externalStatus === 'finished') {
+    /**
+     * Sometimes Bunny send a late webhook after "finished" status, but we
+     * don't want to update the status after the "finished" status occurs.
      */
     return new NextResponse(null, { status: 204 })
   }
 
   try {
-    const sourceVideo = await db.query.video.findFirst({
-      where(fields, { eq }) {
-        return eq(fields.id, videoId)
-      },
-      with: {
-        tagToVideos: {
-          with: {
-            tag: true,
-          },
-        },
-      },
-    })
-
-    if (!sourceVideo || sourceVideo.externalProviderId) {
-      /**
-       * Here we return a success response as the webhook can be called with
-       * videos that were not stored on jupiter or the video could already had
-       * been updated.
-       */
-      return new NextResponse(null, { status: 204 })
-    }
-
     await db.transaction(async (tx) => {
       await tx
         .update(video)
-        .set({ externalProviderId: videoExternalId })
-        .where(eq(video.id, videoId))
+        .set({ externalStatus })
+        .where(eq(video.id, sourceVideo.id))
 
-      db.insert(webhook).values({
+      await tx.insert(webhook).values({
         id: webhookId,
         type: 'UPDATE_EXTERNAL_PROVIDER_STATUS',
-        videoId,
+        videoId: sourceVideo.id,
         status: 'SUCCESS',
         finishedAt: new Date(),
         metadata: JSON.stringify({
-          videoExternalId,
+          externalStatus,
+          externalProviderId,
+          videoLibraryId,
         }),
       })
     })
@@ -77,12 +113,12 @@ export async function POST(request: NextRequest) {
       topic: 'jupiter.video-updated',
       messages: [
         {
-          id: videoId,
+          id: sourceVideo.id,
           duration: sourceVideo.duration,
           title: sourceVideo.title,
           commitUrl: sourceVideo.commitUrl,
           description: sourceVideo.description,
-          externalProviderId: videoExternalId,
+          externalProviderId: sourceVideo.externalProviderId,
           tags: sourceVideo.tagToVideos.map(
             (tagToVideo) => tagToVideo.tag.slug,
           ),
@@ -95,11 +131,13 @@ export async function POST(request: NextRequest) {
     await db.insert(webhook).values({
       id: webhookId,
       type: 'UPDATE_EXTERNAL_PROVIDER_STATUS',
-      videoId,
+      videoId: sourceVideo.id,
       status: 'ERROR',
       finishedAt: new Date(),
       metadata: JSON.stringify({
-        videoExternalId,
+        externalStatus,
+        externalProviderId,
+        videoLibraryId,
       }),
     })
   }

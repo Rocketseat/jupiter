@@ -14,6 +14,7 @@ export const env = createEnv({
     OPENAI_API_KEY: z.string().min(1),
     PANDAVIDEO_API_KEY: z.string(),
     PANDAVIDEO_UPLOAD_FOLDER: z.string().uuid().min(1),
+    BUNNY_API_KEY: z.string(),
     NEXTAUTH_URL: z.string().optional(),
     AUTH_SECRET: z.string().min(1),
     GOOGLE_CLIENT_ID: z.string().min(1),
