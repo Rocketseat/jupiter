@@ -130,5 +130,5 @@ async function handler(request: NextRequest) {
 }
 
 export const POST = env.QSTASH_VALIDATE_SIGNATURE
-  ? handler
-  : verifySignatureAppRouter(handler)
+  ? verifySignatureAppRouter(handler)
+  : handler
