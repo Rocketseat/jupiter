@@ -29,7 +29,7 @@ export default async function VideoPage({ params }: VideoPageProps) {
         </h2>
 
         <div className="flex items-center gap-2">
-          <Button variant="secondary" asChild>
+          <Button variant="outline" asChild>
             <a
               href={`/api/videos/${videoId}/download/video`}
               target="_blank"
@@ -39,7 +39,7 @@ export default async function VideoPage({ params }: VideoPageProps) {
               <span>Download MP4</span>
             </a>
           </Button>
-          <Button variant="secondary" asChild>
+          <Button variant="outline" asChild>
             <a
               href={`/api/videos/${videoId}/download/audio`}
               target="_blank"

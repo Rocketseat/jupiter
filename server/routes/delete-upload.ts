@@ -8,7 +8,6 @@ import { video } from '@/drizzle/schema'
 import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
 import { publishMessagesOnTopic } from '@/lib/kafka'
-import { publishMessage } from '@/lib/qstash'
 
 export const deleteUpload = new Elysia().delete(
   '/videos/:videoId',
@@ -61,14 +60,17 @@ export const deleteUpload = new Elysia().delete(
     }
 
     if (videoToDelete.externalProviderId) {
-      deletionPromises.push(
-        axios.delete('https://api-v2.pandavideo.com.br/videos', {
-          data: [{ video_id: videoId }],
-          headers: {
-            Authorization: env.PANDAVIDEO_API_KEY,
-          },
-        }),
-      )
+      /**
+       * TODO: delete video on bunny
+       */
+      // deletionPromises.push(
+      //   axios.delete('https://api-v2.pandavideo.com.br/videos', {
+      //     data: [{ video_id: videoId }],
+      //     headers: {
+      //       Authorization: env.PANDAVIDEO_API_KEY,
+      //     },
+      //   }),
+      // )
     }
 
     deletionPromises.push(db.delete(video).where(eq(video.id, videoId)))
@@ -77,12 +79,12 @@ export const deleteUpload = new Elysia().delete(
 
     await Promise.all([
       // QStash
-      publishMessage({
-        topic: 'jupiter.video-deleted',
-        body: {
-          videoId,
-        },
-      }),
+      // publishMessage({
+      //   topic: 'jupiter.video-deleted',
+      //   body: {
+      //     videoId,
+      //   },
+      // }),
 
       // Kafka
       publishMessagesOnTopic({

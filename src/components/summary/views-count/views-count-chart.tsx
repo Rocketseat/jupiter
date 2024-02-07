@@ -1,6 +1,6 @@
 'use client'
 
-import { ComponentProps, useMemo } from 'react'
+import { useMemo } from 'react'
 import {
   CartesianGrid,
   Line,
@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { lime, sky } from 'tailwindcss/colors'
+import { sky, teal } from 'tailwindcss/colors'
 
 interface ViewsCountDataPerMonth {
   date: string
@@ -70,10 +70,10 @@ export function ViewsCountChart({ data }: ViewsCountChartProps) {
 
         <Line
           type="monotone"
-          stroke={lime[500]}
+          stroke={teal[500]}
           dataKey="plays"
           dot={{
-            className: 'stroke-0 fill-lime-500',
+            className: 'stroke-0 fill-teal-500',
           }}
         />
 

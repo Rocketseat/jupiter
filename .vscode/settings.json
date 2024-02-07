@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "barberpole",
+    "bunnycdn",
     "cloudflare",
     "eden",
     "elysia",
@@ -9,12 +10,15 @@
     "Immer",
     "neondatabase",
     "NEXTAUTH",
+    "nextjs",
+    "nivo",
     "openai",
     "PANDAVIDEO",
     "presigner",
     "qstash",
     "QSTASH",
     "tanstack",
-    "upstash"
+    "upstash",
+    "webvtt"
   ]
 }

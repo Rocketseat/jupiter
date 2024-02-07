@@ -1,5 +1,7 @@
 import type { NextAuthConfig } from 'next-auth'
+import { GoogleProfile } from 'next-auth/providers/google'
 
+import { db } from '@/drizzle/client'
 import { env } from '@/env'
 
 import { credentialsProvider } from './credentials-provider'
@@ -18,6 +20,28 @@ export const authConfig = {
     strategy: 'jwt',
   },
   callbacks: {
+    async signIn({ account, profile }) {
+      if (account?.provider === 'google') {
+        const googleProfile = profile as GoogleProfile
+        const [, emailDomain] = googleProfile.email.split('@')
+
+        if (!emailDomain) {
+          return false
+        }
+
+        const company = await db.query.company.findFirst({
+          where(fields, { eq }) {
+            return eq(fields.domain, emailDomain)
+          },
+        })
+
+        return googleProfile.email_verified && !!company
+      } else if (account?.provider === 'credentials') {
+        return true
+      }
+
+      return false
+    },
     jwt({ token, user }) {
       if (user) {
         token.companyId = user.companyId

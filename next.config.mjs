@@ -1,5 +1,3 @@
-import FilterWarningsPlugin from 'webpack-filter-warnings-plugin'
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   logging: {
@@ -24,7 +22,6 @@ const nextConfig = {
   },
 
   /**
-   *
    * @param {import('webpack').Configuration} config
    */
   webpack: (config) => {
@@ -38,15 +35,6 @@ const nextConfig = {
       bufferutil: false,
       'utf-8-validate': false,
     }
-
-    /**
-     * Suppress warning about `createFFMpeg`
-     */
-    config.plugins.push(
-      new FilterWarningsPlugin({
-        exclude: /Critical/,
-      }),
-    )
 
     return config
   },

@@ -1,6 +1,5 @@
-import { Client, PublishJsonRequest } from '@upstash/qstash'
-import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
-import { NextRequest, NextResponse } from 'next/server'
+import { Client } from '@upstash/qstash'
+import { z } from 'zod'
 
 import { env } from '@/env'
 
@@ -8,41 +7,45 @@ const qstash = new Client({
   token: env.QSTASH_TOKEN,
 })
 
-export async function publishMessage<T = any>({
-  topic,
-  body,
-  runInDev = false,
-  options,
+export const qStashEventSchema = z.enum([
+  'PROCESS_VIDEO',
+  'UPLOAD_TO_EXTERNAL_PROVIDER',
+  'CREATE_TRANSCRIPTION',
+  'CREATE_SUBTITLES_FROM_TRANSCRIPTION',
+])
+
+export const qStashPayloadSchema = z.object({
+  videoId: z.string().uuid(),
+})
+
+export type QStashEvent = z.infer<typeof qStashEventSchema>
+export type QStashPayload = z.infer<typeof qStashPayloadSchema>
+
+export async function publishEvent({
+  event,
+  payload,
+  delayInSeconds = 0,
 }: {
-  topic: string
-  body: T
+  event: QStashEvent
+  payload: QStashPayload
   runInDev?: boolean
-  options?: Pick<PublishJsonRequest, 'delay'>
+  delayInSeconds?: number
 }) {
-  if (env.NODE_ENV === 'development' && runInDev === false) {
+  if (env.NODE_ENV === 'development' && env.QSTASH_PUBLISH_MESSAGES === false) {
     console.log(
-      `[Skipped] [QStash] Publish to "${topic}: ${JSON.stringify(body)}"`,
+      `[Skipped] [QStash] Event: "${event}": ${JSON.stringify(payload)}"`,
     )
 
     return
   }
 
   await qstash.publishJSON({
-    topic,
+    topic: env.QSTASH_TOPIC,
     contentBasedDeduplication: true,
-    body,
-    ...options,
+    body: {
+      event,
+      payload,
+    },
+    delay: delayInSeconds,
   })
-}
-
-export async function validateQStashSignature(
-  handler: (request: NextRequest) => Promise<NextResponse>,
-) {
-  return async (request: NextRequest) => {
-    if (env.QSTASH_VALIDATE_SIGNATURE) {
-      return await verifySignatureAppRouter(handler)(request)
-    }
-
-    return await handler(request)
-  }
 }

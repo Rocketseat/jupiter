@@ -11,10 +11,10 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Jupiter',
-    absolute: 'Jupiter',
+    template: '%s | Nivo',
+    absolute: 'Nivo',
   },
-  description: 'Upload videos',
+  description: 'The all-in-one video solution for online learning.',
 }
 
 export default function RootLayout({

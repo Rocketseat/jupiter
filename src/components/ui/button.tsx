@@ -23,7 +23,7 @@ const buttonVariants = tv({
       sm: 'h-8 rounded-md px-3',
       xs: 'h-6 rounded px-2 text-xs',
       lg: 'h-11 rounded-md px-8',
-      icon: 'h-10 w-10',
+      icon: 'size-8',
     },
   },
   defaultVariants: {

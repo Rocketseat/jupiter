@@ -30,8 +30,8 @@ export async function UserProfileButton() {
             <Image
               className="aspect-square h-full w-full"
               src={session.user.image}
-              width={48}
-              height={48}
+              width={32}
+              height={32}
               alt=""
             />
           ) : (

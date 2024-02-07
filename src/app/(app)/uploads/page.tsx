@@ -115,10 +115,10 @@ export default async function UploadsPage({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
+                    <TableCell className="text-muted-foreground">
                       {formatSecondsToMinutes(video.duration)}
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
+                    <TableCell className="text-muted-foreground">
                       {formatBytes(video.sizeInBytes)}
                     </TableCell>
                     <TableCell>

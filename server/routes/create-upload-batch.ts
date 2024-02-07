@@ -3,7 +3,7 @@ import { Elysia, t } from 'elysia'
 import { db } from '@/drizzle/client'
 import { tagToVideo, uploadBatch, video } from '@/drizzle/schema'
 import { publishMessagesOnTopic } from '@/lib/kafka'
-import { publishMessage } from '@/lib/qstash'
+import { publishEvent } from '@/lib/qstash'
 
 import { authentication } from './authentication'
 
@@ -74,12 +74,10 @@ export const createUploadBatch = new Elysia().use(authentication).post(
     })
 
     await Promise.all(
-      videos.map(async (video) => {
-        await publishMessage({
-          topic: 'jupiter.upload-created',
-          body: {
-            videoId: video.id,
-          },
+      videos.map((video) => {
+        return publishEvent({
+          event: 'PROCESS_VIDEO',
+          payload: { videoId: video.id },
         })
       }),
     )

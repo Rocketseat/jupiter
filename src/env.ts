@@ -19,9 +19,15 @@ export const env = createEnv({
     AUTH_SECRET: z.string().min(1),
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
+    QSTASH_URL: z.string().url(),
     QSTASH_TOKEN: z.string(),
+    QSTASH_TOPIC: z.string(),
     QSTASH_CURRENT_SIGNING_KEY: z.string(),
     QSTASH_NEXT_SIGNING_KEY: z.string(),
+    QSTASH_PUBLISH_MESSAGES: z
+      .string()
+      .transform((value) => value === 'true')
+      .default('true'),
     QSTASH_VALIDATE_SIGNATURE: z
       .string()
       .transform((value) => value === 'true')
