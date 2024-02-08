@@ -1,4 +1,4 @@
-import type { NextAuthConfig } from 'next-auth'
+import type { NextAuthConfig, Session } from 'next-auth'
 import { GoogleProfile } from 'next-auth/providers/google'
 
 import { db } from '@/drizzle/client'
@@ -42,9 +42,18 @@ export const authConfig = {
 
       return false
     },
-    jwt({ token, user }) {
+    jwt({ token, user, session, trigger }) {
       if (user) {
         token.companyId = user.companyId
+      }
+
+      function isSessionAvailable(session: unknown): session is Session {
+        return !!session
+      }
+
+      if (trigger === 'update' && isSessionAvailable(session)) {
+        console.log(session)
+        token.name = session.user.name
       }
 
       return token

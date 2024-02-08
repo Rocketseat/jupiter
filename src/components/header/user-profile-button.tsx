@@ -1,9 +1,10 @@
-import { LogOut } from 'lucide-react'
+import { Code, Cog, LogOut } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 import { auth, signOut } from '@/auth'
 
-import { Avatar } from './ui/avatar'
+import { Avatar } from '../ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu'
+} from '../ui/dropdown-menu'
 
 export async function UserProfileButton() {
   const session = await auth()
@@ -28,24 +29,36 @@ export async function UserProfileButton() {
         <Avatar>
           {session?.user && session?.user.image ? (
             <Image
-              className="aspect-square h-full w-full"
+              className="aspect-square size-full"
               src={session.user.image}
               width={32}
               height={32}
               alt=""
             />
           ) : (
-            <div className="aspect-square h-full w-full bg-accent" />
+            <div className="aspect-square size-full bg-accent" />
           )}
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
+      <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuItem className="flex items-center gap-2" asChild>
+          <Link href="/settings/profile" className="w-full">
+            <Cog className="size-4" />
+            Settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="flex items-center gap-2" asChild>
+          <Link href="/settings/developers" className="w-full">
+            <Code className="size-4" />
+            Developers
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <form action={handleSignOut}>
           <DropdownMenuItem className="flex items-center gap-2" asChild>
             <button type="submit" className="w-full">
-              <LogOut className="h-4 w-4" />
+              <LogOut className="size-4" />
               Sign out
             </button>
           </DropdownMenuItem>

@@ -1,10 +1,6 @@
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { ReactNode, Suspense } from 'react'
 
 import { UploadsFilters } from './uploads-filters'
-
-dayjs.extend(relativeTime)
 
 export default async function Layout({ children }: { children: ReactNode }) {
   return (

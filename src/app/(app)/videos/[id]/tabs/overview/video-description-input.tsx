@@ -3,7 +3,7 @@
 import { MagicWandIcon } from '@radix-ui/react-icons'
 import { useCompletion } from 'ai/react'
 import { Loader2 } from 'lucide-react'
-import { ComponentProps, TextareaHTMLAttributes, useEffect } from 'react'
+import { TextareaHTMLAttributes, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'

@@ -11,15 +11,15 @@ import { useEffect, useState } from 'react'
 import useDebounceValue from '@/hooks/useDebounceValue'
 import { api } from '@/lib/eden'
 
-import { Button } from './ui/button'
+import { Button } from '../ui/button'
 import {
   CommandDialog,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-} from './ui/command'
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
+} from '../ui/command'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 
 dayjs.extend(relativeTime)
 

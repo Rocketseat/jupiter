@@ -6,6 +6,8 @@ import { deleteUpload } from './routes/delete-upload'
 import { downloadUploadMedia } from './routes/download-upload-media'
 import { generateAIDescription } from './routes/generate-ai-description'
 import { generateAITitle } from './routes/generate-ai-title'
+import { getCompanyWebhookUrl } from './routes/get-company-webhook-url'
+import { getCurrentUserCompany } from './routes/get-current-user-company'
 import { getTags } from './routes/get-tags'
 import { getUpload } from './routes/get-upload'
 import { getUploadBatch } from './routes/get-upload-batch'
@@ -14,6 +16,8 @@ import { getUploadWebhooks } from './routes/get-upload-webhooks'
 import { getUploads } from './routes/get-uploads'
 import { requestAudioUploadURL } from './routes/request-audio-upload-url'
 import { requestVideoUploadURL } from './routes/request-video-upload-url'
+import { setCompanyWebhookUrl } from './routes/set-company-webhook-url'
+import { unsetCompanyWebhookUrl } from './routes/unset-company-webhook-url'
 import { updateUpload } from './routes/update-upload'
 
 export const app = new Elysia({ prefix: '/api' })
@@ -32,6 +36,10 @@ export const app = new Elysia({ prefix: '/api' })
   .use(requestAudioUploadURL)
   .use(requestVideoUploadURL)
   .use(updateUpload)
+  .use(getCurrentUserCompany)
+  .use(getCompanyWebhookUrl)
+  .use(setCompanyWebhookUrl)
+  .use(unsetCompanyWebhookUrl)
   .onError(({ error, set }) => {
     console.error(error)
 

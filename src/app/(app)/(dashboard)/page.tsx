@@ -5,6 +5,7 @@ import { Loading } from '@/components/summary/loading'
 import { Storage } from '@/components/summary/storage'
 import { TotalCount } from '@/components/summary/total-count'
 import { ViewsCount } from '@/components/summary/views-count'
+import { ViewsCountLoading } from '@/components/summary/views-count/loading'
 import { env } from '@/env'
 
 export const metadata: Metadata = {
@@ -26,7 +27,9 @@ export default function DashboardPage() {
         </Suspense>
       </div>
       <div className="grid grid-cols-1">
-        {env.PANDAVIDEO_API_KEY && <ViewsCount />}
+        <Suspense fallback={<ViewsCountLoading />}>
+          {env.PANDAVIDEO_API_KEY && <ViewsCount />}
+        </Suspense>
       </div>
     </>
   )

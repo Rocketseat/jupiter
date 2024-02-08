@@ -1,14 +1,14 @@
-import { PlusCircledIcon } from '@radix-ui/react-icons'
+import { PlusCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import nivoIcon from '@/assets/nivo-icon.svg'
 
-import { NavLink } from './nav-link'
+import { Button } from '../ui/button'
+import { Separator } from '../ui/separator'
+import { MenuLink } from './menu-link'
 import { Search } from './search'
 import { ThemeSwitcher } from './theme-switcher'
-import { Button } from './ui/button'
-import { Separator } from './ui/separator'
 import { UserProfileButton } from './user-profile-button'
 
 export function Header() {
@@ -27,8 +27,8 @@ export function Header() {
           <Separator orientation="vertical" className="h-6" />
 
           <nav className="flex items-center space-x-2 lg:space-x-3">
-            <NavLink href="/">Dashboard</NavLink>
-            <NavLink href="/uploads">Uploads</NavLink>
+            <MenuLink href="/">Dashboard</MenuLink>
+            <MenuLink href="/uploads">Uploads</MenuLink>
           </nav>
         </div>
 
@@ -39,8 +39,8 @@ export function Header() {
 
           <Button size="sm" asChild>
             <Link href="/upload">
-              <PlusCircledIcon className="mr-2 h-4 w-4" />
-              Upload
+              <PlusCircle className="mr-2 size-4" />
+              Upload video
             </Link>
           </Button>
 

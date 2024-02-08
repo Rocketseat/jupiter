@@ -119,7 +119,7 @@ export function VideoForm({ video }: VideoFormProps) {
               data-empty={!video.externalProviderId}
               value={video.externalProviderId ?? '(not generated yet)'}
               id="externalProviderId"
-              className="h-10 flex-1 py-2 text-sm outline-none"
+              className="h-10 flex-1 bg-transparent py-2 text-sm outline-none"
               readOnly
             />
           </div>
