@@ -1,0 +1,23 @@
+{
+  "name": "@nivo/drizzle",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "db:generate": "drizzle-kit generate:pg",
+    "db:migrate": "bun migrate.ts",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.7.2",
+    "@nivo/env": "workspace:`*"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.20.14",
+    "pg": "^8.11.3",
+    "drizzle-orm": "^0.29.3",
+    "@nivo/tsconfig": "workspace:*",
+    "@nivo/eslint-config": "workspace:*"
+  }
+}

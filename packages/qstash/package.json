@@ -1,0 +1,19 @@
+{
+  "name": "@nivo/qstash",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@nivo/env": "workspace:*",
+    "@upstash/qstash": "^2.3.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@nivo/tsconfig": "workspace:*",
+    "@nivo/eslint-config": "workspace:*"
+  }
+}
