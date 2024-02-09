@@ -11,7 +11,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Switch } from '@/components/ui/switch'
-import { trpc } from '@/lib/trpc'
+import { trpc } from '@/lib/trpc/react'
 
 import { Segment } from './segment'
 import { TranscriptionSkeleton } from './transcription-skeleton'

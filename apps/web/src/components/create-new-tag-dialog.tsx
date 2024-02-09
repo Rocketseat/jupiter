@@ -3,7 +3,7 @@ import { AlertCircle, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { trpc } from '@/lib/trpc'
+import { trpc } from '@/lib/trpc/react'
 
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'

@@ -5,7 +5,7 @@ import { atom } from 'jotai'
 import { selectAtom } from 'jotai/utils'
 import { atomWithImmer } from 'jotai-immer'
 
-import { client } from '@/lib/trpc/client'
+import { nativeClient } from '@/lib/trpc/client'
 
 enableMapSet()
 
@@ -225,9 +225,11 @@ export const startVideoUploadAtom = atom(
     const abortController = new AbortController()
 
     try {
-      const { url: uploadUrl } = await client.requestVideoUploadUrl.query({
-        videoId: uploadId,
-      })
+      const { url: uploadUrl } = await nativeClient.requestVideoUploadUrl.query(
+        {
+          videoId: uploadId,
+        },
+      )
 
       await axios.put(uploadUrl, upload.file, {
         signal: abortController.signal,
@@ -283,9 +285,11 @@ export const startAudioUploadAtom = atom(
         throw new Error(`Audio file not found for upload ${uploadId}.`)
       }
 
-      const { url: uploadUrl } = await client.requestAudioUploadUrl.query({
-        videoId: uploadId,
-      })
+      const { url: uploadUrl } = await nativeClient.requestAudioUploadUrl.query(
+        {
+          videoId: uploadId,
+        },
+      )
 
       await axios.put(uploadUrl, upload.audioFile, {
         signal: abortController.signal,

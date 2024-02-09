@@ -2,7 +2,7 @@ import { AppRouter } from '@nivo/trpc'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import SuperJSON from 'superjson'
 
-import { trpc } from '.'
+import { trpc } from './react'
 
 function getBaseUrl() {
   if (typeof window !== 'undefined') return ''
@@ -21,7 +21,7 @@ const trpcLinks = [
   }),
 ]
 
-export const client = createTRPCClient<AppRouter>({
+export const nativeClient = createTRPCClient<AppRouter>({
   links: trpcLinks,
 })
 

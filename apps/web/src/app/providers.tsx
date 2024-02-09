@@ -6,8 +6,8 @@ import { ThemeProvider } from 'next-themes'
 import { ReactNode, useState } from 'react'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { TRPCProvider } from '@/lib/trpc'
 import { reactClient } from '@/lib/trpc/client'
+import { TRPCProvider } from '@/lib/trpc/react'
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 import useDebounceValue from '@/hooks/useDebounceValue'
-import { trpc } from '@/lib/trpc'
+import { trpc } from '@/lib/trpc/react'
 
 import { CreateNewTagDialog } from './create-new-tag-dialog'
 import { Badge } from './ui/badge'

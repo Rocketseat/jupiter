@@ -1,3 +1,5 @@
+import { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
+
 import { metricsRouter } from './routers/metrics'
 import { profileRouter } from './routers/profile'
 import { storageRouter } from './routers/storage'
@@ -22,3 +24,5 @@ export const appRouter = mergeRouters(
 export { createCallerFactory }
 
 export type AppRouter = typeof appRouter
+export type RouterInputs = inferRouterInputs<AppRouter>
+export type RouterOutput = inferRouterOutputs<AppRouter>

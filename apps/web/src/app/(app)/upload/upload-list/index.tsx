@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
-import { trpc } from '@/lib/trpc'
+import { trpc } from '@/lib/trpc/react'
 
 import { Header } from './header'
 import { UploadDropArea } from './upload-drop-area'

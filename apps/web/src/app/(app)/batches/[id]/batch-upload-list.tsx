@@ -22,7 +22,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { UploadItemActions } from '@/components/upload-item-actions'
-import { trpc } from '@/lib/trpc'
+import { trpc } from '@/lib/trpc/react'
 import { formatBytes } from '@/utils/format-bytes'
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 

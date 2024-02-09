@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import useDebounceValue from '@/hooks/useDebounceValue'
-import { trpc } from '@/lib/trpc'
+import { trpc } from '@/lib/trpc/react'
 
 import { Button } from '../ui/button'
 import {

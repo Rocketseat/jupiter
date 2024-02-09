@@ -1,6 +1,7 @@
 import { Session } from '@nivo/auth'
 import { initTRPC, TRPCError } from '@trpc/server'
 import SuperJSON from 'superjson'
+import { ZodError } from 'zod'
 
 type TRPCContext = {
   session: Session | null
@@ -8,6 +9,16 @@ type TRPCContext = {
 
 const t = initTRPC.context<TRPCContext>().create({
   transformer: SuperJSON,
+  errorFormatter({ shape, error }) {
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        zodError:
+          error.cause instanceof ZodError ? error.cause.flatten() : null,
+      },
+    }
+  },
 })
 
 export const {

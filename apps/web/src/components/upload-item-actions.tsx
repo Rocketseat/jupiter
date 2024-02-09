@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
-import { trpc } from '@/lib/trpc'
+import { trpc } from '@/lib/trpc/react'
 
 interface UploadItemActionsProps {
   videoId: string

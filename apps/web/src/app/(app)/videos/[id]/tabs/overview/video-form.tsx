@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { RouterOutput } from '@nivo/trpc'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
 import { Loader2 } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -12,8 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/use-toast'
-import { trpc } from '@/lib/trpc'
-import { RouterOutput } from '@/lib/trpc/shared'
+import { trpc } from '@/lib/trpc/react'
 
 import { VideoDescriptionInput } from './video-description-input'
 import { VideoTagInput } from './video-tag-input'

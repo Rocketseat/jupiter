@@ -18,7 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
-import { trpc } from '@/lib/trpc'
+import { trpc } from '@/lib/trpc/react'
 import { formatSecondsToMinutes } from '@/utils/format-seconds-to-minutes'
 
 import { MetadataTooltip } from './metadata-tooltip'
