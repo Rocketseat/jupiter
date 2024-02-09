@@ -1,5 +1,5 @@
 import { db } from '@nivo/drizzle'
-import { video } from '@nivo/drizzle/schema'
+import { upload } from '@nivo/drizzle/schema'
 import { env } from '@nivo/env'
 import axios from 'axios'
 import { BunnyCdnStream } from 'bunnycdn-stream'
@@ -8,7 +8,7 @@ import { eq } from 'drizzle-orm'
 import { WebhookError } from '../errors/webhook-error'
 
 export async function uploadToExternalProvider(videoId: string) {
-  const sourceVideo = await db.query.video.findFirst({
+  const sourceVideo = await db.query.upload.findFirst({
     where(fields, { eq }) {
       return eq(fields.id, videoId)
     },
@@ -57,7 +57,7 @@ export async function uploadToExternalProvider(videoId: string) {
   })
 
   await db
-    .update(video)
+    .update(upload)
     .set({ externalProviderId })
-    .where(eq(video.id, videoId))
+    .where(eq(upload.id, videoId))
 }

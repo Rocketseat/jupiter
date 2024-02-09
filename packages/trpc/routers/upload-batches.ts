@@ -1,5 +1,5 @@
 import { db } from '@nivo/drizzle'
-import { tagToVideo, uploadBatch, video } from '@nivo/drizzle/schema'
+import { tagToUpload, uploadBatch, upload } from '@nivo/drizzle/schema'
 import { publishEvent } from '@nivo/qstash'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
@@ -21,7 +21,7 @@ export const uploadsBatchesRouter = createTRPCRouter({
           return eq(fields.id, batchId)
         },
         with: {
-          videos: {
+          uploads: {
             with: {
               transcription: {
                 columns: {
@@ -84,7 +84,7 @@ export const uploadsBatchesRouter = createTRPCRouter({
             id: uploadBatch.id,
           })
 
-        await tx.insert(video).values(
+        await tx.insert(upload).values(
           videos.map((videoItem, index) => {
             return {
               id: videoItem.id,
@@ -113,7 +113,7 @@ export const uploadsBatchesRouter = createTRPCRouter({
           return map.set(item.slug, item.id)
         }, new Map<string, string>())
 
-        const tagToVideos = videos.flatMap((videoItem) => {
+        const tagToUploads = videos.flatMap((videoItem) => {
           return videoItem.tags.map((videoTag) => {
             const tagId = tagSlugToId.get(videoTag)
 
@@ -128,7 +128,7 @@ export const uploadsBatchesRouter = createTRPCRouter({
           })
         })
 
-        await tx.insert(tagToVideo).values(tagToVideos)
+        await tx.insert(tagToUpload).values(tagToUploads)
 
         return { batchId }
       })

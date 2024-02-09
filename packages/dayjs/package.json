@@ -12,6 +12,14 @@
   },
   "devDependencies": {
     "@nivo/tsconfig": "workspace:*",
+    "@nivo/prettier": "workspace:*",
     "@nivo/eslint-config": "workspace:*"
-  }
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@nivo/eslint-config/lib"
+    ]
+  },
+  "prettier": "@nivo/prettier"
 }

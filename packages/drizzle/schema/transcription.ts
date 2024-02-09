@@ -1,21 +1,21 @@
 import { relations } from 'drizzle-orm'
 import { pgTable, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
 
-import { transcriptionSegment, video } from '.'
+import { transcriptionSegment, upload } from '.'
 
 export const transcription = pgTable(
   'Transcription',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    videoId: uuid('videoId')
+    uploadId: uuid('uploadId')
       .notNull()
-      .references(() => video.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+      .references(() => upload.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
     createdAt: timestamp('createdAt').defaultNow().notNull(),
     reviewedAt: timestamp('reviewedAt'),
   },
   (table) => {
     return {
-      videoIdKey: uniqueIndex('Transcription_videoId_key').on(table.videoId),
+      uploadIdKey: uniqueIndex('Transcription_uploadId_key').on(table.uploadId),
     }
   },
 )
@@ -23,9 +23,9 @@ export const transcription = pgTable(
 export const transcriptionRelations = relations(
   transcription,
   ({ one, many }) => ({
-    video: one(video, {
-      fields: [transcription.videoId],
-      references: [video.id],
+    upload: one(upload, {
+      fields: [transcription.uploadId],
+      references: [upload.id],
     }),
     segments: many(transcriptionSegment),
   }),

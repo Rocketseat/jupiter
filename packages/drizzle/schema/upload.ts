@@ -8,7 +8,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 
-import { company, tagToVideo, transcription, uploadBatch, user } from '.'
+import { company, tagToUpload, transcription, uploadBatch, user } from '.'
 
 export type BunnyStatus =
   | 'created'
@@ -19,8 +19,8 @@ export type BunnyStatus =
   | 'error'
   | 'failed'
 
-export const video = pgTable(
-  'Video',
+export const upload = pgTable(
+  'Upload',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     duration: integer('duration').notNull(),
@@ -54,29 +54,29 @@ export const video = pgTable(
   },
   (table) => {
     return {
-      externalProviderIdKey: uniqueIndex('Video_externalProviderId_key').on(
+      externalProviderIdKey: uniqueIndex('Upload_externalProviderId_key').on(
         table.externalProviderId,
       ),
     }
   },
 )
 
-export const videoRelations = relations(video, ({ one, many }) => ({
+export const uploadRelations = relations(upload, ({ one, many }) => ({
   uploadBatch: one(uploadBatch, {
-    fields: [video.uploadBatchId],
+    fields: [upload.uploadBatchId],
     references: [uploadBatch.id],
   }),
   company: one(company, {
-    fields: [video.companyId],
+    fields: [upload.companyId],
     references: [company.id],
   }),
   author: one(user, {
-    fields: [video.authorId],
+    fields: [upload.authorId],
     references: [user.id],
   }),
   transcription: one(transcription, {
-    fields: [video.id],
-    references: [transcription.videoId],
+    fields: [upload.id],
+    references: [transcription.uploadId],
   }),
-  tagToVideos: many(tagToVideo),
+  tagToUploads: many(tagToUpload),
 }))

@@ -1,0 +1,12 @@
+{
+  "name": "@nivo/prettier",
+  "version": "0.0.0",
+  "main": "index.mjs",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.11"
+  },
+  "prettier": "@nivo/prettier"
+}

@@ -86,8 +86,8 @@ export function BatchUploadList({ batchId }: BatchUploadListProps) {
             <BatchUploadSkeletonTable />
           ) : (
             <TableBody>
-              {data?.batch && data.batch.videos.length ? (
-                data.batch.videos.map((video) => (
+              {data?.batch && data.batch.uploads.length ? (
+                data.batch.uploads.map((video) => (
                   <TableRow
                     key={video.id}
                     className="has-[a:focus-visible]:bg-accent"

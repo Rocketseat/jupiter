@@ -18,7 +18,7 @@ interface OpenAITranscriptionResponse {
 }
 
 export async function createTranscription(videoId: string) {
-  const sourceVideo = await db.query.video.findFirst({
+  const sourceVideo = await db.query.upload.findFirst({
     where(fields, { eq }) {
       return eq(fields.id, videoId)
     },
@@ -90,7 +90,7 @@ export async function createTranscription(videoId: string) {
     const [{ transcriptionId }] = await tx
       .insert(transcription)
       .values({
-        videoId,
+        uploadId: videoId,
       })
       .returning({
         transcriptionId: transcription.id,

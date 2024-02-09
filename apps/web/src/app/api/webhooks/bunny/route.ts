@@ -1,5 +1,5 @@
 import { db } from '@nivo/drizzle'
-import { BunnyStatus, video, webhook } from '@nivo/drizzle/schema'
+import { BunnyStatus, upload, uploadWebhook } from '@nivo/drizzle/schema'
 import { eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -47,12 +47,12 @@ async function handler(request: NextRequest) {
     VideoLibraryId: videoLibraryId,
   } = bunnyWebhookSchema.parse(requestBody)
 
-  const sourceVideo = await db.query.video.findFirst({
+  const sourceVideo = await db.query.upload.findFirst({
     where(fields, { eq }) {
       return eq(fields.externalProviderId, externalProviderId)
     },
     with: {
-      tagToVideos: {
+      tagToUploads: {
         with: {
           tag: true,
         },
@@ -93,14 +93,14 @@ async function handler(request: NextRequest) {
   try {
     await db.transaction(async (tx) => {
       await tx
-        .update(video)
+        .update(upload)
         .set({ externalStatus })
-        .where(eq(video.id, sourceVideo.id))
+        .where(eq(upload.id, sourceVideo.id))
 
-      await tx.insert(webhook).values({
+      await tx.insert(uploadWebhook).values({
         id: webhookId,
         type: 'UPDATE_EXTERNAL_PROVIDER_STATUS',
-        videoId: sourceVideo.id,
+        uploadId: sourceVideo.id,
         status: 'SUCCESS',
         finishedAt: new Date(),
       })
@@ -116,8 +116,8 @@ async function handler(request: NextRequest) {
           commitUrl: sourceVideo.commitUrl,
           description: sourceVideo.description,
           externalProviderId: sourceVideo.externalProviderId,
-          tags: sourceVideo.tagToVideos.map(
-            (tagToVideo) => tagToVideo.tag.slug,
+          tags: sourceVideo.tagToUploads.map(
+            (tagToUpload) => tagToUpload.tag.slug,
           ),
         },
       ],
@@ -125,10 +125,10 @@ async function handler(request: NextRequest) {
 
     return new NextResponse(null, { status: 204 })
   } catch (err) {
-    await db.insert(webhook).values({
+    await db.insert(uploadWebhook).values({
       id: webhookId,
       type: 'UPDATE_EXTERNAL_PROVIDER_STATUS',
-      videoId: sourceVideo.id,
+      uploadId: sourceVideo.id,
       status: 'ERROR',
       finishedAt: new Date(),
       metadata: err instanceof Error ? JSON.stringify(err) : null,

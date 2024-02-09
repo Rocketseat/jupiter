@@ -12,7 +12,7 @@ export const transcriptionsRouter = createTRPCRouter({
 
       const transcription = await db.query.transcription.findFirst({
         where(fields, { eq }) {
-          return eq(fields.videoId, videoId)
+          return eq(fields.uploadId, videoId)
         },
         with: {
           segments: {

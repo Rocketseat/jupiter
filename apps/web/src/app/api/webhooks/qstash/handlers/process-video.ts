@@ -1,6 +1,6 @@
 import { CopyObjectCommand, r2 } from '@nivo/cloudflare'
 import { db } from '@nivo/drizzle'
-import { video } from '@nivo/drizzle/schema'
+import { upload } from '@nivo/drizzle/schema'
 import { env } from '@nivo/env'
 import { publishEvent } from '@nivo/qstash'
 import { eq } from 'drizzle-orm'
@@ -8,7 +8,7 @@ import { eq } from 'drizzle-orm'
 import { WebhookError } from '../errors/webhook-error'
 
 export async function processVideo(videoId: string) {
-  const sourceVideo = await db.query.video.findFirst({
+  const sourceVideo = await db.query.upload.findFirst({
     where(fields, { eq }) {
       return eq(fields.id, videoId)
     },
@@ -48,9 +48,9 @@ export async function processVideo(videoId: string) {
   await Promise.all([moveVideoFilePromise, moveAudioFilePromise])
 
   await db
-    .update(video)
+    .update(upload)
     .set({ processedAt: new Date(), storageKey, audioStorageKey })
-    .where(eq(video.id, videoId))
+    .where(eq(upload.id, videoId))
 
   await Promise.all([
     publishEvent({

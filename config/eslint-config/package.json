@@ -4,18 +4,26 @@
   "files": [
     "lib.js",
     "next.js",
-    "prettier.js"
+    "prettier.mjs"
   ],
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "@rocketseat/eslint-config": "canary",
+    "@rocketseat/eslint-config": "2.2.2",
+    "eslint-config-next": "^14.1.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
-    "eslint-config-next": "^14.1.0"
+    "@nivo/prettier": "workspace:*"
   },
   "overrides": {
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@typescript-eslint/typescript-estree": "^6.21.0"
-  }
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "./lib.js"
+    ]
+  },
+  "prettier": "@nivo/prettier"
 }

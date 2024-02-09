@@ -1,6 +1,6 @@
 import { dayjs } from '@nivo/dayjs'
 import { db } from '@nivo/drizzle'
-import { video } from '@nivo/drizzle/schema'
+import { upload } from '@nivo/drizzle/schema'
 import { and, count, eq, gte, sum } from 'drizzle-orm'
 
 import { createTRPCRouter, protectedProcedure } from '../trpc'
@@ -12,20 +12,20 @@ export const metricsRouter = createTRPCRouter({
     const [[{ storageOverall }], [{ storageLastMonth }]] = await Promise.all([
       db
         .select({
-          storageOverall: sum(video.sizeInBytes).mapWith(Number),
+          storageOverall: sum(upload.sizeInBytes).mapWith(Number),
         })
-        .from(video)
-        .where(eq(video.companyId, companyId)),
+        .from(upload)
+        .where(eq(upload.companyId, companyId)),
 
       db
         .select({
-          storageLastMonth: sum(video.sizeInBytes).mapWith(Number),
+          storageLastMonth: sum(upload.sizeInBytes).mapWith(Number),
         })
-        .from(video)
+        .from(upload)
         .where(
           and(
-            gte(video.createdAt, dayjs().subtract(30, 'days').toDate()),
-            eq(video.companyId, companyId),
+            gte(upload.createdAt, dayjs().subtract(30, 'days').toDate()),
+            eq(upload.companyId, companyId),
           ),
         ),
     ])
@@ -39,18 +39,18 @@ export const metricsRouter = createTRPCRouter({
     const [[{ amountOverall }], [{ amountLastMonth }]] = await Promise.all([
       db
         .select({ amountOverall: count().mapWith(Number) })
-        .from(video)
-        .where(eq(video.companyId, companyId)),
+        .from(upload)
+        .where(eq(upload.companyId, companyId)),
 
       db
         .select({
           amountLastMonth: count().mapWith(Number),
         })
-        .from(video)
+        .from(upload)
         .where(
           and(
-            gte(video.createdAt, dayjs().subtract(30, 'days').toDate()),
-            eq(video.companyId, companyId),
+            gte(upload.createdAt, dayjs().subtract(30, 'days').toDate()),
+            eq(upload.companyId, companyId),
           ),
         ),
     ])

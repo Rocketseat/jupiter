@@ -7,7 +7,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 
-import { company, tagToVideo } from '.'
+import { company, tagToUpload } from '.'
 
 export const tag = pgTable(
   'Tag',
@@ -34,5 +34,5 @@ export const tagRelations = relations(tag, ({ one, many }) => ({
     fields: [tag.companyId],
     references: [company.id],
   }),
-  tagToVideos: many(tagToVideo),
+  tagToUploads: many(tagToUpload),
 }))

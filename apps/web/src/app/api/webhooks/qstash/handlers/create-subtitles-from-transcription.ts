@@ -1,6 +1,6 @@
 import { PutObjectCommand, r2 } from '@nivo/cloudflare'
 import { db } from '@nivo/drizzle'
-import { video } from '@nivo/drizzle/schema'
+import { upload } from '@nivo/drizzle/schema'
 import { env } from '@nivo/env'
 import { BunnyCdnStream } from 'bunnycdn-stream'
 import { eq } from 'drizzle-orm'
@@ -11,7 +11,7 @@ import { encodeBase64 } from '@/utils/encode-base64'
 import { WebhookError } from '../errors/webhook-error'
 
 export async function createSubtitlesFromTranscription(videoId: string) {
-  const sourceVideo = await db.query.video.findFirst({
+  const sourceVideo = await db.query.upload.findFirst({
     where(fields, { eq }) {
       return eq(fields.id, videoId)
     },
@@ -105,7 +105,7 @@ export async function createSubtitlesFromTranscription(videoId: string) {
   ])
 
   await db
-    .update(video)
+    .update(upload)
     .set({ subtitlesStorageKey })
-    .where(eq(video.id, videoId))
+    .where(eq(upload.id, videoId))
 }

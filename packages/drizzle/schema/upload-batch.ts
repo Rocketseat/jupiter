@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm'
 import { pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
 
-import { company, user, video } from '.'
+import { company, user, upload } from '.'
 
 export const uploadBatch = pgTable('UploadBatch', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -27,5 +27,5 @@ export const uploadBatchRelations = relations(uploadBatch, ({ one, many }) => ({
     fields: [uploadBatch.authorId],
     references: [user.id],
   }),
-  videos: many(video),
+  uploads: many(upload),
 }))

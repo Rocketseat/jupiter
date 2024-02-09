@@ -64,6 +64,13 @@
       "when": 1707397973620,
       "tag": "0008_condemned_venus",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1707510928718,
+      "tag": "0009_normal_sabretooth",
+      "breakpoints": true
     }
   ]
 }

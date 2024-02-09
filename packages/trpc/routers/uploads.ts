@@ -1,6 +1,6 @@
 import { DeleteObjectsCommand, ObjectIdentifier, r2 } from '@nivo/cloudflare'
 import { db } from '@nivo/drizzle'
-import { tag, tagToVideo, user, video } from '@nivo/drizzle/schema'
+import { tag, tagToUpload, user, upload } from '@nivo/drizzle/schema'
 import { env } from '@nivo/env'
 import { TRPCError } from '@trpc/server'
 import {
@@ -22,9 +22,9 @@ export const uploadsRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { videoId } = input
 
-      const upload = await db.query.video.findFirst({
+      const upload = await db.query.upload.findFirst({
         with: {
-          tagToVideos: {
+          tagToUploads: {
             with: {
               tag: {
                 columns: {
@@ -46,12 +46,12 @@ export const uploadsRouter = createTRPCRouter({
         })
       }
 
-      const { tagToVideos, ...video } = upload
+      const { tagToUploads, ...video } = upload
 
       return {
         video: {
           ...video,
-          tags: tagToVideos.map((tagToVideo) => tagToVideo.tag),
+          tags: tagToUploads.map((tagToUpload) => tagToUpload.tag),
         },
       }
     }),
@@ -78,7 +78,7 @@ export const uploadsRouter = createTRPCRouter({
       const { companyId } = ctx.session.user
       const { pageIndex, pageSize, titleFilter, tagsFilter } = input
 
-      const videoColumns = getTableColumns(video)
+      const videoColumns = getTableColumns(upload)
 
       const [videos, [{ amount }]] = await Promise.all([
         db
@@ -89,27 +89,27 @@ export const uploadsRouter = createTRPCRouter({
               image: user.image,
             },
           })
-          .from(video)
-          .leftJoin(tagToVideo, eq(tagToVideo.b, video.id))
-          .leftJoin(tag, eq(tag.id, tagToVideo.a))
-          .leftJoin(user, eq(video.authorId, user.id))
+          .from(upload)
+          .leftJoin(tagToUpload, eq(tagToUpload.b, upload.id))
+          .leftJoin(tag, eq(tag.id, tagToUpload.a))
+          .leftJoin(user, eq(upload.authorId, user.id))
           .where(
             and(
-              eq(video.companyId, companyId),
+              eq(upload.companyId, companyId),
               tagsFilter ? inArray(tag.slug, tagsFilter) : undefined,
-              titleFilter ? ilike(video.title, `%${titleFilter}%`) : undefined,
+              titleFilter ? ilike(upload.title, `%${titleFilter}%`) : undefined,
             ),
           )
-          .orderBy(desc(video.createdAt))
+          .orderBy(desc(upload.createdAt))
           .offset(pageIndex * pageSize)
           .limit(pageSize)
-          .groupBy(video.id, user.name, user.image),
+          .groupBy(upload.id, user.name, user.image),
 
         db
           .select({ amount: count() })
-          .from(video)
-          .leftJoin(tagToVideo, eq(tagToVideo.b, video.id))
-          .leftJoin(tag, eq(tag.id, tagToVideo.a))
+          .from(upload)
+          .leftJoin(tagToUpload, eq(tagToUpload.b, upload.id))
+          .leftJoin(tag, eq(tag.id, tagToUpload.a))
           .where(
             and(
               tagsFilter
@@ -118,7 +118,7 @@ export const uploadsRouter = createTRPCRouter({
                     Array.isArray(tagsFilter) ? tagsFilter : [tagsFilter],
                   )
                 : undefined,
-              titleFilter ? ilike(video.title, `%${titleFilter}%`) : undefined,
+              titleFilter ? ilike(upload.title, `%${titleFilter}%`) : undefined,
             ),
           ),
       ])
@@ -142,7 +142,7 @@ export const uploadsRouter = createTRPCRouter({
       const { companyId } = ctx.session.user
       const { videoId, title, description, tags, commitUrl } = input
 
-      const videoFromCompany = await db.query.video.findFirst({
+      const videoFromCompany = await db.query.upload.findFirst({
         where(fields, { eq, and }) {
           return and(eq(fields.id, videoId), eq(fields.companyId, companyId))
         },
@@ -158,9 +158,9 @@ export const uploadsRouter = createTRPCRouter({
       const currentVideoTags = await db
         .select({ id: tag.id, slug: tag.slug })
         .from(tag)
-        .innerJoin(tagToVideo, eq(tagToVideo.a, tag.id))
-        .innerJoin(video, eq(tagToVideo.b, video.id))
-        .where(eq(video.id, videoId))
+        .innerJoin(tagToUpload, eq(tagToUpload.a, tag.id))
+        .innerJoin(upload, eq(tagToUpload.b, upload.id))
+        .where(eq(upload.id, videoId))
 
       const currentVideoTagsSlugs = currentVideoTags.map((item) => item.slug)
 
@@ -174,25 +174,25 @@ export const uploadsRouter = createTRPCRouter({
 
       await db.transaction(async (tx) => {
         const [{ duration, externalProviderId }] = await tx
-          .update(video)
+          .update(upload)
           .set({
             title,
             description,
             commitUrl,
           })
-          .where(eq(video.id, videoId))
+          .where(eq(upload.id, videoId))
           .returning({
-            duration: video.duration,
-            externalProviderId: video.externalProviderId,
+            duration: upload.duration,
+            externalProviderId: upload.externalProviderId,
           })
 
         if (tagsToRemoveIds.length > 0) {
           await tx
-            .delete(tagToVideo)
+            .delete(tagToUpload)
             .where(
               and(
-                eq(tagToVideo.b, videoId),
-                inArray(tagToVideo.a, tagsToRemoveIds),
+                eq(tagToUpload.b, videoId),
+                inArray(tagToUpload.a, tagsToRemoveIds),
               ),
             )
         }
@@ -209,7 +209,7 @@ export const uploadsRouter = createTRPCRouter({
 
           const tagsToAddIds = tagsToAdd.map((item) => item.id)
 
-          await tx.insert(tagToVideo).values(
+          await tx.insert(tagToUpload).values(
             tagsToAddIds.map((tagId) => {
               return {
                 a: tagId,
@@ -228,7 +228,7 @@ export const uploadsRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { videoId } = input
 
-      const videoToDelete = await db.query.video.findFirst({
+      const videoToDelete = await db.query.upload.findFirst({
         where(fields, { eq }) {
           return eq(fields.id, videoId)
         },
@@ -282,7 +282,7 @@ export const uploadsRouter = createTRPCRouter({
          */
       }
 
-      deletionPromises.push(db.delete(video).where(eq(video.id, videoId)))
+      deletionPromises.push(db.delete(upload).where(eq(upload.id, videoId)))
 
       await Promise.all(deletionPromises)
     }),

@@ -58,7 +58,7 @@ export const storageRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { videoId, media } = input
 
-      const videoToDownload = await db.query.video.findFirst({
+      const videoToDownload = await db.query.upload.findFirst({
         where(fields, { eq }) {
           return eq(fields.id, videoId)
         },

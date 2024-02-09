@@ -1,5 +1,5 @@
 import { db } from '@nivo/drizzle'
-import { webhook } from '@nivo/drizzle/schema'
+import { uploadWebhook } from '@nivo/drizzle/schema'
 import { env } from '@nivo/env'
 import {
   qStashEventSchema,
@@ -31,10 +31,10 @@ async function handler(request: NextRequest) {
   const { event, payload } = qstashWebhookSchema.parse(requestBody)
   const { videoId } = payload
 
-  await db.insert(webhook).values({
+  await db.insert(uploadWebhook).values({
     id: webhookId,
     type: event,
-    videoId,
+    uploadId: videoId,
   })
 
   try {
@@ -54,20 +54,20 @@ async function handler(request: NextRequest) {
     }
 
     await db
-      .update(webhook)
+      .update(uploadWebhook)
       .set({ status: 'SUCCESS', finishedAt: new Date() })
-      .where(eq(webhook.id, webhookId))
+      .where(eq(uploadWebhook.id, webhookId))
 
     return new NextResponse(null, { status: 204 })
   } catch (err) {
     await db
-      .update(webhook)
+      .update(uploadWebhook)
       .set({
         status: 'ERROR',
         finishedAt: new Date(),
         metadata: err instanceof Error ? JSON.stringify(err) : null,
       })
-      .where(eq(webhook.id, webhookId))
+      .where(eq(uploadWebhook.id, webhookId))
 
     if (err instanceof WebhookError) {
       return NextResponse.json({ message: err.message }, { status: 400 })

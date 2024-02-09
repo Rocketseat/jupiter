@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm'
 import { pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
 
-import { tag, uploadBatch, user, video } from '.'
+import { tag, uploadBatch, user, upload } from '.'
 
 export const company = pgTable(
   'Company',
@@ -20,7 +20,7 @@ export const company = pgTable(
 )
 
 export const companyRelations = relations(company, ({ many }) => ({
-  videos: many(video),
+  uploads: many(upload),
   members: many(user),
   uploadBatches: many(uploadBatch),
   tags: many(tag),

@@ -9,7 +9,7 @@ export const runtime = 'edge'
 export const preferredRegion = 'cle1'
 
 export async function POST(request: Request) {
-  const { prompt: videoId } = await request.json()
+  const { prompt: uploadId } = await request.json()
 
   const [{ text }] = await db
     .select({
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       transcription,
       eq(transcription.id, transcriptionSegment.transcriptionId),
     )
-    .where(eq(transcription.videoId, videoId))
+    .where(eq(transcription.uploadId, uploadId))
 
   if (!text) {
     return NextResponse.json(
