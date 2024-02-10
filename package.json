@@ -10,6 +10,7 @@
     "build": "turbo run build --",
     "lint": "turbo run lint --",
     "db:generate": "turbo run db:generate",
-    "db:migrate": "turbo run db:migrate"
+    "db:migrate": "turbo run db:migrate",
+    "db:studio": "turbo run db:studio"
   }
 }

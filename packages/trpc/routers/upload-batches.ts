@@ -1,6 +1,7 @@
 import { db } from '@nivo/drizzle'
-import { tagToUpload, uploadBatch, upload } from '@nivo/drizzle/schema'
+import { tagToUpload, upload, uploadBatch } from '@nivo/drizzle/schema'
 import { publishEvent } from '@nivo/qstash'
+import { publishWebhookEvents } from '@nivo/webhooks'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
@@ -60,7 +61,7 @@ export const uploadsBatchesRouter = createTRPCRouter({
             z.object({
               id: z.string(),
               title: z.string().min(1),
-              language: z.string(),
+              language: z.enum(['pt', 'es']),
               duration: z.number(),
               sizeInBytes: z.number(),
               tags: z.array(z.string()).min(1),
@@ -122,8 +123,8 @@ export const uploadsBatchesRouter = createTRPCRouter({
             }
 
             return {
-              a: tagId,
-              b: videoItem.id,
+              tagId,
+              uploadId: videoItem.id,
             }
           })
         })
@@ -131,6 +132,21 @@ export const uploadsBatchesRouter = createTRPCRouter({
         await tx.insert(tagToUpload).values(tagToUploads)
 
         return { batchId }
+      })
+
+      await publishWebhookEvents({
+        companyId,
+        trigger: 'upload.created',
+        events: videos.map((video) => {
+          return {
+            id: video.id,
+            description: null,
+            duration: video.duration,
+            title: video.title,
+            tags: video.tags,
+            streamUrl: null,
+          }
+        }),
       })
 
       await Promise.all(
@@ -141,20 +157,6 @@ export const uploadsBatchesRouter = createTRPCRouter({
           })
         }),
       )
-
-      // await publishMessagesOnTopic({
-      //   topic: 'jupiter.video-created',
-      //   messages: videos.map((video) => {
-      //     return {
-      //       id: video.id,
-      //       title: video.title,
-      //       duration: video.duration,
-      //       description: null,
-      //       commitUrl: null,
-      //       tags: video.tags,
-      //     }
-      //   }),
-      // })
 
       return { batchId }
     }),

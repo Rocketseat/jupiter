@@ -1,5 +1,6 @@
 import { db } from '@nivo/drizzle'
 import { tag } from '@nivo/drizzle/schema'
+import { publishWebhookEvents } from '@nivo/webhooks'
 import { count, ilike } from 'drizzle-orm'
 import { z } from 'zod'
 
@@ -56,6 +57,12 @@ export const tagsRouter = createTRPCRouter({
       await db.insert(tag).values({
         slug,
         companyId,
+      })
+
+      await publishWebhookEvents({
+        companyId,
+        trigger: 'tag.created',
+        events: [{ slug }],
       })
     }),
 })

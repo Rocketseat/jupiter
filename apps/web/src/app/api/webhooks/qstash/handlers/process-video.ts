@@ -8,17 +8,17 @@ import { eq } from 'drizzle-orm'
 import { WebhookError } from '../errors/webhook-error'
 
 export async function processVideo(videoId: string) {
-  const sourceVideo = await db.query.upload.findFirst({
+  const sourceUpload = await db.query.upload.findFirst({
     where(fields, { eq }) {
       return eq(fields.id, videoId)
     },
   })
 
-  if (!sourceVideo) {
+  if (!sourceUpload) {
     throw new WebhookError('Video not found.')
   }
 
-  if (sourceVideo.processedAt) {
+  if (sourceUpload.processedAt) {
     /**
      * Video already was processed
      */
@@ -26,13 +26,13 @@ export async function processVideo(videoId: string) {
     return
   }
 
-  const storageKey = `batch-${sourceVideo.uploadBatchId}/${sourceVideo.id}.mp4`
-  const audioStorageKey = `batch-${sourceVideo.uploadBatchId}/${sourceVideo.id}.mp3`
+  const storageKey = `batch-${sourceUpload.uploadBatchId}/${sourceUpload.id}.mp4`
+  const audioStorageKey = `batch-${sourceUpload.uploadBatchId}/${sourceUpload.id}.mp3`
 
   const moveVideoFilePromise = r2.send(
     new CopyObjectCommand({
       Bucket: env.CLOUDFLARE_STORAGE_BUCKET_NAME,
-      CopySource: `${env.CLOUDFLARE_UPLOAD_BUCKET_NAME}/${sourceVideo.id}.mp4`,
+      CopySource: `${env.CLOUDFLARE_UPLOAD_BUCKET_NAME}/${sourceUpload.id}.mp4`,
       Key: storageKey,
     }),
   )
@@ -40,7 +40,7 @@ export async function processVideo(videoId: string) {
   const moveAudioFilePromise = r2.send(
     new CopyObjectCommand({
       Bucket: env.CLOUDFLARE_STORAGE_BUCKET_NAME,
-      CopySource: `${env.CLOUDFLARE_UPLOAD_BUCKET_NAME}/${sourceVideo.id}.mp3`,
+      CopySource: `${env.CLOUDFLARE_UPLOAD_BUCKET_NAME}/${sourceUpload.id}.mp3`,
       Key: audioStorageKey,
     }),
   )

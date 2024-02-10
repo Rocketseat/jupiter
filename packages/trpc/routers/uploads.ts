@@ -2,6 +2,7 @@ import { DeleteObjectsCommand, ObjectIdentifier, r2 } from '@nivo/cloudflare'
 import { db } from '@nivo/drizzle'
 import { tag, tagToUpload, upload, user } from '@nivo/drizzle/schema'
 import { env } from '@nivo/env'
+import { publishWebhookEvents } from '@nivo/webhooks'
 import { TRPCError } from '@trpc/server'
 import {
   and,
@@ -158,8 +159,8 @@ export const uploadsRouter = createTRPCRouter({
       const currentVideoTags = await db
         .select({ id: tag.id, slug: tag.slug })
         .from(tag)
-        .innerJoin(tagToUpload, eq(tagToUpload.a, tag.id))
-        .innerJoin(upload, eq(tagToUpload.b, upload.id))
+        .innerJoin(tagToUpload, eq(tagToUpload.tagId, tag.id))
+        .innerJoin(upload, eq(tagToUpload.uploadId, upload.id))
         .where(eq(upload.id, videoId))
 
       const currentVideoTagsSlugs = currentVideoTags.map((item) => item.slug)
@@ -172,8 +173,8 @@ export const uploadsRouter = createTRPCRouter({
         return !currentVideoTagsSlugs.includes(slug)
       })
 
-      await db.transaction(async (tx) => {
-        const [{ duration, externalProviderId }] = await tx
+      const updatedVideo = await db.transaction(async (tx) => {
+        const [updatedVideo] = await tx
           .update(upload)
           .set({
             title,
@@ -181,10 +182,7 @@ export const uploadsRouter = createTRPCRouter({
             commitUrl,
           })
           .where(eq(upload.id, videoId))
-          .returning({
-            duration: upload.duration,
-            externalProviderId: upload.externalProviderId,
-          })
+          .returning()
 
         if (tagsToRemoveIds.length > 0) {
           await tx
@@ -219,13 +217,29 @@ export const uploadsRouter = createTRPCRouter({
           )
         }
 
-        return { duration, externalProviderId }
+        return updatedVideo
+      })
+
+      await publishWebhookEvents({
+        companyId,
+        trigger: 'upload.updated',
+        events: [
+          {
+            id: updatedVideo.id,
+            description: updatedVideo.description,
+            duration: updatedVideo.duration,
+            title: updatedVideo.title,
+            tags,
+            streamUrl: updatedVideo.externalStreamUrl,
+          },
+        ],
       })
     }),
 
   deleteUpload: protectedProcedure
     .input(z.object({ videoId: z.string().uuid() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      const { companyId } = ctx.session.user
       const { videoId } = input
 
       const videoToDelete = await db.query.upload.findFirst({
@@ -285,5 +299,11 @@ export const uploadsRouter = createTRPCRouter({
       deletionPromises.push(db.delete(upload).where(eq(upload.id, videoId)))
 
       await Promise.all(deletionPromises)
+
+      await publishWebhookEvents({
+        companyId,
+        trigger: 'upload.deleted',
+        events: [{ id: videoId }],
+      })
     }),
 })

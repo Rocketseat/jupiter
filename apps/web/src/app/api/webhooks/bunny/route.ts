@@ -1,10 +1,9 @@
+import { BunnyStatus } from '@nivo/bunny'
 import { db } from '@nivo/drizzle'
-import { BunnyStatus, upload, uploadWebhook } from '@nivo/drizzle/schema'
+import { upload, uploadWebhook } from '@nivo/drizzle/schema'
 import { eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-
-import { publishMessagesOnTopic } from '@/lib/kafka'
 
 export const maxDuration = 300
 export const preferredRegion = 'cle1'
@@ -104,23 +103,6 @@ async function handler(request: NextRequest) {
         status: 'SUCCESS',
         finishedAt: new Date(),
       })
-    })
-
-    await publishMessagesOnTopic({
-      topic: 'jupiter.video-updated',
-      messages: [
-        {
-          id: sourceVideo.id,
-          duration: sourceVideo.duration,
-          title: sourceVideo.title,
-          commitUrl: sourceVideo.commitUrl,
-          description: sourceVideo.description,
-          externalProviderId: sourceVideo.externalProviderId,
-          tags: sourceVideo.tagToUploads.map(
-            (tagToUpload) => tagToUpload.tag.slug,
-          ),
-        },
-      ],
     })
 
     return new NextResponse(null, { status: 204 })

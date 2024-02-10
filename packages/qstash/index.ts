@@ -1,13 +1,10 @@
 import { env } from '@nivo/env'
-import { Client } from '@upstash/qstash'
 import { z } from 'zod'
+
+import { qstash } from './client'
 
 export type * from '@upstash/qstash'
 export { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs'
-
-const qstash = new Client({
-  token: env.QSTASH_TOKEN,
-})
 
 export const qStashEventSchema = z.enum([
   'PROCESS_VIDEO',
@@ -41,7 +38,7 @@ export async function publishEvent({
   }
 
   await qstash.publishJSON({
-    topic: env.QSTASH_TOPIC,
+    topic: env.QSTASH_INTERNAL_TOPIC,
     contentBasedDeduplication: true,
     body: {
       event,

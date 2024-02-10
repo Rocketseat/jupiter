@@ -3,6 +3,7 @@ import { db } from '@nivo/drizzle'
 import { transcription, transcriptionSegment } from '@nivo/drizzle/schema'
 import { env } from '@nivo/env'
 import { publishEvent } from '@nivo/qstash'
+import { publishWebhookEvents } from '@nivo/webhooks'
 import axios from 'axios'
 import FormData from 'form-data'
 
@@ -86,7 +87,7 @@ export async function createTranscription(videoId: string) {
     },
   )
 
-  await db.transaction(async (tx) => {
+  const { transcriptionId } = await db.transaction(async (tx) => {
     const [{ transcriptionId }] = await tx
       .insert(transcription)
       .values({
@@ -106,6 +107,26 @@ export async function createTranscription(videoId: string) {
         }
       }),
     )
+
+    return { transcriptionId }
+  })
+
+  await publishWebhookEvents({
+    companyId: sourceVideo.companyId,
+    trigger: 'upload.transcription.created',
+    events: [
+      {
+        id: transcriptionId,
+        uploadId: sourceVideo.id,
+        text: response.data.text,
+        segments: response.data.segments.map((segment) => {
+          return {
+            text: segment.text,
+            timestamp: [segment.start, segment.end],
+          }
+        }),
+      },
+    ],
   })
 
   await publishEvent({

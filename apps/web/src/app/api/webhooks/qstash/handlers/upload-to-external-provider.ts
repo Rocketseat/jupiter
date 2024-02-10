@@ -1,6 +1,8 @@
+import { getBunnyStreamUrl } from '@nivo/bunny'
 import { db } from '@nivo/drizzle'
 import { upload } from '@nivo/drizzle/schema'
 import { env } from '@nivo/env'
+import { publishWebhookEvents } from '@nivo/webhooks'
 import axios from 'axios'
 import { BunnyCdnStream } from 'bunnycdn-stream'
 import { eq } from 'drizzle-orm'
@@ -16,6 +18,15 @@ export async function uploadToExternalProvider(videoId: string) {
       company: {
         columns: {
           externalId: true,
+        },
+      },
+      tagToUploads: {
+        with: {
+          tag: {
+            columns: {
+              slug: true,
+            },
+          },
         },
       },
     },
@@ -56,8 +67,32 @@ export async function uploadToExternalProvider(videoId: string) {
     title: sourceVideo.title,
   })
 
+  const streamUrl = getBunnyStreamUrl({
+    libraryId: sourceVideo.company.externalId,
+    videoId: externalProviderId,
+  })
+
   await db
     .update(upload)
-    .set({ externalProviderId })
+    .set({ externalProviderId, externalStreamUrl: streamUrl })
     .where(eq(upload.id, videoId))
+
+  const tags = sourceVideo.tagToUploads.map((tagToUpload) => {
+    return tagToUpload.tag.slug
+  })
+
+  await publishWebhookEvents({
+    companyId: sourceVideo.companyId,
+    trigger: 'upload.updated',
+    events: [
+      {
+        id: sourceVideo.id,
+        description: sourceVideo.description,
+        duration: sourceVideo.duration,
+        title: sourceVideo.title,
+        tags,
+        streamUrl,
+      },
+    ],
+  })
 }

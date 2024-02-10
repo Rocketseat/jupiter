@@ -1,3 +1,4 @@
+import { BunnyStatus } from '@nivo/bunny'
 import { relations } from 'drizzle-orm'
 import {
   integer,
@@ -9,15 +10,6 @@ import {
 } from 'drizzle-orm/pg-core'
 
 import { company, tagToUpload, transcription, uploadBatch, user } from '.'
-
-export type BunnyStatus =
-  | 'created'
-  | 'uploaded'
-  | 'processing'
-  | 'transcoding'
-  | 'finished'
-  | 'error'
-  | 'failed'
 
 export const upload = pgTable(
   'uploads',
@@ -43,6 +35,7 @@ export const upload = pgTable(
     }),
     externalProviderId: text('external_provider_id'),
     externalStatus: text('external_status').$type<BunnyStatus>(),
+    externalStreamUrl: text('external_stream_url'),
     audioStorageKey: text('audio_storage_key'),
     processedAt: timestamp('processed_at'),
     sizeInBytes: integer('size_in_bytes').notNull(),
