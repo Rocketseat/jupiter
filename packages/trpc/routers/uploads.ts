@@ -1,6 +1,6 @@
 import { DeleteObjectsCommand, ObjectIdentifier, r2 } from '@nivo/cloudflare'
 import { db } from '@nivo/drizzle'
-import { tag, tagToUpload, user, upload } from '@nivo/drizzle/schema'
+import { tag, tagToUpload, upload, user } from '@nivo/drizzle/schema'
 import { env } from '@nivo/env'
 import { TRPCError } from '@trpc/server'
 import {
@@ -90,8 +90,8 @@ export const uploadsRouter = createTRPCRouter({
             },
           })
           .from(upload)
-          .leftJoin(tagToUpload, eq(tagToUpload.b, upload.id))
-          .leftJoin(tag, eq(tag.id, tagToUpload.a))
+          .leftJoin(tagToUpload, eq(tagToUpload.uploadId, upload.id))
+          .leftJoin(tag, eq(tag.id, tagToUpload.tagId))
           .leftJoin(user, eq(upload.authorId, user.id))
           .where(
             and(
@@ -108,8 +108,8 @@ export const uploadsRouter = createTRPCRouter({
         db
           .select({ amount: count() })
           .from(upload)
-          .leftJoin(tagToUpload, eq(tagToUpload.b, upload.id))
-          .leftJoin(tag, eq(tag.id, tagToUpload.a))
+          .leftJoin(tagToUpload, eq(tagToUpload.uploadId, upload.id))
+          .leftJoin(tag, eq(tag.id, tagToUpload.tagId))
           .where(
             and(
               tagsFilter
@@ -191,8 +191,8 @@ export const uploadsRouter = createTRPCRouter({
             .delete(tagToUpload)
             .where(
               and(
-                eq(tagToUpload.b, videoId),
-                inArray(tagToUpload.a, tagsToRemoveIds),
+                eq(tagToUpload.uploadId, videoId),
+                inArray(tagToUpload.tagId, tagsToRemoveIds),
               ),
             )
         }
@@ -212,8 +212,8 @@ export const uploadsRouter = createTRPCRouter({
           await tx.insert(tagToUpload).values(
             tagsToAddIds.map((tagId) => {
               return {
-                a: tagId,
-                b: videoId,
+                tagId,
+                uploadId: videoId,
               }
             }),
           )

@@ -1,11 +1,11 @@
 {
-  "id": "c9ca6640-787b-4b51-80b4-a18237571824",
+  "id": "b21fb707-d469-4e57-becf-273e61ec2f8c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
   "tables": {
-    "Account": {
-      "name": "Account",
+    "accounts": {
+      "name": "accounts",
       "schema": "",
       "columns": {
         "id": {
@@ -15,8 +15,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -33,8 +33,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "providerAccountId": {
-          "name": "providerAccountId",
+        "provider_account_id": {
+          "name": "provider_account_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -45,60 +45,60 @@
           "primaryKey": false,
           "notNull": false
         },
-        "accessToken": {
-          "name": "accessToken",
+        "access_token": {
+          "name": "access_token",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "expiresAt": {
-          "name": "expiresAt",
+        "expires_at": {
+          "name": "expires_at",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "idToken": {
-          "name": "idToken",
+        "id_token": {
+          "name": "id_token",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "refreshToken": {
-          "name": "refreshToken",
+        "refresh_token": {
+          "name": "refresh_token",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "sessionState": {
-          "name": "sessionState",
+        "session_state": {
+          "name": "session_state",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "tokenType": {
-          "name": "tokenType",
+        "token_type": {
+          "name": "token_type",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         }
       },
       "indexes": {
-        "Account_provider_providerAccountId_key": {
-          "name": "Account_provider_providerAccountId_key",
+        "accounts_provider_provider_account_id_index": {
+          "name": "accounts_provider_provider_account_id_index",
           "columns": [
             "provider",
-            "providerAccountId"
+            "provider_account_id"
           ],
           "isUnique": true
         }
       },
       "foreignKeys": {
-        "Account_userId_User_id_fk": {
-          "name": "Account_userId_User_id_fk",
-          "tableFrom": "Account",
-          "tableTo": "User",
+        "accounts_user_id_users_id_fk": {
+          "name": "accounts_user_id_users_id_fk",
+          "tableFrom": "accounts",
+          "tableTo": "users",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -110,8 +110,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Company": {
-      "name": "Company",
+    "companies": {
+      "name": "companies",
       "schema": "",
       "columns": {
         "id": {
@@ -132,11 +132,17 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
-        "Company_domain_key": {
-          "name": "Company_domain_key",
+        "companies_domain_index": {
+          "name": "companies_domain_index",
           "columns": [
             "domain"
           ],
@@ -147,52 +153,37 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Session": {
-      "name": "Session",
+    "sessions": {
+      "name": "sessions",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "sessionToken": {
-          "name": "sessionToken",
+        "session_token": {
+          "name": "session_token",
           "type": "text",
-          "primaryKey": false,
+          "primaryKey": true,
           "notNull": true
         },
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "expires": {
           "name": "expires",
-          "type": "timestamp(3)",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         }
       },
-      "indexes": {
-        "Session_sessionToken_key": {
-          "name": "Session_sessionToken_key",
-          "columns": [
-            "sessionToken"
-          ],
-          "isUnique": true
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
-        "Session_userId_User_id_fk": {
-          "name": "Session_userId_User_id_fk",
-          "tableFrom": "Session",
-          "tableTo": "User",
+        "sessions_user_id_users_id_fk": {
+          "name": "sessions_user_id_users_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "users",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -204,8 +195,73 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Tag": {
-      "name": "Tag",
+    "tag_to_uploads": {
+      "name": "tag_to_uploads",
+      "schema": "",
+      "columns": {
+        "tag_id": {
+          "name": "tag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "upload_id": {
+          "name": "upload_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "tag_to_uploads_tag_id_upload_id_index": {
+          "name": "tag_to_uploads_tag_id_upload_id_index",
+          "columns": [
+            "tag_id",
+            "upload_id"
+          ],
+          "isUnique": true
+        },
+        "tag_to_uploads_upload_id_index": {
+          "name": "tag_to_uploads_upload_id_index",
+          "columns": [
+            "upload_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "tag_to_uploads_tag_id_tags_id_fk": {
+          "name": "tag_to_uploads_tag_id_tags_id_fk",
+          "tableFrom": "tag_to_uploads",
+          "tableTo": "tags",
+          "columnsFrom": [
+            "tag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "tag_to_uploads_upload_id_uploads_id_fk": {
+          "name": "tag_to_uploads_upload_id_uploads_id_fk",
+          "tableFrom": "tag_to_uploads",
+          "tableTo": "uploads",
+          "columnsFrom": [
+            "upload_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "tags": {
+      "name": "tags",
       "schema": "",
       "columns": {
         "id": {
@@ -221,23 +277,23 @@
           "primaryKey": false,
           "notNull": true
         },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp(3)",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "companyId": {
-          "name": "companyId",
+        "company_id": {
+          "name": "company_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {
-        "Tag_slug_key": {
-          "name": "Tag_slug_key",
+        "tags_slug_index": {
+          "name": "tags_slug_index",
           "columns": [
             "slug"
           ],
@@ -245,12 +301,12 @@
         }
       },
       "foreignKeys": {
-        "Tag_companyId_Company_id_fk": {
-          "name": "Tag_companyId_Company_id_fk",
-          "tableFrom": "Tag",
-          "tableTo": "Company",
+        "tags_company_id_companies_id_fk": {
+          "name": "tags_company_id_companies_id_fk",
+          "tableFrom": "tags",
+          "tableTo": "companies",
           "columnsFrom": [
-            "companyId"
+            "company_id"
           ],
           "columnsTo": [
             "id"
@@ -262,90 +318,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "_TagToVideo": {
-      "name": "_TagToVideo",
-      "schema": "",
-      "columns": {
-        "A": {
-          "name": "A",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "B": {
-          "name": "B",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "_TagToVideo_AB_unique": {
-          "name": "_TagToVideo_AB_unique",
-          "columns": [
-            "A",
-            "B"
-          ],
-          "isUnique": true
-        },
-        "_TagToVideo_B_index": {
-          "name": "_TagToVideo_B_index",
-          "columns": [
-            "B"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "_TagToVideo_A_Tag_id_fk": {
-          "name": "_TagToVideo_A_Tag_id_fk",
-          "tableFrom": "_TagToVideo",
-          "tableTo": "Tag",
-          "columnsFrom": [
-            "A"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "_TagToVideo_B_Video_id_fk": {
-          "name": "_TagToVideo_B_Video_id_fk",
-          "tableFrom": "_TagToVideo",
-          "tableTo": "Video",
-          "columnsFrom": [
-            "B"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "test": {
-      "name": "test",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "Transcription": {
-      "name": "Transcription",
+    "transcriptions": {
+      "name": "transcriptions",
       "schema": "",
       "columns": {
         "id": {
@@ -355,42 +329,36 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "videoId": {
-          "name": "videoId",
+        "upload_id": {
+          "name": "upload_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp(3)",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
-        },
-        "reviewedAt": {
-          "name": "reviewedAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {
-        "Transcription_videoId_key": {
-          "name": "Transcription_videoId_key",
+        "transcriptions_upload_id_index": {
+          "name": "transcriptions_upload_id_index",
           "columns": [
-            "videoId"
+            "upload_id"
           ],
           "isUnique": true
         }
       },
       "foreignKeys": {
-        "Transcription_videoId_Video_id_fk": {
-          "name": "Transcription_videoId_Video_id_fk",
-          "tableFrom": "Transcription",
-          "tableTo": "Video",
+        "transcriptions_upload_id_uploads_id_fk": {
+          "name": "transcriptions_upload_id_uploads_id_fk",
+          "tableFrom": "transcriptions",
+          "tableTo": "uploads",
           "columnsFrom": [
-            "videoId"
+            "upload_id"
           ],
           "columnsTo": [
             "id"
@@ -402,8 +370,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "TranscriptionSegment": {
-      "name": "TranscriptionSegment",
+    "transcription_segments": {
+      "name": "transcription_segments",
       "schema": "",
       "columns": {
         "id": {
@@ -413,8 +381,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "transcriptionId": {
-          "name": "transcriptionId",
+        "transcription_id": {
+          "name": "transcription_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -440,12 +408,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "TranscriptionSegment_transcriptionId_Transcription_id_fk": {
-          "name": "TranscriptionSegment_transcriptionId_Transcription_id_fk",
-          "tableFrom": "TranscriptionSegment",
-          "tableTo": "Transcription",
+        "transcription_segments_transcription_id_transcriptions_id_fk": {
+          "name": "transcription_segments_transcription_id_transcriptions_id_fk",
+          "tableFrom": "transcription_segments",
+          "tableTo": "transcriptions",
           "columnsFrom": [
-            "transcriptionId"
+            "transcription_id"
           ],
           "columnsTo": [
             "id"
@@ -457,8 +425,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "UploadBatch": {
-      "name": "UploadBatch",
+    "upload_batches": {
+      "name": "upload_batches",
       "schema": "",
       "columns": {
         "id": {
@@ -468,28 +436,47 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp(3)",
+        "author_id": {
+          "name": "author_id",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": false
         },
-        "companyId": {
-          "name": "companyId",
+        "company_id": {
+          "name": "company_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "UploadBatch_companyId_Company_id_fk": {
-          "name": "UploadBatch_companyId_Company_id_fk",
-          "tableFrom": "UploadBatch",
-          "tableTo": "Company",
+        "upload_batches_author_id_users_id_fk": {
+          "name": "upload_batches_author_id_users_id_fk",
+          "tableFrom": "upload_batches",
+          "tableTo": "users",
           "columnsFrom": [
-            "companyId"
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        },
+        "upload_batches_company_id_companies_id_fk": {
+          "name": "upload_batches_company_id_companies_id_fk",
+          "tableFrom": "upload_batches",
+          "tableTo": "companies",
+          "columnsFrom": [
+            "company_id"
           ],
           "columnsTo": [
             "id"
@@ -501,8 +488,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "User": {
-      "name": "User",
+    "users": {
+      "name": "users",
       "schema": "",
       "columns": {
         "id": {
@@ -512,8 +499,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "companyId": {
-          "name": "companyId",
+        "company_id": {
+          "name": "company_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -530,9 +517,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "emailVerified": {
-          "name": "emailVerified",
-          "type": "timestamp(3)",
+        "email_verified": {
+          "name": "email_verified",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         },
@@ -544,8 +531,8 @@
         }
       },
       "indexes": {
-        "User_email_key": {
-          "name": "User_email_key",
+        "users_email_index": {
+          "name": "users_email_index",
           "columns": [
             "email"
           ],
@@ -553,12 +540,12 @@
         }
       },
       "foreignKeys": {
-        "User_companyId_Company_id_fk": {
-          "name": "User_companyId_Company_id_fk",
-          "tableFrom": "User",
-          "tableTo": "Company",
+        "users_company_id_companies_id_fk": {
+          "name": "users_company_id_companies_id_fk",
+          "tableFrom": "users",
+          "tableTo": "companies",
           "columnsFrom": [
-            "companyId"
+            "company_id"
           ],
           "columnsTo": [
             "id"
@@ -570,8 +557,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "VerificationToken": {
-      "name": "VerificationToken",
+    "verification_tokens": {
+      "name": "verification_tokens",
       "schema": "",
       "columns": {
         "identifier": {
@@ -588,34 +575,34 @@
         },
         "expires": {
           "name": "expires",
-          "type": "timestamp(3)",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {
-        "VerificationToken_token_key": {
-          "name": "VerificationToken_token_key",
+        "verification_tokens_token_index": {
+          "name": "verification_tokens_token_index",
           "columns": [
-            "token"
-          ],
-          "isUnique": true
-        },
-        "VerificationToken_identifier_token_key": {
-          "name": "VerificationToken_identifier_token_key",
-          "columns": [
-            "identifier",
             "token"
           ],
           "isUnique": true
         }
       },
       "foreignKeys": {},
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "verification_tokens_identifier_token_pk": {
+          "name": "verification_tokens_identifier_token_pk",
+          "columns": [
+            "identifier",
+            "token"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
-    "Video": {
-      "name": "Video",
+    "uploads": {
+      "name": "uploads",
       "schema": "",
       "columns": {
         "id": {
@@ -637,8 +624,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "storageKey": {
-          "name": "storageKey",
+        "storage_key": {
+          "name": "storage_key",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -649,56 +636,68 @@
           "primaryKey": false,
           "notNull": false
         },
-        "uploadBatchId": {
-          "name": "uploadBatchId",
+        "upload_batch_id": {
+          "name": "upload_batch_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
-        "companyId": {
-          "name": "companyId",
+        "company_id": {
+          "name": "company_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "externalProviderId": {
-          "name": "externalProviderId",
+        "author_id": {
+          "name": "author_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "external_provider_id": {
+          "name": "external_provider_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "audioStorageKey": {
-          "name": "audioStorageKey",
+        "external_status": {
+          "name": "external_status",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "processedAt": {
-          "name": "processedAt",
-          "type": "timestamp(3)",
+        "audio_storage_key": {
+          "name": "audio_storage_key",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "sizeInBytes": {
-          "name": "sizeInBytes",
+        "processed_at": {
+          "name": "processed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "size_in_bytes": {
+          "name": "size_in_bytes",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "uploadOrder": {
-          "name": "uploadOrder",
+        "upload_order": {
+          "name": "upload_order",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "commitUrl": {
-          "name": "commitUrl",
+        "commit_url": {
+          "name": "commit_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "subtitlesStorageKey": {
-          "name": "subtitlesStorageKey",
+        "subtitles_storage_key": {
+          "name": "subtitles_storage_key",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -710,30 +709,30 @@
           "notNull": true,
           "default": "'pt'"
         },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp(3)",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         }
       },
       "indexes": {
-        "Video_externalProviderId_key": {
-          "name": "Video_externalProviderId_key",
+        "uploads_external_provider_id_index": {
+          "name": "uploads_external_provider_id_index",
           "columns": [
-            "externalProviderId"
+            "external_provider_id"
           ],
           "isUnique": true
         }
       },
       "foreignKeys": {
-        "Video_uploadBatchId_UploadBatch_id_fk": {
-          "name": "Video_uploadBatchId_UploadBatch_id_fk",
-          "tableFrom": "Video",
-          "tableTo": "UploadBatch",
+        "uploads_upload_batch_id_upload_batches_id_fk": {
+          "name": "uploads_upload_batch_id_upload_batches_id_fk",
+          "tableFrom": "uploads",
+          "tableTo": "upload_batches",
           "columnsFrom": [
-            "uploadBatchId"
+            "upload_batch_id"
           ],
           "columnsTo": [
             "id"
@@ -741,25 +740,38 @@
           "onDelete": "set null",
           "onUpdate": "cascade"
         },
-        "Video_companyId_Company_id_fk": {
-          "name": "Video_companyId_Company_id_fk",
-          "tableFrom": "Video",
-          "tableTo": "Company",
+        "uploads_company_id_companies_id_fk": {
+          "name": "uploads_company_id_companies_id_fk",
+          "tableFrom": "uploads",
+          "tableTo": "companies",
           "columnsFrom": [
-            "companyId"
+            "company_id"
           ],
           "columnsTo": [
             "id"
           ],
           "onDelete": "restrict",
           "onUpdate": "cascade"
+        },
+        "uploads_author_id_users_id_fk": {
+          "name": "uploads_author_id_users_id_fk",
+          "tableFrom": "uploads",
+          "tableTo": "users",
+          "columnsFrom": [
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Webhook": {
-      "name": "Webhook",
+    "upload_webhooks": {
+      "name": "upload_webhooks",
       "schema": "",
       "columns": {
         "id": {
@@ -769,35 +781,35 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "videoId": {
-          "name": "videoId",
+        "upload_id": {
+          "name": "upload_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "type": {
           "name": "type",
-          "type": "WebhookType",
+          "type": "UploadWebhookType",
           "primaryKey": false,
           "notNull": true
         },
         "status": {
           "name": "status",
-          "type": "WebhookStatus",
+          "type": "UploadWebhookStatus",
           "primaryKey": false,
           "notNull": true,
           "default": "'RUNNING'"
         },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp(3)",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "finishedAt": {
-          "name": "finishedAt",
-          "type": "timestamp(3)",
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         },
@@ -810,12 +822,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "Webhook_videoId_Video_id_fk": {
-          "name": "Webhook_videoId_Video_id_fk",
-          "tableFrom": "Webhook",
-          "tableTo": "Video",
+        "upload_webhooks_upload_id_uploads_id_fk": {
+          "name": "upload_webhooks_upload_id_uploads_id_fk",
+          "tableFrom": "upload_webhooks",
+          "tableTo": "uploads",
           "columnsFrom": [
-            "videoId"
+            "upload_id"
           ],
           "columnsTo": [
             "id"
@@ -829,16 +841,16 @@
     }
   },
   "enums": {
-    "WebhookStatus": {
-      "name": "WebhookStatus",
+    "UploadWebhookStatus": {
+      "name": "UploadWebhookStatus",
       "values": {
         "ERROR": "ERROR",
         "SUCCESS": "SUCCESS",
         "RUNNING": "RUNNING"
       }
     },
-    "WebhookType": {
-      "name": "WebhookType",
+    "UploadWebhookType": {
+      "name": "UploadWebhookType",
       "values": {
         "CREATE_SUBTITLES_FROM_TRANSCRIPTION": "CREATE_SUBTITLES_FROM_TRANSCRIPTION",
         "UPDATE_EXTERNAL_PROVIDER_STATUS": "UPDATE_EXTERNAL_PROVIDER_STATUS",

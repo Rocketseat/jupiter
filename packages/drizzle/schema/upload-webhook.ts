@@ -17,15 +17,15 @@ export const uploadWebhookStatus = pgEnum('UploadWebhookStatus', [
   'RUNNING',
 ])
 
-export const uploadWebhook = pgTable('UploadWebhook', {
+export const uploadWebhook = pgTable('upload_webhooks', {
   id: uuid('id').primaryKey().defaultRandom(),
-  uploadId: uuid('uploadId')
+  uploadId: uuid('upload_id')
     .notNull()
     .references(() => upload.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   type: uploadWebhookType('type').notNull(),
   status: uploadWebhookStatus('status').default('RUNNING').notNull(),
-  createdAt: timestamp('createdAt').defaultNow().notNull(),
-  finishedAt: timestamp('finishedAt'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  finishedAt: timestamp('finished_at'),
   metadata: text('metadata'),
 })
 

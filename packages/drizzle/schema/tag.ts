@@ -10,12 +10,12 @@ import {
 import { company, tagToUpload } from '.'
 
 export const tag = pgTable(
-  'Tag',
+  'tags',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     slug: text('slug').notNull(),
-    createdAt: timestamp('createdAt').defaultNow().notNull(),
-    companyId: uuid('companyId')
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    companyId: uuid('company_id')
       .notNull()
       .references(() => company.id, {
         onDelete: 'restrict',
@@ -24,7 +24,7 @@ export const tag = pgTable(
   },
   (table) => {
     return {
-      slugKey: uniqueIndex('Tag_slug_key').on(table.slug),
+      slugUnique: uniqueIndex().on(table.slug),
     }
   },
 )

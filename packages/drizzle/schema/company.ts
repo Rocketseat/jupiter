@@ -1,20 +1,19 @@
 import { relations } from 'drizzle-orm'
 import { pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
 
-import { tag, uploadBatch, user, upload } from '.'
+import { tag, upload, uploadBatch, user } from '.'
 
 export const company = pgTable(
-  'Company',
+  'companies',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     name: text('name').notNull(),
     domain: text('domain').notNull(),
-    webhookUrl: text('webhookUrl'),
-    externalId: text('externalId'),
+    externalId: text('external_id'),
   },
   (table) => {
     return {
-      domainKey: uniqueIndex('Company_domain_key').on(table.domain),
+      domainKey: uniqueIndex().on(table.domain),
     }
   },
 )

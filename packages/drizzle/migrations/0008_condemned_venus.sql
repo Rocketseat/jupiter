@@ -1,1 +1,0 @@
-ALTER TABLE "Company" ADD COLUMN "webhookUrl" text;

@@ -4,18 +4,20 @@ import { pgTable, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
 import { transcriptionSegment, upload } from '.'
 
 export const transcription = pgTable(
-  'Transcription',
+  'transcriptions',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    uploadId: uuid('uploadId')
+    uploadId: uuid('upload_id')
       .notNull()
-      .references(() => upload.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
-    createdAt: timestamp('createdAt').defaultNow().notNull(),
-    reviewedAt: timestamp('reviewedAt'),
+      .references(() => upload.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => {
     return {
-      uploadIdKey: uniqueIndex('Transcription_uploadId_key').on(table.uploadId),
+      uploadIdUnique: uniqueIndex().on(table.uploadId),
     }
   },
 )

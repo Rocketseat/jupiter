@@ -11,7 +11,7 @@ export const drizzleAuthAdapter: Adapter = {
       where(fields, { eq }) {
         return eq(fields.domain, emailDomain)
       },
-    });
+    })
 
     if (!company) {
       throw new Error('Domain not registered.')

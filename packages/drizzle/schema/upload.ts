@@ -20,43 +20,41 @@ export type BunnyStatus =
   | 'failed'
 
 export const upload = pgTable(
-  'Upload',
+  'uploads',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     duration: integer('duration').notNull(),
     title: text('title').notNull(),
-    storageKey: text('storageKey'),
+    storageKey: text('storage_key'),
     description: text('description'),
-    uploadBatchId: uuid('uploadBatchId').references(() => uploadBatch.id, {
+    uploadBatchId: uuid('upload_batch_id').references(() => uploadBatch.id, {
       onDelete: 'set null',
       onUpdate: 'cascade',
     }),
-    companyId: uuid('companyId')
+    companyId: uuid('company_id')
       .notNull()
       .references(() => company.id, {
         onDelete: 'restrict',
         onUpdate: 'cascade',
       }),
-    authorId: uuid('authorId').references(() => user.id, {
+    authorId: uuid('author_id').references(() => user.id, {
       onDelete: 'set null',
       onUpdate: 'cascade',
     }),
-    externalProviderId: text('externalProviderId'),
-    externalStatus: text('externalStatus').$type<BunnyStatus>(),
-    audioStorageKey: text('audioStorageKey'),
-    processedAt: timestamp('processedAt'),
-    sizeInBytes: integer('sizeInBytes').notNull(),
-    uploadOrder: integer('uploadOrder').notNull(),
-    commitUrl: text('commitUrl'),
-    subtitlesStorageKey: text('subtitlesStorageKey'),
-    language: text('language').default('pt').notNull(),
-    createdAt: timestamp('createdAt').defaultNow().notNull(),
+    externalProviderId: text('external_provider_id'),
+    externalStatus: text('external_status').$type<BunnyStatus>(),
+    audioStorageKey: text('audio_storage_key'),
+    processedAt: timestamp('processed_at'),
+    sizeInBytes: integer('size_in_bytes').notNull(),
+    uploadOrder: integer('upload_order').notNull(),
+    commitUrl: text('commit_url'),
+    subtitlesStorageKey: text('subtitles_storage_key'),
+    language: text('language').default('pt').$type<'pt' | 'es'>().notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => {
     return {
-      externalProviderIdKey: uniqueIndex('Upload_externalProviderId_key').on(
-        table.externalProviderId,
-      ),
+      externalProviderIdUnique: uniqueIndex().on(table.externalProviderId),
     }
   },
 )

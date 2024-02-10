@@ -10,10 +10,10 @@ import {
 import { account, company, session, uploadBatch } from '.'
 
 export const user = pgTable(
-  'User',
+  'users',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    companyId: uuid('companyId')
+    companyId: uuid('company_id')
       .notNull()
       .references(() => company.id, {
         onDelete: 'restrict',
@@ -21,12 +21,12 @@ export const user = pgTable(
       }),
     name: text('name'),
     email: text('email').notNull(),
-    emailVerified: timestamp('emailVerified'),
+    emailVerified: timestamp('email_verified'),
     image: text('image'),
   },
   (table) => {
     return {
-      emailKey: uniqueIndex('User_email_key').on(table.email),
+      emailUnique: uniqueIndex().on(table.email),
     }
   },
 )

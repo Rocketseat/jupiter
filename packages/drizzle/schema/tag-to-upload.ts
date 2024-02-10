@@ -4,30 +4,33 @@ import { index, pgTable, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
 import { tag, upload } from '.'
 
 export const tagToUpload = pgTable(
-  '_TagToUpload',
+  'tag_to_uploads',
   {
-    a: uuid('A')
+    tagId: uuid('tag_id')
       .notNull()
       .references(() => tag.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
-    b: uuid('B')
+    uploadId: uuid('upload_id')
       .notNull()
-      .references(() => upload.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+      .references(() => upload.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
   },
   (table) => {
     return {
-      abUnique: uniqueIndex('_TagToUpload_AB_unique').on(table.a, table.b),
-      bIdx: index().on(table.b),
+      tagIdUploadIdUnique: uniqueIndex().on(table.tagId, table.uploadId),
+      uploadIdIndex: index().on(table.uploadId),
     }
   },
 )
 
 export const tagToVideoRelations = relations(tagToUpload, ({ one }) => ({
   tag: one(tag, {
-    fields: [tagToUpload.a],
+    fields: [tagToUpload.tagId],
     references: [tag.id],
   }),
   upload: one(upload, {
-    fields: [tagToUpload.b],
+    fields: [tagToUpload.uploadId],
     references: [upload.id],
   }),
 }))

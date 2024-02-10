@@ -1,16 +1,15 @@
 import { db } from '@nivo/drizzle'
-import { env } from '@nivo/env'
+// import { env } from '@nivo/env'
 import type { NextAuthConfig, Session } from 'next-auth'
 import { GoogleProfile } from 'next-auth/providers/google'
 
-import { credentialsProvider } from './credentials-provider'
+// import { credentialsProvider } from './credentials-provider'
 import { drizzleAuthAdapter } from './drizzle-auth-adapter'
 import { googleProvider } from './google-provider'
 
 export const authConfig = {
   adapter: drizzleAuthAdapter,
-  providers:
-    env.VERCEL_ENV === 'preview' ? [credentialsProvider] : [googleProvider],
+  providers: [googleProvider],
   pages: {
     signIn: '/auth/sign-in',
     error: '/auth/error',

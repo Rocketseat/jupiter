@@ -3,9 +3,9 @@ import { numeric, pgTable, text, uuid } from 'drizzle-orm/pg-core'
 
 import { transcription } from '.'
 
-export const transcriptionSegment = pgTable('TranscriptionSegment', {
+export const transcriptionSegment = pgTable('transcription_segments', {
   id: uuid('id').primaryKey().defaultRandom(),
-  transcriptionId: uuid('transcriptionId')
+  transcriptionId: uuid('transcription_id')
     .notNull()
     .references(() => transcription.id, {
       onDelete: 'cascade',
