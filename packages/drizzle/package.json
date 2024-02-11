@@ -12,9 +12,10 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.7.2",
-    "@nivo/env": "workspace:`*",
-    "@nivo/bunny": "workspace:`*",
-    "drizzle-orm": "^0.29.3"
+    "@nivo/bunny": "workspace:*",
+    "@nivo/env": "workspace:*",
+    "drizzle-orm": "^0.29.3",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "drizzle-kit": "^0.20.14",

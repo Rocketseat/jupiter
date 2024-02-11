@@ -1,5 +1,6 @@
 import { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 
+import { companyWebhooksRouter } from './routers/company-webhooks'
 import { metricsRouter } from './routers/metrics'
 import { profileRouter } from './routers/profile'
 import { storageRouter } from './routers/storage'
@@ -19,6 +20,7 @@ export const appRouter = mergeRouters(
   uploadWebhooksRouter,
   uploadsRouter,
   metricsRouter,
+  companyWebhooksRouter,
 )
 
 export { createCallerFactory }
