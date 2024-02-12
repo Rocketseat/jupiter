@@ -1,0 +1,1 @@
+ALTER TABLE "uploads" ADD COLUMN "external_stream_url" text;

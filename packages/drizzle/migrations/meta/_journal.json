@@ -1,0 +1,27 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1707525964652,
+      "tag": "0000_dazzling_carmella_unuscione",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1707574802709,
+      "tag": "0001_long_wild_child",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1707584877777,
+      "tag": "0002_wooden_firebrand",
+      "breakpoints": true
+    }
+  ]
+}

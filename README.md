@@ -1,11 +1,3 @@
-Jupiter is a video upload hub that automates the generation of titles, descriptions and transcripts through AI.
+# Nivo
 
-### To-do
-
-- Whisper JAX
-- New FFMPeg (@ffmpeg/core)
-- Datadog / Sentry
-- DeadLetter queue (manual retry)
-  - store number of retries and if its the last maybe notice somewhere and display a button for manual retry
-- Find possibly typos in transcription based on commit diff
-- Tests please?!
+The all-in-one video solution for online learning.

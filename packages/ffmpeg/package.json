@@ -1,0 +1,27 @@
+{
+  "name": "@nivo/ffmpeg",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@ffmpeg/core": "^0.12.6",
+    "@ffmpeg/ffmpeg": "^0.12.10",
+    "@ffmpeg/util": "^0.12.1"
+  },
+  "devDependencies": {
+    "@nivo/tsconfig": "workspace:*",
+    "@nivo/prettier": "workspace:*",
+    "@nivo/eslint-config": "workspace:*"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@nivo/eslint-config/lib"
+    ]
+  },
+  "prettier": "@nivo/prettier"
+}

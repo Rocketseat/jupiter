@@ -1,0 +1,35 @@
+{
+  "name": "@nivo/trpc",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@nivo/auth": "workspace:*",
+    "@nivo/drizzle": "workspace:*",
+    "@nivo/cloudflare": "workspace:*",
+    "@nivo/qstash": "workspace:*",
+    "@nivo/env": "workspace:*",
+    "@nivo/dayjs": "workspace:*",
+    "@nivo/webhooks": "workspace:*",
+    "@trpc/server": "next",
+    "drizzle-orm": "^0.29.3",
+    "superjson": "^2.2.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@nivo/tsconfig": "workspace:*",
+    "@nivo/prettier": "workspace:*",
+    "@nivo/eslint-config": "workspace:*"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@nivo/eslint-config/lib"
+    ]
+  },
+  "prettier": "@nivo/prettier"
+}

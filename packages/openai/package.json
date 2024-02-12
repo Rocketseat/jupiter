@@ -1,0 +1,26 @@
+{
+  "name": "@nivo/openai",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@nivo/env": "workspace:*",
+    "openai-edge": "^1.2.2"
+  },
+  "devDependencies": {
+    "@nivo/tsconfig": "workspace:*",
+    "@nivo/prettier": "workspace:*",
+    "@nivo/eslint-config": "workspace:*"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@nivo/eslint-config/lib"
+    ]
+  },
+  "prettier": "@nivo/prettier"
+}
