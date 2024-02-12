@@ -1,10 +1,6 @@
 'use client'
 
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { Loader2, Video } from 'lucide-react'
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import useDebounceValue from '@/hooks/useDebounceValue'
@@ -15,15 +11,11 @@ import {
   CommandDialog,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from '../ui/command'
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
-
-dayjs.extend(relativeTime)
+import { SearchItem } from './search-item'
 
 export function Search() {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
 
@@ -43,11 +35,6 @@ export function Search() {
       enabled: open,
     },
   )
-
-  function handleItemSelected(videoId: string) {
-    setOpen(false)
-    router.push(`/videos/${videoId}`)
-  }
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -95,40 +82,11 @@ export function Search() {
               data?.videos &&
               data.videos.map((video) => {
                 return (
-                  <CommandItem
-                    onSelect={() => handleItemSelected(video.id)}
+                  <SearchItem
                     key={video.id}
-                    value={video.id}
-                  >
-                    <Video className="mr-2 h-3 w-3" />
-                    <span>{video.title}</span>
-                    <div className="ml-auto flex items-center gap-1 text-muted-foreground">
-                      <time title={video.createdAt.toLocaleString()}>
-                        {dayjs(video.createdAt).fromNow()}
-                      </time>
-                      {video.author?.image && (
-                        <Tooltip>
-                          <div className="flex items-center gap-2">
-                            <span>by</span>
-                            <TooltipTrigger asChild>
-                              <Image
-                                src={video.author?.image}
-                                className="size-5 rounded-full"
-                                width={20}
-                                height={20}
-                                alt=""
-                              />
-                            </TooltipTrigger>
-                            {video.author?.name && (
-                              <TooltipContent align="end">
-                                {video.author?.name}
-                              </TooltipContent>
-                            )}
-                          </div>
-                        </Tooltip>
-                      )}
-                    </div>
-                  </CommandItem>
+                    onRequestClose={() => setOpen(false)}
+                    video={video}
+                  />
                 )
               })
             )}

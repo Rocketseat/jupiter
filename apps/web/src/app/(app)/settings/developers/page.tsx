@@ -1,7 +1,6 @@
-import { Code2 } from 'lucide-react'
+import { ClipboardCopy, Code2 } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Suspense } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +17,6 @@ import { Separator } from '@/components/ui/separator'
 import { CreateWebhook } from './create-webhook'
 import { WebhookDocsButton } from './webhooks-docs-button'
 import { WebhooksList } from './webhooks-list'
-import WebhooksListLoading from './webhooks-list-loading'
 
 export const metadata: Metadata = {
   title: 'Developers settings',
@@ -51,15 +49,20 @@ export default async function SettingsPage() {
               to understand how to use our API.
             </p>
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="apiKey">API Key</Label>
-            <Input
-              name="apiKey"
-              id="apiKey"
-              defaultValue="69A13303-436F-4345-8DA4-770E6C4861EF"
-              disabled
-            />
+            <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-slate-400 has-[input:focus-visible]:ring-offset-2 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:has-[input:focus-visible]:ring-slate-800">
+              <input
+                id="apiKey"
+                className="h-10 flex-1 bg-transparent py-2 text-sm outline-none"
+                readOnly
+                defaultValue={'*'.repeat(48)}
+              />
+              <Button variant="secondary" size="xs">
+                <ClipboardCopy className="mr-1.5 size-3" />
+                Click to copy
+              </Button>
+            </div>
           </div>
 
           <Separator />
@@ -76,9 +79,7 @@ export default async function SettingsPage() {
               </div>
               <CreateWebhook />
             </div>
-            <Suspense fallback={<WebhooksListLoading />}>
-              <WebhooksList />
-            </Suspense>
+            <WebhooksList />
           </div>
 
           <Separator />

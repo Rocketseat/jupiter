@@ -1,6 +1,6 @@
 'use client'
 
-import { Globe, KeyRound } from 'lucide-react'
+import { ClipboardCopy, Globe } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
 import { Button } from '@/components/ui/button'
@@ -20,15 +20,18 @@ import {
 import { trpc } from '@/lib/trpc/react'
 
 import { WebhookListItemActions } from './webhook-list-item-actions'
+import WebhooksListLoading from './webhooks-list-loading'
 
 const WebhookEventsChart = dynamic(() => import('./webhook-events-chart'), {
   ssr: false,
 })
 
-export async function WebhooksList() {
-  const { data } = trpc.getCompanyWebhooks.useQuery(undefined, {
-    suspense: true,
-  })
+export function WebhooksList() {
+  const { data, isLoading } = trpc.getCompanyWebhooks.useQuery()
+
+  if (isLoading) {
+    return <WebhooksListLoading />
+  }
 
   return (
     <div className="rounded-md border">
@@ -49,7 +52,7 @@ export async function WebhooksList() {
           {data?.companyWebhooks.map((webhook) => {
             return (
               <TableRow key={webhook.id}>
-                <TableCell className="py-1">
+                <TableCell className="py-1.5">
                   <div className="flex items-center gap-2">
                     <Globe className="size-4 flex-shrink-0" />
                     <span className="truncate whitespace-nowrap font-medium">
@@ -57,7 +60,7 @@ export async function WebhooksList() {
                     </span>
                   </div>
                 </TableCell>
-                <TableCell className="py-1">
+                <TableCell className="py-1.5">
                   <Tooltip>
                     <TooltipTrigger className="underline">
                       {webhook.triggers.length} event(s)
@@ -67,27 +70,24 @@ export async function WebhooksList() {
                     </TooltipContent>
                   </Tooltip>
                 </TableCell>
-                <TableCell className="py-1">
+                <TableCell className="py-1.5">
                   <WebhookEventsChart />
                 </TableCell>
-                <TableCell className="py-1 text-right">3%</TableCell>
-                <TableCell className="py-1">
+                <TableCell className="py-1.5 text-right">3%</TableCell>
+                <TableCell className="py-1.5">
                   <div className="flex items-center gap-2">
                     <span className="size-2 shrink-0 rounded-full bg-teal-400" />
                     <span className="text-xs font-semibold">ACTIVE</span>
                   </div>
                 </TableCell>
-                <TableCell className="py-1">
-                  <div className="flex items-center justify-end">
-                    <Button variant="link">
-                      <KeyRound className="mr-2 size-3" />
+                <TableCell className="py-1.5">
+                  <div className="flex items-center justify-end space-x-2">
+                    <Button variant="link" size="sm">
+                      <ClipboardCopy className="mr-2 size-3" />
                       Signing key
                     </Button>
 
-                    <WebhookListItemActions
-                      companyWebhookId={webhook.id}
-                      triggers={webhook.triggers}
-                    />
+                    <WebhookListItemActions webhook={webhook} />
                   </div>
                 </TableCell>
               </TableRow>

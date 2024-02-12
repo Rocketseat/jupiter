@@ -86,4 +86,30 @@ export const companyWebhooksRouter = createTRPCRouter({
           ),
         )
     }),
+
+  updateCompanyWebhook: protectedProcedure
+    .input(
+      z.object({
+        companyWebhookId: z.string().uuid(),
+        url: z.string().url(),
+        triggers: z.array(webhookEventTrigger),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { companyId } = ctx.session.user
+      const { companyWebhookId, url, triggers } = input
+
+      await db
+        .update(companyWebhook)
+        .set({
+          url,
+          triggers,
+        })
+        .where(
+          and(
+            eq(companyWebhook.companyId, companyId),
+            eq(companyWebhook.id, companyWebhookId),
+          ),
+        )
+    }),
 })
