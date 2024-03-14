@@ -85,7 +85,7 @@ export function TagInput({
             data-error={!!error}
             variant="outline"
             size="sm"
-            className="flex h-8 items-center border-dashed px-2 data-[error=true]:border-red-400 data-[error=true]:bg-red-50"
+            className="flex h-8 items-center border-dashed px-2 data-[error=true]:border-red-400 data-[error=true]:bg-red-50 data-[error=true]:dark:border-red-400 data-[error=true]:dark:bg-red-500"
           >
             <Tag className="mr-2 h-3 w-3" />
             <span className="text-xs">Tags</span>
