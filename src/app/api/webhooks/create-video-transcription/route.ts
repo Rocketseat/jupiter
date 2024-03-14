@@ -11,6 +11,7 @@ import { env } from '@/env'
 import { r2 } from '@/lib/cloudflare-r2'
 import { prisma } from '@/lib/prisma'
 import { publishMessage } from '@/lib/qstash'
+import { publishMessagesOnTopic } from '@/lib/kafka'
 
 const createTranscriptionBodySchema = z.object({
   videoId: z.string().uuid(),
@@ -150,18 +151,33 @@ async function handler(request: NextRequest) {
       }),
     ])
 
-    await publishMessage({
-      topic: 'jupiter.transcription-created',
-      body: {
-        videoId,
-        title: video.title,
-        transcription: response.data.text,
-        segments: response.data.segments,
-      },
-      options: {
-        delay: 10,
-      },
-    })
+ 
+    await Promise.all([
+      publishMessage({
+        topic: 'jupiter.transcription-created',
+        body: {
+          videoId,
+          title: video.title,
+          transcription: response.data.text,
+          segments: response.data.segments,
+        },
+        options: {
+          delay: 10,
+        },
+      }),
+
+      publishMessagesOnTopic({
+        topic: 'jupiter.transcription-created',
+        messages: [
+          {
+            videoId,
+            title: video.title,
+            transcription: response.data.text,
+            segments: response.data.segments,
+          },
+        ],
+      }),
+    ])
 
     return new NextResponse(null, { status: 201 })
   } catch (err: unknown) {
