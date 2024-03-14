@@ -8,7 +8,7 @@ export const generateAITitle = new Elysia().post(
     const { slug } = query
 
     const response = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-3.5-turbo-0125',
       temperature: 0,
       messages: [
         {
